@@ -5,6 +5,8 @@ jdk:
 services:
 - docker
 before_install:
+- openssl aes-256-cbc -K $encrypted_7354dd005c57_key -iv $encrypted_7354dd005c57_iv
+  -in travis/helseci.key.enc -out travis/helseci.key -d
 - git clone https://github.com/navikt/github-apps-support.git
 - export PATH=`pwd`/github-apps-support/bin:$PATH
 - export GH_TOKEN=$(generate-installation-token.sh `generate-jwt.sh ./travis/helseci.key
@@ -17,6 +19,7 @@ script:
 - "./gradlew build"
 - docker build --pull -t $DOCKER_IMG_NAME:$COMMIT_SHORT .
 - |
+  set -e
   if [ "${TRAVIS_PULL_REQUEST}" = "false" ] && [ "${TRAVIS_BRANCH}" = "master" ]; then
     echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin
     docker push $DOCKER_IMG_NAME:$COMMIT_SHORT
@@ -50,4 +53,5 @@ env:
   - APP_NAME=spa
   - DOCKER_IMG_NAME=navikt/spa
   - GITHUB_APP_ID=19726
-
+  - secure: xtMH0Q/LclYRGzZaPwwvvlCDGMCRm07o7TQ0UBflWjApEr5YFnYdX41+gDqfdoFpZ9oA5sFsenOvSjLLDBgefSRU2uZf82dKihOD5CnTbsEPHF8vUnwX1jflTQA6gL8dQk/y0XIt1MuICt9wRp3GXPp73y343qLpsZzS0wp7QJjm9zaWLmVJ/01PV+jqkfCHKoLP0FkxnbYlCMVarEJ1wcx/qM99z7Sb+7pPzkGJR1T3EMdNj5a0Y1Q0jcycpBmZbaWT1N0+KzJN1XsMFnKNtOH+zaodAdvlU/Vi9qGAmTdva8VmJkKDzU/PYDakJ61UTADykFrlIK6s2oMtlJoVN4wzevhZaKJUiQXDOjFRddp2ztAstCp/IqgAgdjCa1eqZlcC/ls1acJ5I6S3g59kgajzG5i4HrLa0vT94D1swD23c9mj2RjuBn0/PxVZ7gEUDE7HHciirssqhgy2A/RqcajTOaGoCW655h2LiRFSZhQIGCtbXCMiGAHtFb525RShEh/dSvo4DfkbKcyqt55aBfDn4sW2qU64Nx4a9/5HEtsdVB7xZ4GxO0aJouR/Js7xKbzR3SKE4vdIpeS45gQcfa48Z/5yniQMJAqKCp2m7JlcvEJzSrzVoS2lLyEEoncx2CIvRvVNE1ahwzZOvpbHpWk4kE47hFd7qWLiNnQWhMk=
+  - secure: K50ecN7bqHvsVzP4QsJkfsFnI/4I1hs2IWLBkuxNh7YtroOF1TfiKu3d8JmvMU4vpZ+L6U7Jkwcf95VhFWCfqM2xOEPEZTv0bFkX3w/6TmpAEhCmZzjPdbEEwYDqmjmQBeOHbUifKkn8uYTGKCl47Sc3E0sgdd8RBiYURyEMK41ks/akamObPXXspl0jJcMGa/XZ41OhyK+jWnmLh8Zdt98Y50MBvGW/Jw8yWn43iNVQyedQCcbnMQSOQu2PxXErTOzrmZ+s3TtT1IuiE5X0fFUXte6DpQQbEppjNaBUU9kMgCRA0h3EEeye2IcbSVT0ikWGdz2TPclsnCL9foiw6qgzlI5BSA6I7FF89YP7xZ1ysV6ix6nqQlZSF7ZuDDEM1DbMgLD8BryB7uJOWjs2f3KHepXYuzLX8meO3DoTXotCGFndrtzKjGFDc9ymtYwszjbN7zQBy0Y494fSDtZejP2ulCJicoO7tU8LecH4QX+WdxudQh1vxIRnwIqjj4sjcnsRumpuNbrW0pO6iMdyPzzFRDLbEcBOGWL9X03wf6h88dHMNkByeSpd2LEcykLiqSiagBeyVBguQyQ0LIo8ZR+NYmGgrWtm9QMCsrc5nx6PxU3o3F2WUqJ7pTg88URFHRM0tyhuYIi5Jq+2h53wNmk5Al2SinUos7xgOxC3ZBg=
