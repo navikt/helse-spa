@@ -3,12 +3,14 @@ package no.nav.helse
 import java.math.BigDecimal
 import java.time.LocalDate
 
+sealed class Vedtak
+
 /**
  * Forventet resultat av en søknad.
  *
  * Mulig at begrepet "vedtak" er belastet og burde erstattes av noe annet.
  */
-data class Vedtak(
+data class UtbetalingsVedtak(
         /**utledes av søknad*/
         val søknadsnr: String,
         /**prosent-tall*/
@@ -21,4 +23,12 @@ data class Vedtak(
         val beløp: BigDecimal,
         /**typisk skal enten søker eller arbeidsgiver få utbetalingen*/
         val mottaker: String
-)
+) : Vedtak()
+
+data class Avslagsvedtak(
+        /**utledes av søknad*/
+        val søknadsnr: String,
+        /**utledes av NARE*/
+        val årsak: String
+) : Vedtak()
+
