@@ -20,7 +20,8 @@ data class Soknad(val søknadsNr: String,
                   val utdanningsgrad: Int,
                   val søktOmUtenlandsopphold: Boolean,
                   val annetSykefravær: Collection<Fravær>,
-                  val andreInntektskilder: Collection<Inntektskilde>) {
+                  val andreInntektskilder: Collection<Inntektskilde>,
+                  val opptjeningstid: Collection<Opptjeningstid>) {
 
     fun evaluer(): Vedtak {
         val harOpptjening: Specification<Soknad> = harOpptjening()
@@ -41,10 +42,22 @@ data class Soknad(val søknadsNr: String,
     }
 }
 
+data class Opptjeningstid(val fom: LocalDate,
+                          val tom: LocalDate,
+                          val type: Opptjeningstype)
+
+enum class Opptjeningstype {
+    JOBB, DAGPENGER, SYKEPENGER, PLEIEPENGER, FORELDREPENGER, ANNET
+}
+
 data class Sykemelding(val grad: Float,
                        val fom: LocalDate,
                        val tom: LocalDate)
 
+/**
+ * Når brukeren beskriver en arbeidstid som skiller seg fra arbeidstiden slik
+ * den er oppgitt i sykemeldningen
+ */
 data class KorrigertArbeidstid(val fom: LocalDate,
                                val tom: LocalDate,
                                val faktiskGrad: Float,

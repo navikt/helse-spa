@@ -4,6 +4,7 @@ val prometheusVersion = "0.5.0"
 val gsonVersion = "2.7"
 
 val junitJupiterVersion = "5.3.1"
+val assertJVersion = "3.11.1"
 val mainClass = "no.nav.helse.AppKt"
 
 plugins {
@@ -38,6 +39,7 @@ dependencies {
 
     testCompile("org.junit.jupiter:junit-jupiter-api:$junitJupiterVersion")
     testCompile("org.junit.jupiter:junit-jupiter-params:$junitJupiterVersion")
+    testCompile("org.assertj:assertj-core:$assertJVersion")
     testRuntime("org.junit.jupiter:junit-jupiter-engine:$junitJupiterVersion")
 }
 
