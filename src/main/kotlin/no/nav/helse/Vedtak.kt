@@ -1,5 +1,6 @@
 package no.nav.helse
 
+import no.nav.nare.evaluation.Evaluation
 import java.math.BigDecimal
 import java.time.LocalDate
 
@@ -22,13 +23,17 @@ data class UtbetalingsVedtak(
         /**uavklart om dette er dagsats eller beløp for hele perioden*/
         val beløp: BigDecimal,
         /**typisk skal enten søker eller arbeidsgiver få utbetalingen*/
-        val mottaker: String
+        val mottaker: String,
+        /**hvorfor vi kom frem til utbetalingsvedtak*/
+        val evaluation: Evaluation
 ) : Vedtak()
 
 data class Avslagsvedtak(
         /**utledes av søknad*/
         val søknadsnr: String,
         /**utledes av NARE*/
-        val årsak: String
+        val årsak: String,
+        /**hvorfor vi kom frem til et avslag*/
+        val evaluation: Evaluation
 ) : Vedtak()
 

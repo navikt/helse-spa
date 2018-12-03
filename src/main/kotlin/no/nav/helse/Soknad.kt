@@ -25,18 +25,20 @@ data class Soknad(val søknadsNr: String,
 
     fun evaluer(): Vedtak {
         val harOpptjening: Specification<Soknad> = harOpptjening()
-        val evaluate: Evaluation = harOpptjening.evaluate(this)
+        val evaluation: Evaluation = harOpptjening.evaluate(this)
 
-        return when (evaluate.result()) {
+        return when (evaluation.result()) {
             Result.YES -> UtbetalingsVedtak(this.søknadsNr,
                     this.sykemelding.grad,
                     this.sykemelding.fom,
                     this.sykemelding.tom,
                     BigDecimal.TEN,
-                    this.bruker
+                    this.bruker,
+                    evaluation
             )
             Result.NO -> Avslagsvedtak(this.søknadsNr,
-                    "Mangler opptjening: ${evaluate.reason()}"
+                    "Mangler opptjening: ${evaluation.reason()}",
+                    evaluation
             )
         }
     }
