@@ -2,6 +2,7 @@ val slf4jVersion = "1.7.25"
 val ktorVersion = "1.0.0"
 val prometheusVersion = "0.5.0"
 val gsonVersion = "2.7"
+val navStreamsVersion = "10"
 
 val junitJupiterVersion = "5.3.1"
 val assertJVersion = "3.11.1"
@@ -36,6 +37,7 @@ dependencies {
     compile("io.prometheus:simpleclient_common:$prometheusVersion")
     compile("io.prometheus:simpleclient_hotspot:$prometheusVersion")
     compile("com.google.code.gson:gson:$gsonVersion")
+    compile("no.nav.helse:streams:$navStreamsVersion")
 
     testCompile("org.junit.jupiter:junit-jupiter-api:$junitJupiterVersion")
     testCompile("org.junit.jupiter:junit-jupiter-params:$junitJupiterVersion")
@@ -46,6 +48,7 @@ dependencies {
 repositories {
     jcenter()
     mavenCentral()
+    maven("http://packages.confluent.io/maven/")
     maven("https://dl.bintray.com/kotlin/ktor")
 }
 
