@@ -31,18 +31,29 @@ class Yrkesaktiv : AbstractSpecification<Soknad>() {
     }
 }
 
-data class Periode(val fom: LocalDate, val tom: LocalDate) {
+/**
+ * en tom tom betyr at periden ikke er avsluttet
+ */
+data class Periode(val fom: LocalDate, val tom: LocalDate?) {
     fun utvid(that: Periode): Periode {
         return Periode(fom = if (this.fom.isBefore(that.fom)) this.fom else that.fom,
-                tom = if (this.tom.isAfter(that.tom)) this.tom else that.tom)
+                tom = if (this.tom == null || that.tom == null) null else if (this.tom.isAfter(that.tom)) this.tom else that.tom)
     }
 
     /**
      * Eg. January 2nd to January 4th ´tilstøterEllerOverlapper´ january 5th to january 7th.
+     *
+     * Also, January 4th to eternity ´tilstøterEllerOverlapper´ February 27th to eternity
      */
     fun tilstøterEllerOverlapper(that: Periode): Boolean {
-        return (this.fom.minusDays(2).isBefore(that.tom))
-                && (this.tom.plusDays(2).isAfter(that.fom))
+        return if (this.tom == null && that.tom == null) true
+        else if (this.tom == null) that.tilstøterEllerOverlapper(this)
+        else if (that.tom == null) {
+            that.fom == this.tom || that.fom.isBefore(this.tom) || that.fom.plusDays(1) == this.tom
+        } else {
+            (this.fom.minusDays(2).isBefore(that.tom))
+                    && (this.tom.plusDays(2).isAfter(that.fom))
+        }
     }
 
 }
@@ -63,6 +74,9 @@ fun List<Periode>.smeltSammenTilstøtendePerioder(): List<Periode> {
     if (this.size == 1) return this
 
     val head: Periode = first()
+
+    if (head.tom == null) return listOf(head)
+
     val neck: Periode = elementAt(1)
     val firstNonAbutingDay: LocalDate = head.tom.plusDays(2)
     val tail: List<Periode> = this.drop(1)

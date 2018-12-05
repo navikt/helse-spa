@@ -88,7 +88,7 @@ class PeriodeTest {
     }
 
     @Test
-    fun `expand utvider i begger retninger`() {
+    fun `utvid fungerer i begger retninger`() {
         val a = Periode(fom = LocalDate.of(2001, Month.JANUARY, 10),
                 tom = LocalDate.of(2001, Month.JANUARY, 15))
         val b = Periode(fom = LocalDate.of(2001, Month.JANUARY, 16),
@@ -101,12 +101,25 @@ class PeriodeTest {
     }
 
     @Test
-    fun `expand er symmetrisk`() {
+    fun `utvid er symmetrisk`() {
         val a = Periode(fom = LocalDate.of(2001, Month.JANUARY, 10),
                                 tom = LocalDate.of(2001, Month.JANUARY, 15))
         val b = Periode(fom = LocalDate.of(2001, Month.JANUARY, 16),
                                 tom = LocalDate.of(2001, Month.JANUARY, 20))
 
         assertThat(a.utvid(b)).isEqualTo(b.utvid(a))
+    }
+
+    @Test
+    fun `utvid virker på en ikke-avsluttet periode`() {
+        val a = Periode(fom = LocalDate.of(2001, Month.JANUARY, 10),
+                tom = null)
+        val b = Periode(fom = LocalDate.of(2001, Month.JANUARY, 16),
+                tom = LocalDate.of(2001, Month.JANUARY, 20))
+
+        val c = a.utvid(b)
+
+        assertThat(c.fom).isEqualTo(a.fom)
+        assertThat(c.tom).isNull()
     }
 }
