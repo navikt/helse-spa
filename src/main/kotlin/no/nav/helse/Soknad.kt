@@ -12,6 +12,7 @@ import java.time.LocalDate
  */
 data class Soknad(val søknadsNr: String,
                   val bruker: String, // AktørId
+                  val norskIdent: String, // fnr
                   val arbeidsgiver: String, // Orgnummer eller aktørId?
                   val sykemeldingId: String, // identity reference
                   val sykemelding: Sykemelding,

@@ -51,6 +51,7 @@ class JSONToSoknadMapper : ValueMapper<JSONObject, Soknad> {
     override fun apply(value: JSONObject?): Soknad {
         return Soknad("1",
                 "foo",
+                "00000000000",
                 "bar",
                 "baz",
                 Sykemelding(0.0f, LocalDate.now(), LocalDate.now()),

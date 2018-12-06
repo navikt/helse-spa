@@ -100,6 +100,7 @@ fun åresvis(): Collection<Opptjeningstid> {
 val soknadTemplate = Soknad(
         søknadsNr = "1",
         bruker = "abcd",
+        norskIdent = "00000000000",
         arbeidsgiver = "et orgnr",
         sykemeldingId = "2",
         sykemelding = Sykemelding(
