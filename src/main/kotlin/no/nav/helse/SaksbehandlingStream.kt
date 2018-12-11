@@ -34,6 +34,7 @@ class SaksbehandlingStream(env: Environment) {
         return try {
             !JSONToSoknadMapper().apply(value).søknadsNr.isEmpty()
         } catch(e: Exception){
+            acceptCounter.labels("rejected").inc()
             false
         }
     }
@@ -47,6 +48,7 @@ class SaksbehandlingStream(env: Environment) {
                 .mapValues(JSONToSoknadMapper())
                 .mapValues { value -> value.evaluer() }
                 .mapValues { value -> JSONObject(value) }
+                .peek { _, _-> acceptCounter.labels("processed").inc() }
                 .toTopic(Topics.VEDTAK_SYKEPENGER)
 
         return builder.build()
