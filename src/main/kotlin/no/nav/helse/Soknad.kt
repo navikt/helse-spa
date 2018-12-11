@@ -28,6 +28,7 @@ data class Soknad(val søknadsNr: String,
         val harOpptjening: Specification<Soknad> = harOpptjening()
         val evaluation: Evaluation = harOpptjening.evaluate(this)
 
+        /*
         return when (evaluation.result()) {
             Result.YES -> UtbetalingsVedtak(this.søknadsNr,
                     this.sykemelding.grad,
@@ -42,6 +43,15 @@ data class Soknad(val søknadsNr: String,
                     evaluation
             )
         }
+        */
+        return UtbetalingsVedtak(this.søknadsNr,
+                this.sykemelding.grad,
+                this.sykemelding.fom,
+                this.sykemelding.tom,
+                BigDecimal.TEN,
+                this.bruker,
+                evaluation
+        )
     }
 }
 

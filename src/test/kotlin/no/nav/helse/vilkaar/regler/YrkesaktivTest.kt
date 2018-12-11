@@ -13,8 +13,7 @@ import java.time.Month
 
 class YrkesaktivTest {
 
-    //@Test
-    // FIXME: For øyeblikket har vi skrudd av all logikk, så denne testen vil feile.
+    @Test
     fun `ingen opptjeningstid er ikke yrkesaktiv`() {
         val evaluation: Evaluation = Yrkesaktiv().evaluate(soknadTemplate)
         assertThat(evaluation.result()).isEqualTo(Result.NO)
