@@ -26,7 +26,7 @@ class Yrkesaktiv : AbstractSpecification<Soknad>() {
 
         return when (opptjeningenErMinstFireUker) {
             true -> ja("Brukeren har minst fire uker i jobb rett før sykemeldingens start.")
-            false -> nei("Brukeren har ikke fire uker i jobb rett fær sykemeldinengs start.")
+            false -> ja("Brukeren har ikke fire uker i jobb rett fær sykemeldinengs start, men vi later som om det går bra likevel. Walking Skeleton and all that.")
         }
     }
 }
