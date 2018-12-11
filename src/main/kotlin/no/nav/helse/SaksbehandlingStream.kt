@@ -8,8 +8,9 @@ import org.apache.kafka.streams.Topology
 import org.apache.kafka.streams.kstream.*
 import org.json.JSONObject
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
-class SaksbehandlingStream(val env: Environment) {
+class SaksbehandlingStream(env: Environment) {
     private val acceptCounter: Counter = Counter.build()
             .name("spa_behandling_stream_counter")
             .labelNames("state")
@@ -29,7 +30,12 @@ class SaksbehandlingStream(val env: Environment) {
 
     @Suppress("UNUSED_PARAMETER")
     private fun canAccept(key: String?, value: JSONObject): Boolean {
-        return false
+        // if we can parse the input _and_ it actually has a søknads-nummer
+        return try {
+            !JSONToSoknadMapper().apply(value).søknadsNr.isEmpty()
+        } catch(e: Exception){
+            false
+        }
     }
 
     private fun topology(): Topology {
@@ -45,22 +51,44 @@ class SaksbehandlingStream(val env: Environment) {
 
         return builder.build()
     }
+
+    fun start() {
+        consumer.start()
+    }
+
+    fun stop() {
+        consumer.stop()
+    }
 }
 
 class JSONToSoknadMapper : ValueMapper<JSONObject, Soknad> {
-    override fun apply(value: JSONObject?): Soknad {
-        return Soknad("1",
-                "foo",
-                "00000000000",
-                "bar",
-                "baz",
-                Sykemelding(0.0f, LocalDate.now(), LocalDate.now()),
+    override fun apply(value: JSONObject): Soknad {
+        return Soknad(value.getString("søknadsNr"),
+                value.getString("bruker"),
+                value.getString("norskIdent"),
+                value.getString("arbeidsgiver"),
+                value.getString("sykemeldingId"),
+                JSONToSykemeldingMapper().apply(value.getJSONObject("sykemelding")),
                 emptyList(),
                 emptyList(),
-                0,
-                false,
+                value.getInt("utdanningsgrad"),
+                value.getBoolean("søktOmUtenlandsopphold"),
                 emptyList(),
                 emptyList(),
                 emptyList())
     }
+}
+
+class JSONToSykemeldingMapper {
+    fun apply(value: JSONObject?): Sykemelding {
+        return if (value == null) Sykemelding(0.0f, LocalDate.now(), LocalDate.now())
+        else Sykemelding(value.getFloat("grad"),
+                value.getLocalDate("fom", "yyyy-MM-dd"),
+                value.getLocalDate("tom", "yyyy-MM-dd"))
+    }
+}
+
+fun JSONObject.getLocalDate(key: String, format: String): LocalDate {
+    val rawValue = getString(key)
+    return LocalDate.parse(rawValue, DateTimeFormatter.ofPattern(format))
 }
