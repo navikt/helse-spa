@@ -45,10 +45,10 @@ data class Soknad(val søknadsNr: String,
         }
         */
         return UtbetalingsVedtak(this.søknadsNr,
-                this.sykemelding.grad,
-                this.sykemelding.fom,
-                this.sykemelding.tom,
-                BigDecimal.TEN,
+                100.0f,
+                LocalDate.now(),
+                LocalDate.now(),
+                BigDecimal.valueOf(1000L),
                 this.bruker,
                 evaluation
         )
