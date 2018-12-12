@@ -6,9 +6,13 @@ import org.apache.kafka.streams.KafkaStreams
 import org.apache.kafka.streams.StreamsBuilder
 import org.apache.kafka.streams.Topology
 import org.apache.kafka.streams.kstream.*
+import org.json.JSONException
 import org.json.JSONObject
+import org.slf4j.LoggerFactory
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+
+private val log = LoggerFactory.getLogger("Saksbehandlingsstrøm")
 
 class SaksbehandlingStream(env: Environment) {
     private val acceptCounter: Counter = Counter.build()
@@ -34,6 +38,7 @@ class SaksbehandlingStream(env: Environment) {
         return try {
             !JSONToSoknadMapper().apply(value).søknadsNr.isEmpty()
         } catch(e: Exception){
+            if (e is JSONException) log.info("Couldn't parse the message: {}.", e.message)
             acceptCounter.labels("rejected").inc()
             false
         }
