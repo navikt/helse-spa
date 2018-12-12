@@ -1,24 +1,13 @@
 {
-  "søknadsNr": "alpha-1",
-  "bruker": "1234512345",
-  "norskIdent": "01010101010",
-  "arbeidsgiver": "700769933",
-  "sykemeldingId": "1",
-  "sykemelding": {
-    "grad": 30.3,
-    "fom": "2017-01-01",
-    "tom": "2017-02-28"
-  },
-  "korrigertArbeidstod": [],
-  "fravær": [],
-  "utdanningsgrad": 0,
-  "søktOmUtenlandsopphold": false,
-  "annetSykefravær":[],
-  "andreInntektskilder": [],
-  "opptjeningstid": [
-    {
-      "fom": "2000-01-01",
-      "type": "JOBB"
-    }
-  ]
+  "aktorId": "0000000000000",
+  "innsendtDato": "2018-11-16",
+  "tom": "2018-09-07",
+  "fom": "2018-08-28",
+  "soknadstype": "SELVSTENDIGE_OG_FRILANSERE",
+  "sykmeldingId": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+  "id": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+  "opprettetDato": "2018-11-16",
+  "korrigerer": null,
+  "korrigertAv": null,
+  "status": "SENDT"
 }

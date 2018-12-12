@@ -2,7 +2,6 @@ package no.nav.helse
 
 import no.nav.helse.vilkaar.harOpptjening
 import no.nav.nare.evaluation.Evaluation
-import no.nav.nare.evaluation.Result
 import no.nav.nare.specifications.Specification
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -10,19 +9,17 @@ import java.time.LocalDate
 /**
  * En fullstendig beriket sykepengesøknad
  */
-data class Soknad(val søknadsNr: String,
-                  val bruker: String, // AktørId
-                  val norskIdent: String, // fnr
-                  val arbeidsgiver: String, // Orgnummer eller aktørId?
+data class Soknad(val id: String, // antagelig en uuid?
+                  val aktorId: String, // AktørId
                   val sykemeldingId: String, // identity reference
-                  val sykemelding: Sykemelding,
-                  val korrigertArbeidstid: Collection<KorrigertArbeidstid>,
-                  val fravær: Collection<Fravær>,
-                  val utdanningsgrad: Int,
-                  val søktOmUtenlandsopphold: Boolean,
-                  val annetSykefravær: Collection<Fravær>,
-                  val andreInntektskilder: Collection<Inntektskilde>,
-                  val opptjeningstid: Collection<Opptjeningstid>) {
+                  val soknadstype: String,
+                  val innsendtDato: LocalDate,
+                  val tom: LocalDate,
+                  val fom: LocalDate,
+                  val opprettetDato: LocalDate,
+                  val status: String
+
+) {
 
     fun evaluer(): Vedtak {
         val harOpptjening: Specification<Soknad> = harOpptjening()
@@ -30,26 +27,26 @@ data class Soknad(val søknadsNr: String,
 
         /*
         return when (evaluation.result()) {
-            Result.YES -> UtbetalingsVedtak(this.søknadsNr,
+            Result.YES -> UtbetalingsVedtak(this.id,
                     this.sykemelding.grad,
                     this.sykemelding.fom,
                     this.sykemelding.tom,
                     BigDecimal.TEN,
-                    this.bruker,
+                    this.aktorId,
                     evaluation
             )
-            Result.NO -> Avslagsvedtak(this.søknadsNr,
+            Result.NO -> Avslagsvedtak(this.id,
                     "Mangler opptjening: ${evaluation.reason()}",
                     evaluation
             )
         }
         */
-        return UtbetalingsVedtak(this.søknadsNr,
+        return UtbetalingsVedtak(this.id,
                 100.0f,
-                LocalDate.now(),
-                LocalDate.now(),
+                this.fom,
+                this.tom,
                 BigDecimal.valueOf(1000L),
-                this.bruker,
+                this.aktorId,
                 evaluation
         )
     }

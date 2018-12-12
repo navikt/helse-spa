@@ -13,12 +13,7 @@ class JSONToSoknadMapperTest {
 
         val søknad = JSONToSoknadMapper().apply(input)
 
-        assertThat(søknad.søknadsNr).isEqualTo("alpha-1")
-
-        val sykemeldingFom = LocalDate.of(2017, 1, 1)
-        val sykemeldingTom = LocalDate.of(2017, 2, 28)
-
-        assertThat(søknad.sykemelding.fom).isEqualTo(sykemeldingFom)
-        assertThat(søknad.sykemelding.tom).isEqualTo(sykemeldingTom)
+        assertThat(søknad.id).isEqualTo("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa")
+        assertThat(søknad.fom).isEqualTo(LocalDate.of(2018, 8, 28))
     }
 }

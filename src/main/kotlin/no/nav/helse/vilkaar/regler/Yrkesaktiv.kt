@@ -8,11 +8,11 @@ import java.time.LocalDate
 import java.time.Period
 
 /**
- * en bruker har vært yrkesaktiv om vedkommende har hatt fire sammenhengende uker i arbeid før sykemeldingens start
+ * en aktorId har vært yrkesaktiv om vedkommende har hatt fire sammenhengende uker i arbeid før sykemeldingens start
  */
 class Yrkesaktiv : AbstractSpecification<Soknad>() {
     override fun evaluate(t: Soknad): Evaluation {
-
+/* FIXME: Datastructure wasn't quite what I though. fix.
         // 27 dager, siden det er greit å starte i jobb på dag 28 før sykemelding
         val kritiskPeriode: Period = Period.ofWeeks(4).minusDays(1)
         val kritiskDag: LocalDate = t.sykemelding.fom.minus(kritiskPeriode)
@@ -23,11 +23,8 @@ class Yrkesaktiv : AbstractSpecification<Soknad>() {
                 .finnSisteUtvidedePeriode()
 
         val opptjeningenErMinstFireUker: Boolean = sistePeriodeFørSykemelding?.fom?.isBefore(kritiskDag) ?: false
-
-        return when (opptjeningenErMinstFireUker) {
-            true -> ja("Brukeren har minst fire uker i jobb rett før sykemeldingens start.")
-            false -> nei("Brukeren har ikke fire uker i jobb rett fær sykemeldinengs start.")
-        }
+*/
+        return ja("Brukeren har minst fire uker i jobb rett før sykemeldingens start.")
     }
 }
 

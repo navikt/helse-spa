@@ -36,7 +36,7 @@ class SaksbehandlingStream(env: Environment) {
     private fun canAccept(key: String?, value: JSONObject): Boolean {
         // if we can parse the input _and_ it actually has a søknads-nummer
         return try {
-            !JSONToSoknadMapper().apply(value).søknadsNr.isEmpty()
+            !JSONToSoknadMapper().apply(value).id.isEmpty()
         } catch(e: Exception){
             if (e is JSONException) log.info("Couldn't parse the message: {}.", e.message)
             acceptCounter.labels("rejected").inc()
@@ -70,19 +70,16 @@ class SaksbehandlingStream(env: Environment) {
 
 class JSONToSoknadMapper : ValueMapper<JSONObject, Soknad> {
     override fun apply(value: JSONObject): Soknad {
-        return Soknad(value.getString("søknadsNr"),
-                value.getString("bruker"),
-                value.getString("norskIdent"),
-                value.getString("arbeidsgiver"),
-                value.getString("sykemeldingId"),
-                JSONToSykemeldingMapper().apply(value.getJSONObject("sykemelding")),
-                emptyList(),
-                emptyList(),
-                value.getInt("utdanningsgrad"),
-                value.getBoolean("søktOmUtenlandsopphold"),
-                emptyList(),
-                emptyList(),
-                emptyList())
+         return Soknad(value.getString("id"),
+                value.getString("aktorId"),
+                value.getString("sykmeldingId"),
+                value.getString("soknadstype"),
+                value.getLocalDate("innsendtDato", "yyyy-MM-dd"),
+                value.getLocalDate("tom", "yyyy-MM-dd"),
+                value.getLocalDate("fom", "yyyy-MM-dd"),
+                value.getLocalDate("opprettetDato", "yyyy-MM-dd"),
+                value.getString("status")
+                )
     }
 }
 
