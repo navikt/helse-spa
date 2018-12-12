@@ -17,15 +17,15 @@ class SaksbehandlingStream(env: Environment) {
             .help("Antall meldinger SaksbehandlingsStream i SPA har godtatt og forsøkt behandlet")
             .register()
 
-    private val groupId = "spa-behandling"
+    private val appId = "spa-behandling"
 
     private val consumer: StreamConsumer
 
     init {
-        val streamConfig = streamConfig(groupId, env.bootstrapServersUrl,
+        val streamConfig = streamConfig(appId, env.bootstrapServersUrl,
                 env.username to env.password,
                 env.navTruststorePath to env.navTruststorePassword)
-        consumer = StreamConsumer(groupId, KafkaStreams(topology(), streamConfig))
+        consumer = StreamConsumer(appId, KafkaStreams(topology(), streamConfig))
     }
 
     @Suppress("UNUSED_PARAMETER")
