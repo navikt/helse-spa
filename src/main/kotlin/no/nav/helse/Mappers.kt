@@ -13,8 +13,8 @@ class JSONToSoknadMapper : ValueMapper<JSONObject, Soknad> {
                  value.getOptString("sykmeldingId"),
                  value.getOptString("soknadstype"),
                  value.getOptLocalDate("innsendtDato", "yyyy-MM-dd"),
-                 value.getLocalDate("tom", "yyyy-MM-dd"),
-                 value.getLocalDate("fom", "yyyy-MM-dd"),
+                 value.getOptLocalDate("tom", "yyyy-MM-dd"),
+                 value.getOptLocalDate("fom", "yyyy-MM-dd"),
                  value.getOptLocalDate("opprettetDato", "yyyy-MM-dd"),
                  value.getString("status")
          )
