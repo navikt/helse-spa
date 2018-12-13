@@ -14,8 +14,8 @@ data class Soknad(val id: String, // antagelig en uuid?
                   val sykemeldingId: String?, // identity reference
                   val soknadstype: String?,
                   val innsendtDato: LocalDate?,
-                  val tom: LocalDate,
-                  val fom: LocalDate,
+                  val tom: LocalDate?,
+                  val fom: LocalDate?,
                   val opprettetDato: LocalDate?,
                   val status: String
 
@@ -43,8 +43,8 @@ data class Soknad(val id: String, // antagelig en uuid?
         */
         return UtbetalingsVedtak(this.id,
                 100.0f,
-                this.fom,
-                this.tom,
+                this.fom?: LocalDate.now(),
+                this.tom?: LocalDate.now(),
                 BigDecimal.valueOf(1000L),
                 this.aktorId,
                 evaluation
