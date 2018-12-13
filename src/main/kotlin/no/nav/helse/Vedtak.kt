@@ -20,10 +20,10 @@ data class UtbetalingsVedtak(
         val fom: LocalDate,
         /**inklusiv siste dag for utbetaling. Dette vil være siste dag i sykemelding, siste dag i søknak, eller siste tilgjengelige antall utbetalingsdager overstiger brukerens tilgjengelige antall dager (som vanligvis er 248 dager etter arbeidsgiverperioden, ekslusive helger men inklusive helligdager)*/
         val tom: LocalDate,
-        /**uavklart om dette er dagsats eller beløp for hele perioden*/
-        val beløp: BigDecimal,
+        /**uavklart om dette er dagsats eller belop for hele perioden*/
+        val belop: BigDecimal,
         /**typisk skal enten søker eller arbeidsgiver få utbetalingen*/
-        val mottaker: String,
+        val mottaker: String?,
         /**hvorfor vi kom frem til utbetalingsvedtak*/
         val evaluation: Evaluation
 ) : Vedtak()

@@ -9,8 +9,6 @@ import org.apache.kafka.streams.kstream.*
 import org.json.JSONException
 import org.json.JSONObject
 import org.slf4j.LoggerFactory
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 
 private val log = LoggerFactory.getLogger("Saksbehandlingsstrøm")
 
@@ -62,37 +60,4 @@ class SaksbehandlingStream(env: Environment) {
     fun start() {
         consumer.start()
     }
-
-    fun stop() {
-        consumer.stop()
-    }
-}
-
-class JSONToSoknadMapper : ValueMapper<JSONObject, Soknad> {
-    override fun apply(value: JSONObject): Soknad {
-         return Soknad(value.getString("id"),
-                value.getString("aktorId"),
-                value.getString("sykmeldingId"),
-                value.getString("soknadstype"),
-                value.getLocalDate("innsendtDato", "yyyy-MM-dd"),
-                value.getLocalDate("tom", "yyyy-MM-dd"),
-                value.getLocalDate("fom", "yyyy-MM-dd"),
-                value.getLocalDate("opprettetDato", "yyyy-MM-dd"),
-                value.getString("status")
-                )
-    }
-}
-
-class JSONToSykemeldingMapper {
-    fun apply(value: JSONObject?): Sykemelding {
-        return if (value == null) Sykemelding(0.0f, LocalDate.now(), LocalDate.now())
-        else Sykemelding(value.getFloat("grad"),
-                value.getLocalDate("fom", "yyyy-MM-dd"),
-                value.getLocalDate("tom", "yyyy-MM-dd"))
-    }
-}
-
-fun JSONObject.getLocalDate(key: String, format: String): LocalDate {
-    val rawValue = getString(key)
-    return LocalDate.parse(rawValue, DateTimeFormatter.ofPattern(format))
 }
