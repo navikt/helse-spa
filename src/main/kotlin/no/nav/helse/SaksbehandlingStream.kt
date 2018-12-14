@@ -60,4 +60,7 @@ class SaksbehandlingStream(env: Environment) {
     fun start() {
         consumer.start()
     }
+    fun stop() {
+        consumer.stop()
+    }
 }

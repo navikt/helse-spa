@@ -39,6 +39,7 @@ dependencies {
     compile("com.google.code.gson:gson:$gsonVersion")
     compile("no.nav.helse:streams:$navStreamsVersion")
 
+    testCompile ("no.nav:kafka-embedded-env:2.0.1")
     testCompile("org.junit.jupiter:junit-jupiter-api:$junitJupiterVersion")
     testCompile("org.junit.jupiter:junit-jupiter-params:$junitJupiterVersion")
     testCompile("org.assertj:assertj-core:$assertJVersion")
