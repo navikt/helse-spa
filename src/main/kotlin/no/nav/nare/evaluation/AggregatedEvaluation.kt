@@ -1,5 +1,6 @@
 package no.nav.nare.evaluation
 
+import org.json.JSONPropertyName
 import java.util.Arrays
 
 
@@ -7,7 +8,11 @@ abstract class AggregatedEvaluation protected constructor(private val operator: 
     private val result: Result
 
     private val reason: String
+
     private val children: List<Evaluation>
+
+    @JSONPropertyName("children")
+    fun getChildren(): List<Evaluation> { return children }
 
     init {
         this.children = Arrays.asList(*children)
