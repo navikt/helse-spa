@@ -2,6 +2,7 @@ package no.nav.helse
 
 import no.nav.helse.vilkaar.harOpptjening
 import no.nav.nare.evaluation.Evaluation
+import no.nav.nare.evaluation.Result
 import no.nav.nare.specifications.Specification
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -17,7 +18,10 @@ data class Soknad(val id: String, // antagelig en uuid?
                   val tom: LocalDate?,
                   val fom: LocalDate?,
                   val opprettetDato: LocalDate?,
-                  val status: String
+                  val status: String,
+                  val evaluation: Evaluation? = null,
+                  val result: Result? = null,
+                  val apneProblemer: Collection<Any> = emptyList()
 
 ) {
 
