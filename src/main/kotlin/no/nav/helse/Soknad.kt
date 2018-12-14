@@ -25,22 +25,6 @@ data class Soknad(val id: String, // antagelig en uuid?
         val harOpptjening: Specification<Soknad> = harOpptjening()
         val evaluation: Evaluation = harOpptjening.evaluate(this)
 
-        /*
-        return when (evaluation.result()) {
-            Result.YES -> UtbetalingsVedtak(this.id,
-                    this.sykemelding.grad,
-                    this.sykemelding.fom,
-                    this.sykemelding.tom,
-                    BigDecimal.TEN,
-                    this.aktorId,
-                    evaluation
-            )
-            Result.NO -> Avslagsvedtak(this.id,
-                    "Mangler opptjening: ${evaluation.reason()}",
-                    evaluation
-            )
-        }
-        */
         return UtbetalingsVedtak(this.id,
                 100.0f,
                 this.fom?: LocalDate.now(),
