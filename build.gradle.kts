@@ -68,3 +68,9 @@ tasks.withType<Test> {
 tasks.withType<Wrapper> {
     gradleVersion = "4.10.2"
 }
+
+tasks {
+    "run"(JavaExec::class) {
+        environment("KAFKA_BOOTSTRAP_SERVERS", "localhost:9092")
+    }
+}
