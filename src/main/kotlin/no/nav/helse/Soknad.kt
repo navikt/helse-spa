@@ -1,9 +1,5 @@
 package no.nav.helse
 
-import no.nav.helse.vilkaar.harOpptjening
-import no.nav.nare.evaluation.Evaluation
-import no.nav.nare.evaluation.Result
-import no.nav.nare.specifications.Specification
 import java.math.BigDecimal
 import java.time.LocalDate
 
@@ -19,23 +15,17 @@ data class Soknad(val id: String, // antagelig en uuid?
                   val fom: LocalDate?,
                   val opprettetDato: LocalDate?,
                   val status: String,
-                  val evaluation: Evaluation? = null,
-                  val result: Result? = null,
                   val apneProblemer: Collection<Any> = emptyList()
 
 ) {
 
     fun evaluer(): Vedtak {
-        val harOpptjening: Specification<Soknad> = harOpptjening()
-        val evaluation: Evaluation = harOpptjening.evaluate(this)
-
         return UtbetalingsVedtak(this.id,
                 100.0f,
                 this.fom?: LocalDate.now(),
                 this.tom?: LocalDate.now(),
                 BigDecimal.valueOf(1000L),
-                this.aktorId,
-                evaluation
+                this.aktorId
         )
     }
 }
