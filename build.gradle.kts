@@ -1,5 +1,5 @@
 val slf4jVersion = "1.7.25"
-val ktorVersion = "1.0.0"
+val ktorVersion = "1.1.2"
 val prometheusVersion = "0.5.0"
 val gsonVersion = "2.7"
 val navStreamsVersion = "10"
@@ -27,6 +27,7 @@ application {
 sourceSets {
     getByName("main").java.srcDirs("src/main/kotlin")
     getByName("test").java.srcDirs("src/test/kotlin")
+
 }
 
 dependencies {
@@ -34,6 +35,7 @@ dependencies {
     compile("ch.qos.logback:logback-classic:1.2.3")
     compile("net.logstash.logback:logstash-logback-encoder:5.2")
     compile("io.ktor:ktor-server-netty:$ktorVersion")
+    compile("io.ktor:ktor-html-builder:$ktorVersion")
     compile("io.prometheus:simpleclient_common:$prometheusVersion")
     compile("io.prometheus:simpleclient_hotspot:$prometheusVersion")
     compile("com.google.code.gson:gson:$gsonVersion")
