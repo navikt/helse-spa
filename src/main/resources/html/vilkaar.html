@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Sykepenger</title>
-    <link rel="stylesheet" href="spa.css" />
+    <link rel="stylesheet" href="spa.css"/>
 </head>
 <body>
 <header>
@@ -21,21 +21,37 @@
 </section>
 <section id="section_opptjening" class="vilkaarsgruppe">
     <h2>Opptjening</h2>
-    <p>Ansettelsesdato <input id="ansettelsesdato_input" type="date" /></p>
-    <p>Første sykdomsdag <input id="forste_sykdomsdag_input" type="date" /></p>
+    <p>Ansettelsesdato <input class="vilkaar_input" id="ansettelsesdato_input" type="date"/></p>
+    <p>Første sykdomsdag <input class="vilkaar_input" id="forste_sykdomsdag_input" type="date"/></p>
 </section>
 <section id="section_medlemskap" class="vilkaarsgruppe">
     <h2>Medlemskap</h2>
-    <p>Bosted: <select id="bosted_input"><option value="Norge">Norge</option></select></p>
+    <p>Bosted:
+        <select id="bosted_input" class="vilkaar_input">
+            <option value="-">-</option>
+            <option value="Norge">Norge</option>
+            <option value="Oman">Oman</option>
+        </select>
+    </p>
 </section>
 <section id="section_andre_ytelser" class="vilkaarsgruppe">
     <h2>Andre ytelser</h2>
-    <p>Ytelser: <select id="andre_ytelser_input"><option value="Ingen">Ingen andre ytelser</option></select></p>
+    <p>Ytelser:
+        <select id="andre_ytelser_input" class="vilkaar_input">
+            <option value="-">-</option>
+            <option value="Ingen">Ingen andre ytelser</option>
+            <option value="Mange">Mange andre ytelser</option>
+        </select>
+    </p>
 </section>
 <section id="section_frist" class="vilkaarsgruppe">
     <h2>Sendt innen tre måneder</h2>
-    <p>Søknad sendt <input id="soknad_sendt_input" type="date" /></p>
+    <p>Søknad sendt <input class="vilkaar_input" id="soknad_sendt_input" type="date"/></p>
 </section>
 <footer>natch</footer>
+<script src="spa.js"></script>
+<script defer="defer">
+    startTheCaseWork();
+</script>
 </body>
 </html>

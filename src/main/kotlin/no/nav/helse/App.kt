@@ -25,6 +25,7 @@ fun main() {
 fun Route.routeResources() {
     static("") {
         resources("css")
+        resources("js")
         resources("html")
     }
 }
