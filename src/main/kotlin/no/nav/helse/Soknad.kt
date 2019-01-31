@@ -1,6 +1,5 @@
 package no.nav.helse
 
-import java.math.BigDecimal
 import java.time.LocalDate
 
 /**
@@ -17,48 +16,4 @@ data class Soknad(val id: String, // antagelig en uuid?
                   val status: String,
                   val apneProblemer: Collection<Any> = emptyList()
 
-) {
-
-    fun evaluer(): Vedtak {
-        return UtbetalingsVedtak(this.id,
-                100.0f,
-                this.fom?: LocalDate.now(),
-                this.tom?: LocalDate.now(),
-                BigDecimal.valueOf(1000L),
-                this.aktorId
-        )
-    }
-}
-
-data class Opptjeningstid(val fom: LocalDate,
-                          val tom: LocalDate,
-                          val type: Opptjeningstype)
-
-enum class Opptjeningstype {
-    JOBB, DAGPENGER, SYKEPENGER, PLEIEPENGER, FORELDREPENGER, ANNET
-}
-
-data class Sykemelding(val grad: Float,
-                       val fom: LocalDate,
-                       val tom: LocalDate)
-
-/**
- * Når brukeren beskriver en arbeidstid som skiller seg fra arbeidstiden slik
- * den er oppgitt i sykemeldningen
- */
-data class KorrigertArbeidstid(val fom: LocalDate,
-                               val tom: LocalDate,
-                               val faktiskGrad: Float,
-                               val faktiskTimer: Int,
-                               val avtaltTimer: Int)
-
-data class Fravær(val fom: LocalDate,
-                  val tom: LocalDate,
-                  val type: Fraværstype)
-
-enum class Fraværstype {
-    FERIE, PERMISJON, UTDANNING, UTENLANDSOPPHOLD
-}
-
-data class Inntektskilde(val type: String,
-                         val erSykemeldt: Boolean)
+)

@@ -6,11 +6,7 @@ import org.apache.kafka.streams.KafkaStreams
 import org.apache.kafka.streams.StreamsBuilder
 import org.apache.kafka.streams.Topology
 import org.apache.kafka.streams.kstream.*
-import org.json.JSONException
 import org.json.JSONObject
-import org.slf4j.LoggerFactory
-
-private val log = LoggerFactory.getLogger("Saksbehandlingsstrøm")
 
 class SaksbehandlingStream(env: Environment) {
     private val acceptCounter: Counter = Counter.build()
@@ -30,27 +26,11 @@ class SaksbehandlingStream(env: Environment) {
         consumer = StreamConsumer(appId, KafkaStreams(topology(), streamConfig))
     }
 
-    @Suppress("UNUSED_PARAMETER")
-    private fun canAccept(key: String?, value: JSONObject): Boolean {
-        // if we can parse the input _and_ it actually has a søknads-nummer
-        return try {
-            !JSONToSoknadMapper().apply(value).id.isEmpty()
-        } catch(e: Exception){
-            if (e is JSONException) log.info("Couldn't parse the message: {}.", e.message)
-            acceptCounter.labels("rejected").inc()
-            false
-        }
-    }
-
     private fun topology(): Topology {
         val builder = StreamsBuilder()
         val stream: KStream<String, JSONObject> = builder.consumeTopic(Topics.SYKEPENGEBEHANDLING)
 
-        stream.filter(this::canAccept)
-                .peek { _, _-> acceptCounter.labels("accepted").inc() }
-                .mapValues(JSONToSoknadMapper())
-                .mapValues { value -> value.evaluer() }
-                .mapValues { value -> JSONObject(value) }
+        stream.peek { _, _-> acceptCounter.labels("accepted").inc() }
                 .peek { _, _-> acceptCounter.labels("processed").inc() }
                 .toTopic(Topics.VEDTAK_SYKEPENGER)
 
