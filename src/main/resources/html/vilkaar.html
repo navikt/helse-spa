@@ -6,8 +6,36 @@
     <link rel="stylesheet" href="spa.css" />
 </head>
 <body>
-<p>
-    Put the gold here.
-</p>
+<header>
+    <h1>nav</h1>
+    <h2>Sykepenger</h2>
+    <span>meny 1-ikon</span>
+    <span>meny 2-ikon</span>
+    <span>menneske-ikon</span>
+    <span>Kari Behandler Nordmann</span>
+</header>
+<section id="section_status" class="vilkaarsgruppe">
+    <h1>Inngangsvilkår</h1>
+    <p>Ikke nok informasjon til å avklare vilkår</p>
+    <p>0% automatisering</p>
+</section>
+<section id="section_opptjening" class="vilkaarsgruppe">
+    <h2>Opptjening</h2>
+    <p>Ansettelsesdato <input id="ansettelsesdato_input" type="date" /></p>
+    <p>Første sykdomsdag <input id="forste_sykdomsdag_input" type="date" /></p>
+</section>
+<section id="section_medlemskap" class="vilkaarsgruppe">
+    <h2>Medlemskap</h2>
+    <p>Bosted: <select id="bosted_input"><option value="Norge">Norge</option></select></p>
+</section>
+<section id="section_andre_ytelser" class="vilkaarsgruppe">
+    <h2>Andre ytelser</h2>
+    <p>Ytelser: <select id="andre_ytelser_input"><option value="Ingen">Ingen andre ytelser</option></select></p>
+</section>
+<section id="section_frist" class="vilkaarsgruppe">
+    <h2>Sendt innen tre måneder</h2>
+    <p>Søknad sendt <input id="soknad_sendt_input" type="date" /></p>
+</section>
+<footer>natch</footer>
 </body>
 </html>
