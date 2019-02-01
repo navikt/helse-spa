@@ -40,6 +40,7 @@ dependencies {
     compile("io.prometheus:simpleclient_hotspot:$prometheusVersion")
     compile("com.google.code.gson:gson:$gsonVersion")
     compile("no.nav.helse:streams:$navStreamsVersion")
+    compile("com.google.code.gson:gson:2.2.4")
 
     compile("no.nav.helse.sykepenger.lovverk:sykepenger-inngangsvilkar:2018-12-20-101.b6828bf")
 
