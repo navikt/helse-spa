@@ -2,18 +2,10 @@ package no.nav.helse
 
 import java.time.LocalDate
 
-/**
- * En fullstendig beriket sykepengesøknad
- */
-data class Soknad(val id: String, // antagelig en uuid?
-                  val aktorId: String?, // AktørId
-                  val sykemeldingId: String?, // identity reference
-                  val soknadstype: String?,
-                  val innsendtDato: LocalDate?,
-                  val tom: LocalDate?,
-                  val fom: LocalDate?,
-                  val opprettetDato: LocalDate?,
-                  val status: String,
-                  val apneProblemer: Collection<Any> = emptyList()
-
+data class SoknadFraSketch(
+        val ansettelsesDato: LocalDate? = null,
+        val forsteSykdomsdag: LocalDate? = null,
+        val bosted: String? = null,
+        val andreYtelser: String? = null,
+        val soknadSendtDato: LocalDate? = null
 )

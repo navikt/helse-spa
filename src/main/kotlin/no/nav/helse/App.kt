@@ -3,10 +3,12 @@ package no.nav.helse
 import io.ktor.http.content.resources
 import io.ktor.http.content.static
 import io.ktor.routing.Route
+import io.ktor.routing.post
 import io.ktor.routing.routing
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
 import org.slf4j.LoggerFactory
+import java.time.LocalDate
 
 private val log = LoggerFactory.getLogger("Spa")
 
@@ -18,6 +20,9 @@ fun main() {
     embeddedServer(Netty, 80) {
         routing {
             routeResources()
+            post("/soknad") {
+
+            }
         }
     }.start(wait = false)
 }
