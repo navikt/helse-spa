@@ -3,9 +3,9 @@ package no.nav.helse
 import java.time.LocalDate
 
 data class SoknadFraSketch(
-        val ansettelsesDato: LocalDate? = null,
-        val forsteSykdomsdag: LocalDate? = null,
+        val ansettelsesdato: LocalDate? = null,
+        val forste_sykdomsdag: LocalDate? = null,
         val bosted: String? = null,
-        val andreYtelser: String? = null,
-        val soknadSendtDato: LocalDate? = null
+        val andre_ytelser: String? = null,
+        val soknad_sendt: LocalDate? = null
 )

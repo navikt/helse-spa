@@ -36,6 +36,7 @@ dependencies {
     compile("net.logstash.logback:logstash-logback-encoder:5.2")
     compile("io.ktor:ktor-server-netty:$ktorVersion")
     compile("io.ktor:ktor-html-builder:$ktorVersion")
+    compile("io.ktor:ktor-gson:$ktorVersion")
     compile("io.prometheus:simpleclient_common:$prometheusVersion")
     compile("io.prometheus:simpleclient_hotspot:$prometheusVersion")
     compile("com.google.code.gson:gson:$gsonVersion")
