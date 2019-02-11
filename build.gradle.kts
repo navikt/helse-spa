@@ -33,7 +33,8 @@ dependencies {
     compile("no.nav.helse:streams:$navStreamsVersion")
     compile("com.google.code.gson:gson:2.2.4")
 
-    compile("no.nav.helse.sykepenger.lovverk:sykepenger-inngangsvilkar:2018-12-20-101.b6828bf")
+    compile("no.nav.helse.sykepenger.lovverk:sykepenger-inngangsvilkar:2018-12-20-101.51d0399")
+    compile("no.nav.helse.sykepenger.lovverk:sykepenger-beregning:2018-12-20-101.8ef150a")
 
     testCompile ("no.nav:kafka-embedded-env:2.0.1")
     testCompile("org.junit.jupiter:junit-jupiter-api:$junitJupiterVersion")
