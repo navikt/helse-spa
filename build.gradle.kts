@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 val slf4jVersion = "1.7.25"
 val ktorVersion = "1.1.2"
 val prometheusVersion = "0.5.0"
@@ -9,25 +11,13 @@ val assertJVersion = "3.11.1"
 val mainClass = "no.nav.helse.AppKt"
 
 plugins {
-    application
-    kotlin("jvm") version "1.3.11"
-    id("com.github.johnrengelman.shadow") version "4.0.3"
+    kotlin("jvm") version "1.3.20"
 }
 
 buildscript {
     dependencies {
         classpath("org.junit.platform:junit-platform-gradle-plugin:1.2.0")
     }
-}
-
-application {
-    mainClassName = "$mainClass"
-}
-
-sourceSets {
-    getByName("main").java.srcDirs("src/main/kotlin")
-    getByName("test").java.srcDirs("src/test/kotlin")
-
 }
 
 dependencies {
@@ -64,6 +54,33 @@ java {
     targetCompatibility = JavaVersion.VERSION_11
 }
 
+tasks.named<Jar>("jar") {
+    baseName = "app"
+
+    manifest {
+        attributes["Main-Class"] = mainClass
+        attributes["Class-Path"] = configurations["compile"].map {
+            it.name
+        }.joinToString(separator = " ")
+    }
+
+    doLast {
+        configurations["compile"].forEach {
+            val file = File("$buildDir/libs/${it.name}")
+            if (!file.exists())
+                it.copyTo(file)
+        }
+    }
+}
+
+tasks.named<KotlinCompile>("compileKotlin") {
+    kotlinOptions.jvmTarget = "1.8"
+}
+
+tasks.named<KotlinCompile>("compileTestKotlin") {
+    kotlinOptions.jvmTarget = "1.8"
+}
+
 tasks.withType<Test> {
     useJUnitPlatform()
     testLogging {
@@ -72,11 +89,5 @@ tasks.withType<Test> {
 }
 
 tasks.withType<Wrapper> {
-    gradleVersion = "4.10.2"
-}
-
-tasks {
-    "run"(JavaExec::class) {
-        environment("KAFKA_BOOTSTRAP_SERVERS", "localhost:9092")
-    }
+    gradleVersion = "5.1.1"
 }
