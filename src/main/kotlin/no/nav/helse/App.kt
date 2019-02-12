@@ -16,6 +16,8 @@ import io.ktor.routing.post
 import io.ktor.routing.routing
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
+import io.prometheus.client.CollectorRegistry
+import no.nav.NarePrometheus
 import no.nav.helse.sykepenger.beregning.Beregningsgrunnlag
 import no.nav.helse.sykepenger.beregning.Beregningsresultat
 import no.nav.helse.sykepenger.beregning.Sykepengegrunnlag
@@ -34,6 +36,7 @@ fun main() {
     /*val spa = SaksbehandlingStream(Environment())
     log.info("Opening up the Spa")
     spa.start()*/
+    val nare: NarePrometheus = NarePrometheus(CollectorRegistry.defaultRegistry)
 
     embeddedServer(Netty, 8181) {
         install(ContentNegotiation) {
@@ -115,7 +118,7 @@ fun main() {
                         harVurdertInntekt = søknad.harVurdertInntekt
                 )
 
-                val evaluering = sykepengevilkår.evaluer(vilkårsgrunnlag)
+                val evaluering = nare.tellEvaluering { sykepengevilkår.evaluer(vilkårsgrunnlag) }
 
                 val beregningsgrunnlag = Beregningsgrunnlag(
                         søknad.fom,
