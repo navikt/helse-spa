@@ -31,6 +31,11 @@ class SaksbehandlingStream(env: Environment) {
         val stream: KStream<String, JSONObject> = builder.consumeTopic(Topics.SYKEPENGEBEHANDLING)
 
         stream.peek { _, _-> acceptCounter.labels("accepted").inc() }
+                .mapValues { _, søknad -> hentRegisterData(søknad) }
+                .mapValues { _, søknad -> fastsettFakta(søknad) }
+                .mapValues { _, søknad -> prøvVilkår(søknad) }
+                .mapValues { _, søknad -> beregnSykepenger(søknad) }
+                .mapValues { _, søknad -> fattVedtak(søknad) }
                 .peek { _, _-> acceptCounter.labels("processed").inc() }
                 .toTopic(Topics.VEDTAK_SYKEPENGER)
 
@@ -43,4 +48,10 @@ class SaksbehandlingStream(env: Environment) {
     fun stop() {
         consumer.stop()
     }
+
+    fun hentRegisterData(input: JSONObject): JSONObject = input
+    fun fastsettFakta(input: JSONObject): JSONObject = input
+    fun prøvVilkår(input: JSONObject): JSONObject = input
+    fun beregnSykepenger(input: JSONObject): JSONObject = input
+    fun fattVedtak(input: JSONObject): JSONObject = input
 }
