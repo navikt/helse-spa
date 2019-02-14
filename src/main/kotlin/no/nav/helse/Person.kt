@@ -3,7 +3,7 @@ package no.nav.helse
 import java.time.LocalDate
 import java.time.LocalDateTime
 
-fun hentTPfcSData(input: Sykepengesoknad): Vurdering<Tpsfakta, Person> {
+fun hentTPSData(input: Sykepengesoknad): Vurdering<Tpsfakta, Person> {
     val person = hentPerson(AktorId(input.aktorId))
 
     return Avklart(fastsattVerdi = Tpsfakta(fodselsdato = person.fdato, bostedland = person.bostedsland),
