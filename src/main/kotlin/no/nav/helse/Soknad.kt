@@ -9,6 +9,9 @@ data class BeriketSykepengesoknad(
         val faktagrunnlag: Faktagrunnlag
 )
 
+data class AvklartSykepengesoknad(val originalSoknad: Sykepengesoknad,
+             val medlemskap: Vurdering<Boolean, Tpsfakta>)
+
 data class Sykepengesoknad(val aktorId: String,
                            val soktUtenlandsopphold: Boolean,
                            val fom: LocalDate,
@@ -23,7 +26,7 @@ data class Soknadsperiode(val fom: LocalDate,
                           val tom: LocalDate,
                           val sykmeldingsgrad: Int)
 
-data class Faktagrunnlag(val tps: Vurdering<Tpsfakta, Person>)
+data class Faktagrunnlag(val tps: Tpsfakta)
 
 data class Tpsfakta(val fodselsdato: LocalDate, val bostedland: String) {
     fun alder(): Int {

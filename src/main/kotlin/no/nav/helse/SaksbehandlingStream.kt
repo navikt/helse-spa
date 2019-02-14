@@ -67,10 +67,10 @@ class SaksbehandlingStream(env: Environment) {
             startSyketilfelle = LocalDate.now())
 
     fun hentRegisterData(input: Sykepengesoknad): BeriketSykepengesoknad =
-            BeriketSykepengesoknad(input, Faktagrunnlag(hentTPSData(input)))
+            BeriketSykepengesoknad(input, Faktagrunnlag(tps = hentTPSData(input)))
 
-    fun fastsettFakta(input: BeriketSykepengesoknad): BeriketSykepengesoknad = input
-    fun prøvVilkår(input: BeriketSykepengesoknad): BeriketSykepengesoknad = input
-    fun beregnSykepenger(input: BeriketSykepengesoknad): BeriketSykepengesoknad = input
-    fun fattVedtak(input: BeriketSykepengesoknad): JSONObject = JSONObject(input.originalSoknad)
+    fun fastsettFakta(input: BeriketSykepengesoknad): AvklartSykepengesoknad = AvklartSykepengesoknad(input.originalSoknad, vurderMedlemskap(input))
+    fun prøvVilkår(input: AvklartSykepengesoknad): AvklartSykepengesoknad = input
+    fun beregnSykepenger(input: AvklartSykepengesoknad): AvklartSykepengesoknad = input
+    fun fattVedtak(input: AvklartSykepengesoknad): JSONObject = JSONObject(input.originalSoknad)
 }

@@ -1,24 +1,18 @@
 package no.nav.helse
 
 import java.time.LocalDate
-import java.time.LocalDateTime
 
-fun hentTPSData(input: Sykepengesoknad): Vurdering<Tpsfakta, Person> {
+fun hentTPSData(input: Sykepengesoknad): Tpsfakta {
     val person = hentPerson(AktorId(input.aktorId))
-
-    return Avklart(fastsattVerdi = Tpsfakta(fodselsdato = person.fdato, bostedland = person.bostedsland),
-            begrunnelse = "TPS data",
-            datoForFastsettelse = LocalDateTime.now(),
-            fastsattAv = "SPA",
-            grunnlag = person)
+    return Tpsfakta(fodselsdato = person.fdato, bostedland = person.bostedsland)
 }
 
 /*
 something clever to fetch person from Sparkel
  */
-fun hentPerson(aktorId: AktorId): Person {
+private fun hentPerson(aktorId: AktorId): Person {
     return Person(
-            id=AktorId("1234"),
+            id = AktorId("1234"),
             fornavn = "Joey",
             mellomnavn = "H",
             etternavn = "Sixpack",
