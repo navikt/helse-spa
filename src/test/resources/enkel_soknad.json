@@ -1,0 +1,56 @@
+{
+  "id": "a6b6e7c3-4e07-414e-b426-7f572f9bc59c",
+  "type": "ARBEIDSTAKERE",
+  "status": "NY",
+  "aktorId": "1000",
+  "sykmeldingId": "2cad79a9-b401-49e1-bf56-de3213b216b3",
+  "arbeidsgiver": {
+    "navn": "FIRMA AS",
+    "orgnummer": "123"
+  },
+  "arbeidssituasjon": "ARBEIDSTAKER",
+  "korrigerer": null,
+  "korrigertAv": null,
+  "soktUtenlandsopphold": false,
+  "arbeidsgiverForskutterer": null,
+  "fom": [
+    2019,
+    1,
+    12
+  ],
+  "tom": [
+    2019,
+    2,
+    2
+  ],
+  "startSyketilfelle": [
+    2018,
+    3,
+    9
+  ],
+  "arbeidGjenopptatt": null,
+  "sykmeldingSkrevet": [
+    2019,
+    1,
+    12,
+    0,
+    0
+  ],
+  "opprettet": [
+    2019,
+    1,
+    21,
+    14,
+    52,
+    20,
+    440000000
+  ],
+  "sendtNav": null,
+  "sendtArbeidsgiver": null,
+  "egenmeldinger": [],
+  "papirsykmeldinger": null,
+  "fravar": [],
+  "andreInntektskilder": [],
+  "soknadsperioder": [],
+  "sporsmal": []
+}

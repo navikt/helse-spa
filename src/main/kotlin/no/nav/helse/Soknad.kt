@@ -1,5 +1,6 @@
 package no.nav.helse
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.Year
@@ -12,15 +13,15 @@ data class BeriketSykepengesoknad(
 data class AvklartSykepengesoknad(val originalSoknad: Sykepengesoknad,
              val medlemskap: Vurdering<Boolean, Tpsfakta>)
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 data class Sykepengesoknad(val aktorId: String,
                            val soktUtenlandsopphold: Boolean,
                            val fom: LocalDate,
                            val tom: LocalDate,
                            val startSyketilfelle: LocalDate,
-                           val sendtNav: LocalDateTime,
+                           val sendtNav: LocalDateTime?,
                            val soknadsperioder: List<Soknadsperiode>,
-                           val harVurdertInntekt: Boolean,
-                           val andreYtelser: List<String>)
+                           val harVurdertInntekt: Boolean)
 
 data class Soknadsperiode(val fom: LocalDate,
                           val tom: LocalDate,

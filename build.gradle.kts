@@ -9,6 +9,7 @@ val navStreamsVersion = "10"
 val junitJupiterVersion = "5.3.1"
 val assertJVersion = "3.11.1"
 val mainClass = "no.nav.helse.AppKt"
+val jacksonVersion = "2.9.7"
 
 plugins {
     kotlin("jvm") version "1.3.20"
@@ -31,8 +32,9 @@ dependencies {
     compile("io.prometheus:simpleclient_hotspot:$prometheusVersion")
     compile("com.google.code.gson:gson:$gsonVersion")
     compile("no.nav.helse:streams:$navStreamsVersion")
-    compile("com.google.code.gson:gson:2.2.4")
-
+    //compile("com.google.code.gson:gson:2.2.4")
+    compile("com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion")
+    compile("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion")
     compile("no.nav.helse.sykepenger.lovverk:sykepenger-inngangsvilkar:2018-12-20-101.51d0399")
     compile("no.nav.helse.sykepenger.lovverk:sykepenger-beregning:2018-12-20-101.8ef150a")
     compile("no.nav:nare-prometheus:0b41ab4")

@@ -58,7 +58,6 @@ class SaksbehandlingStream(env: Environment) {
      */
     fun somSoknad(input: JSONObject): Sykepengesoknad = Sykepengesoknad(aktorId = "",
             harVurdertInntekt = false,
-            andreYtelser = emptyList(),
             fom = LocalDate.now(),
             tom = LocalDate.now(),
             sendtNav = LocalDateTime.now(),
