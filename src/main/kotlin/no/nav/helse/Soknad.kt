@@ -4,30 +4,29 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.Year
 
-data class Sykepengesøknad(val aktørId: String,
+data class Sykepengesoknad(val aktorId: String,
                            val soktUtenlandsopphold: Boolean,
                            val fom: LocalDate,
                            val tom: LocalDate,
                            val startSyketilfelle: LocalDate,
                            val sendtNav: LocalDateTime,
-                           val soknadsperioder: List<Søknadsperiode>,
-
+                           val soknadsperioder: List<Soknadsperiode>,
                            val faktagrunnlag: Faktagrunnlag,
                            val harVurdertInntekt: Boolean,
                            val andreYtelser: List<String>)
 
-data class Søknadsperiode(val fom: LocalDate,
+data class Soknadsperiode(val fom: LocalDate,
                           val tom: LocalDate,
                           val sykmeldingsgrad: Int)
 
 data class Faktagrunnlag(val tps: Tpsfakta, val aareg: Aaregfakta, val aordningen: Aordningenfakta,
                          val inntektsmelding: Inntektsmeldingfakta)
 
-data class Tpsfakta(val fødselsdato: LocalDate, val bostedland: String) {
+data class Tpsfakta(val fodselsdato: LocalDate, val bostedland: String) {
 
     fun alder(): Int {
-        val age = Year.now().value - fødselsdato.year
-        return if (LocalDate.now().withYear(fødselsdato.year) >= fødselsdato) age else age - 1
+        val age = Year.now().value - fodselsdato.year
+        return if (LocalDate.now().withYear(fodselsdato.year) >= fodselsdato) age else age - 1
     }
 }
 
@@ -37,6 +36,6 @@ data class Arbeidsgiver(val orgnummer: String)
 data class Arbeidsavtale(val fomGyldighetsperiode: LocalDate)
 
 data class Aordningenfakta(val perioder: List<Periode>)
-data class Periode(val periode: LocalDate, val beløp: Long)
+data class Periode(val periode: LocalDate, val belop: Long)
 
-data class Inntektsmeldingfakta(val beløp: Long, val omregnetÅrsinntekt: Long = beløp * 12)
+data class Inntektsmeldingfakta(val belop: Long, val omregnetArsinntekt: Long = belop * 12)

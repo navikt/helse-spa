@@ -31,11 +31,11 @@ class SaksbehandlingStream(env: Environment) {
         val stream: KStream<String, JSONObject> = builder.consumeTopic(Topics.SYKEPENGEBEHANDLING)
 
         stream.peek { _, _-> acceptCounter.labels("accepted").inc() }
-                .mapValues { _, søknad -> hentRegisterData(søknad) }
-                .mapValues { _, søknad -> fastsettFakta(søknad) }
-                .mapValues { _, søknad -> prøvVilkår(søknad) }
-                .mapValues { _, søknad -> beregnSykepenger(søknad) }
-                .mapValues { _, søknad -> fattVedtak(søknad) }
+                .mapValues { _, soknad -> hentRegisterData(soknad) }
+                .mapValues { _, soknad -> fastsettFakta(soknad) }
+                .mapValues { _, soknad -> prøvVilkår(soknad) }
+                .mapValues { _, soknad -> beregnSykepenger(soknad) }
+                .mapValues { _, soknad -> fattVedtak(soknad) }
                 .peek { _, _-> acceptCounter.labels("processed").inc() }
                 .toTopic(Topics.VEDTAK_SYKEPENGER)
 
