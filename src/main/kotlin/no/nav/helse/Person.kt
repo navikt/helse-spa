@@ -3,7 +3,7 @@ package no.nav.helse
 import java.time.LocalDate
 import java.time.LocalDateTime
 
-fun hentTPSData(input: Sykepengesoknad): Vurdering<Tpsfakta, Person> {
+fun hentTPfcSData(input: Sykepengesoknad): Vurdering<Tpsfakta, Person> {
     val person = hentPerson(AktorId(input.aktorId))
 
     return Avklart(fastsattVerdi = Tpsfakta(fodselsdato = person.fdato, bostedland = person.bostedsland),
@@ -29,7 +29,7 @@ fun hentPerson(aktorId: AktorId): Person {
 }
 
 enum class Kjonn {
-    MANN, KVINNE
+    MANN, KVINNE, UKJENN
 }
 
 data class Person(
