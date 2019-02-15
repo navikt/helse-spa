@@ -2,7 +2,7 @@ package no.nav.helse
 
 import com.fasterxml.jackson.annotation.JsonFormat
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-import javax.xml.datatype.XMLGregorianCalendar
+import java.time.YearMonth
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class InntektsFakta(val arbeidsInntektIdentListe : Array<ArbeidsInntektIdent>)
@@ -13,7 +13,7 @@ data class ArbeidsInntektIdent(val arbeidsInntektMaaned: Array<ArbeidsInntektMaa
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class ArbeidsInntektMaaned(val arbeidsInntektInformasjon: ArbeidsInntektInformasjon,
                                 @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MMz")
-                                val aarMaaned:XMLGregorianCalendar)
+                                val aarMaaned:YearMonth)
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class ArbeidsInntektInformasjon(val inntektListe: Array<InntektListeElement>)
@@ -21,4 +21,4 @@ data class ArbeidsInntektInformasjon(val inntektListe: Array<InntektListeElement
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class InntektListeElement(val beloep: Long,
                                @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MMz")
-                               val utbetaltIPeriode: XMLGregorianCalendar)
+                               val utbetaltIPeriode: YearMonth)
