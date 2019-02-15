@@ -6,7 +6,8 @@ data class Environment(
         val bootstrapServersUrl: String = getEnvVar("KAFKA_BOOTSTRAP_SERVERS"),
         val httpPort: Int? = null,
         val navTruststorePath: String? = getEnvVar("NAV_TRUSTSTORE_PATH"),
-        val navTruststorePassword: String? = getEnvVar("NAV_TRUSTSTORE_PASSWORD")
+        val navTruststorePassword: String? = getEnvVar("NAV_TRUSTSTORE_PASSWORD"),
+        val sparkelBaseUrl: String = getEnvVar("SPARKEL_BASE_URL", "http://localhost:8099")
 )
 
 private fun getEnvVar(varName: String, defaultValue: String? = null) =

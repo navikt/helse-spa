@@ -10,7 +10,7 @@ import org.json.JSONObject
 import java.time.LocalDate
 import java.time.LocalDateTime
 
-class SaksbehandlingStream(env: Environment) {
+class SaksbehandlingStream(val env: Environment) {
     private val acceptCounter: Counter = Counter.build()
             .name("spa_behandling_stream_counter")
             .labelNames("state")
@@ -66,7 +66,7 @@ class SaksbehandlingStream(env: Environment) {
             startSyketilfelle = LocalDate.now())
 
     fun hentRegisterData(input: Sykepengesoknad): BeriketSykepengesoknad =
-            BeriketSykepengesoknad(input, Faktagrunnlag(tps = hentTPSData(input)))
+            BeriketSykepengesoknad(input, Faktagrunnlag(tps = PersonOppslag(env.sparkelBaseUrl).hentTPSData(input)))
 
     fun fastsettFakta(input: BeriketSykepengesoknad): AvklartSykepengesoknad = AvklartSykepengesoknad(input.originalSoknad, vurderMedlemskap(input))
     fun prøvVilkår(input: AvklartSykepengesoknad): AvklartSykepengesoknad = input
