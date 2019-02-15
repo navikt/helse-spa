@@ -1,30 +1,28 @@
 package no.nav.helse
 
-import java.net.URL
+import com.github.kittinunf.fuel.httpGet
+import no.nav.helse.serde.defaultObjectMapper
 import java.time.LocalDate
 
-class PersonOppslag(val sparkelUrl: String) {
+class PersonOppslag(val sparkelUrl: String, val stsRestClient: StsRestClient) {
     fun hentTPSData(input: Sykepengesoknad): Tpsfakta {
         val person = hentPerson(AktorId(input.aktorId))
         return Tpsfakta(fodselsdato = person.fdato, bostedland = person.bostedsland)
     }
 
-    /*
-    something clever to fetch person from Sparkel
-     */
     private fun hentPerson(aktorId: AktorId): Person {
-        URL("$sparkelUrl/api/person/${aktorId.aktor}").openStream().use { stream ->
+        val bearer = stsRestClient.token()
 
-        }
-        return Person(
-                id = AktorId("1234"),
-                fornavn = "Joey",
-                mellomnavn = "H",
-                etternavn = "Sixpack",
-                fdato = LocalDate.of(1977, 1, 1),
-                kjonn = Kjonn.MANN,
-                bostedsland = "Norge"
-        )
+        val (_, _, result) = "$sparkelUrl/api/person/$aktorId".httpGet()
+                .header(mapOf(
+                        "Authorization" to "Bearer $bearer",
+                        "Accept" to "application/json",
+                        "Nav-Call-Id" to "anything",
+                        "Nav-Consumer-Id" to "spa"
+                        ))
+                .responseString()
+
+        return defaultObjectMapper.readValue(result.component1(), Person::class.java)
     }
 }
 

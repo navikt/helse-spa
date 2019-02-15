@@ -11,6 +11,7 @@ import org.apache.kafka.streams.kstream.*
 import org.json.JSONObject
 
 class SaksbehandlingStream(val env: Environment) {
+    private val stsClient = StsRestClient(baseUrl = env.stsRestUrl, username = env.username, password = env.password)
     private val acceptCounter: Counter = Counter.build()
             .name("spa_behandling_stream_counter")
             .labelNames("state")
@@ -53,7 +54,7 @@ class SaksbehandlingStream(val env: Environment) {
     }
 
     fun hentRegisterData(input: Sykepengesoknad): BeriketSykepengesoknad =
-            BeriketSykepengesoknad(input, Faktagrunnlag(tps = PersonOppslag(env.sparkelBaseUrl).hentTPSData(input)))
+            BeriketSykepengesoknad(input, Faktagrunnlag(tps = PersonOppslag(env.sparkelBaseUrl, stsClient).hentTPSData(input)))
 
     fun fastsettFakta(input: BeriketSykepengesoknad): AvklartSykepengesoknad = AvklartSykepengesoknad(input.originalSoknad, vurderMedlemskap(input))
     fun prøvVilkår(input: AvklartSykepengesoknad): AvklartSykepengesoknad = input
