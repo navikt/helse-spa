@@ -5,6 +5,7 @@ val ktorVersion = "1.1.2"
 val prometheusVersion = "0.5.0"
 val gsonVersion = "2.7"
 val navStreamsVersion = "10"
+val fuelVersion = "1.15.1"
 
 val junitJupiterVersion = "5.3.1"
 val assertJVersion = "3.11.1"
@@ -38,6 +39,8 @@ dependencies {
     compile("no.nav.helse.sykepenger.lovverk:sykepenger-inngangsvilkar:2018-12-20-101.51d0399")
     compile("no.nav.helse.sykepenger.lovverk:sykepenger-beregning:2018-12-20-101.8ef150a")
     compile("no.nav:nare-prometheus:0b41ab4")
+    compile("com.github.kittinunf.fuel:fuel:$fuelVersion")
+
 
     testCompile ("no.nav:kafka-embedded-env:2.0.1")
     testCompile("org.junit.jupiter:junit-jupiter-api:$junitJupiterVersion")
