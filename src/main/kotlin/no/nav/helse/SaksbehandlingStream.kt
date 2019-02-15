@@ -1,6 +1,8 @@
 package no.nav.helse
 
+import io.prometheus.client.CollectorRegistry
 import io.prometheus.client.Counter
+import no.nav.NarePrometheus
 import no.nav.helse.serde.sykepengesoknadSerde
 import no.nav.helse.streams.*
 import org.apache.kafka.common.serialization.Serdes
@@ -67,3 +69,5 @@ val sykepengesoknadTopic = Topic(
         keySerde = Serdes.String(),
         valueSerde = sykepengesoknadSerde
 )
+
+val narePrometheus = NarePrometheus(CollectorRegistry.defaultRegistry)

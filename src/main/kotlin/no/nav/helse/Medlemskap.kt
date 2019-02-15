@@ -17,7 +17,8 @@ fun søkerBorI(land: String, tps: Tpsfakta): Evaluering =
             Evaluering.nei("Søker er bosatt i ${tps.bostedland} som ikke er $land")
 
 fun vurderMedlemskap(soknad: BeriketSykepengesoknad): Vurdering<Boolean, Tpsfakta> {
-    val evaluering = erMedlem.evaluer(soknad.faktagrunnlag.tps)
+    val evaluering = narePrometheus.tellEvaluering { erMedlem.evaluer(soknad.faktagrunnlag.tps) }
+
     return when (evaluering.resultat) {
         Resultat.JA -> Avklart(fastsattVerdi = true, grunnlag = soknad.faktagrunnlag.tps, fastsattAv = "SPA", datoForFastsettelse = LocalDateTime.now(), begrunnelse = evaluering.begrunnelse)
         Resultat.NEI -> Avklart(fastsattVerdi = false, grunnlag = soknad.faktagrunnlag.tps, fastsattAv = "SPA", datoForFastsettelse = LocalDateTime.now(), begrunnelse = evaluering.begrunnelse)
