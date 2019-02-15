@@ -1,14 +1,14 @@
 package no.nav.helse
 
 import io.prometheus.client.Counter
+import no.nav.helse.serde.sykepengesoknadSerde
 import no.nav.helse.streams.*
+import org.apache.kafka.common.serialization.Serdes
 import org.apache.kafka.streams.KafkaStreams
 import org.apache.kafka.streams.StreamsBuilder
 import org.apache.kafka.streams.Topology
 import org.apache.kafka.streams.kstream.*
 import org.json.JSONObject
-import java.time.LocalDate
-import java.time.LocalDateTime
 
 class SaksbehandlingStream(val env: Environment) {
     private val acceptCounter: Counter = Counter.build()
@@ -30,10 +30,9 @@ class SaksbehandlingStream(val env: Environment) {
 
     private fun topology(): Topology {
         val builder = StreamsBuilder()
-        val stream: KStream<String, JSONObject> = builder.consumeTopic(Topics.SYKEPENGEBEHANDLING)
+        val stream: KStream<String, Sykepengesoknad> = builder.consumeTopic(sykepengesoknadTopic)
 
         stream.peek { _, _ -> acceptCounter.labels("accepted").inc() }
-                .mapValues { _, soknad -> somSoknad(soknad) }
                 .mapValues { _, soknad -> hentRegisterData(soknad) }
                 .mapValues { _, soknad -> fastsettFakta(soknad) }
                 .mapValues { _, soknad -> prøvVilkår(soknad) }
@@ -53,18 +52,6 @@ class SaksbehandlingStream(val env: Environment) {
         consumer.stop()
     }
 
-    /*
-        parse with jackson?
-     */
-    fun somSoknad(input: JSONObject): Sykepengesoknad = Sykepengesoknad(aktorId = "",
-            harVurdertInntekt = false,
-            fom = LocalDate.now(),
-            tom = LocalDate.now(),
-            sendtNav = LocalDateTime.now(),
-            soknadsperioder = emptyList(),
-            soktUtenlandsopphold = false,
-            startSyketilfelle = LocalDate.now())
-
     fun hentRegisterData(input: Sykepengesoknad): BeriketSykepengesoknad =
             BeriketSykepengesoknad(input, Faktagrunnlag(tps = PersonOppslag(env.sparkelBaseUrl).hentTPSData(input)))
 
@@ -73,3 +60,9 @@ class SaksbehandlingStream(val env: Environment) {
     fun beregnSykepenger(input: AvklartSykepengesoknad): AvklartSykepengesoknad = input
     fun fattVedtak(input: AvklartSykepengesoknad): JSONObject = JSONObject(input.originalSoknad)
 }
+
+val sykepengesoknadTopic = Topic(
+        name = Topics.SYKEPENGESØKNADER_INN.name,
+        keySerde = Serdes.String(),
+        valueSerde = sykepengesoknadSerde
+)
