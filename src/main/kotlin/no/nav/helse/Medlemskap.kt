@@ -3,7 +3,6 @@ package no.nav.helse
 import no.nav.nare.core.evaluations.Evaluering
 import no.nav.nare.core.evaluations.Resultat
 import no.nav.nare.core.specifications.Spesifikasjon
-import java.time.LocalDateTime
 
 val erMedlem = Spesifikasjon<Tpsfakta>(
         beskrivelse = "Formålet med sykepenger er å gi kompensasjon for bortfall av arbeidsinntekt for yrkesaktive medlemmer som er arbeidsuføre på grunn av sykdom eller skade.",
@@ -20,8 +19,8 @@ fun vurderMedlemskap(soknad: BeriketSykepengesoknad): Vurdering<Boolean, Tpsfakt
     val evaluering = narePrometheus.tellEvaluering { erMedlem.evaluer(soknad.faktagrunnlag.tps) }
 
     return when (evaluering.resultat) {
-        Resultat.JA -> Avklart(fastsattVerdi = true, grunnlag = soknad.faktagrunnlag.tps, fastsattAv = "SPA", datoForFastsettelse = LocalDateTime.now(), begrunnelse = evaluering.begrunnelse)
-        Resultat.NEI -> Avklart(fastsattVerdi = false, grunnlag = soknad.faktagrunnlag.tps, fastsattAv = "SPA", datoForFastsettelse = LocalDateTime.now(), begrunnelse = evaluering.begrunnelse)
-        Resultat.KANSKJE -> Uavklart(grunnlag = soknad.faktagrunnlag.tps, begrunnelse = evaluering.begrunnelse, arsak = Arsak.SKJONN)
+        Resultat.KANSKJE -> Vurdering.Uavklart(Vurdering.Uavklart.Arsak.SKJONN, evaluering.begrunnelse, soknad.faktagrunnlag.tps)
+        else -> Vurdering.Avklart(evaluering.resultat == Resultat.JA, evaluering.begrunnelse, soknad.faktagrunnlag.tps
+                , "SPA")
     }
 }
