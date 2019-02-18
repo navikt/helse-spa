@@ -57,7 +57,10 @@ class SaksbehandlingStream(val env: Environment) {
     }
 
     fun hentRegisterData(input: Sykepengesoknad): BeriketSykepengesøknad =
-            BeriketSykepengesøknad(input, Faktagrunnlag(tps = PersonOppslag(env.sparkelBaseUrl, stsClient).hentTPSData(input)))
+            BeriketSykepengesøknad(input, Faktagrunnlag(
+                    tps = PersonOppslag(env.sparkelBaseUrl, stsClient).hentTPSData(input),
+                    inntekt = InntektOppslag(env.sparkelBaseUrl, stsClient).hentInntekt(input.aktorId, input.startSyketilfelle, input.startSyketilfelle.minusYears(1)))
+            )
 
     fun fastsettFakta(input: BeriketSykepengesøknad): AvklartSykepengesoknad = AvklartSykepengesoknad(
             originalSoknad = input.originalSoknad,

@@ -29,6 +29,7 @@ data class Soknadsperiode(val fom: LocalDate,
                           val tom: LocalDate,
                           val sykmeldingsgrad: Int)
 
-data class Faktagrunnlag(val tps: Tpsfakta)
+data class Faktagrunnlag(val tps: Tpsfakta,
+                         val inntekt: InntektsFakta)
 
 data class Tpsfakta(val fodselsdato: LocalDate, val bostedland: String)

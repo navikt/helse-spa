@@ -7,6 +7,8 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.slf4j.LoggerFactory
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 class InntektTest {
 
@@ -33,5 +35,11 @@ class InntektTest {
             assertEquals(if (i <= 2) 50000L else 60000L,
                     inntektsFakta.arbeidsInntektIdentListe[0].arbeidsInntektMaaned[i].arbeidsInntektInformasjon.inntektListe[0].beloep)
         }
+    }
+
+    @Test
+    fun test1() {
+        val d = LocalDate.now()
+        println(d.format(DateTimeFormatter.ofPattern("yyyy-MM")))
     }
 }

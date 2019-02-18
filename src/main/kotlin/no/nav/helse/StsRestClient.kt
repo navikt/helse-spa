@@ -1,11 +1,10 @@
 package no.nav.helse
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import com.fasterxml.jackson.annotation.JsonProperty
 import com.github.kittinunf.fuel.httpGet
-import no.nav.helse.*
 import no.nav.helse.serde.defaultObjectMapper
-import org.json.JSONObject
 import java.time.LocalDateTime
-import java.util.*
 
 /**
  * henter jwt token fra STS
@@ -26,7 +25,8 @@ class StsRestClient(val baseUrl: String, val username: String, val password: Str
         return cachedOidcToken!!.accessToken
     }
 
-    data class Token(val accessToken: String, val type: String, val expiresIn: Int) {
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    data class Token(@JsonProperty("access_token") val accessToken: String, @JsonProperty("token_type") val type: String, @JsonProperty("expires_in") val expiresIn: Int) {
         // expire 10 seconds before actual expiry. for great margins.
         val expirationTime: LocalDateTime = LocalDateTime.now().plusSeconds(expiresIn - 10L)
 
