@@ -11,6 +11,7 @@ import org.apache.kafka.streams.StreamsBuilder
 import org.apache.kafka.streams.Topology
 import org.apache.kafka.streams.kstream.*
 import org.json.JSONObject
+import vurderAlderPåSisteDagISøknadsPeriode
 
 class SaksbehandlingStream(val env: Environment) {
     private val stsClient = StsRestClient(baseUrl = env.stsRestUrl, username = env.username, password = env.password)
@@ -58,7 +59,10 @@ class SaksbehandlingStream(val env: Environment) {
     fun hentRegisterData(input: Sykepengesoknad): BeriketSykepengesøknad =
             BeriketSykepengesøknad(input, Faktagrunnlag(tps = PersonOppslag(env.sparkelBaseUrl, stsClient).hentTPSData(input)))
 
-    fun fastsettFakta(input: BeriketSykepengesøknad): AvklartSykepengesoknad = AvklartSykepengesoknad(input.originalSoknad, vurderMedlemskap(input))
+    fun fastsettFakta(input: BeriketSykepengesøknad): AvklartSykepengesoknad = AvklartSykepengesoknad(
+            originalSoknad = input.originalSoknad,
+            medlemskap = vurderMedlemskap(input),
+            alder = vurderAlderPåSisteDagISøknadsPeriode(input))
     fun prøvVilkår(input: AvklartSykepengesoknad): AvklartSykepengesoknad = input
     fun beregnSykepenger(input: AvklartSykepengesoknad): AvklartSykepengesoknad = input
     fun fattVedtak(input: AvklartSykepengesoknad): JSONObject = JSONObject(input.originalSoknad)

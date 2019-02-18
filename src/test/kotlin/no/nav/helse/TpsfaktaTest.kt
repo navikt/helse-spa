@@ -1,5 +1,6 @@
 package no.nav.helse
 
+import alder
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.time.LocalDate

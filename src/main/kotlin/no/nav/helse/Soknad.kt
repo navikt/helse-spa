@@ -1,7 +1,10 @@
 package no.nav.helse
 
+import Alder
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-import java.time.*
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.Period
 
 data class BeriketSykepengesøknad(
         val originalSoknad: Sykepengesoknad,
@@ -9,7 +12,8 @@ data class BeriketSykepengesøknad(
 )
 
 data class AvklartSykepengesoknad(val originalSoknad: Sykepengesoknad,
-             val medlemskap: Vurdering<Boolean, Tpsfakta>)
+                                  val medlemskap: Vurdering<Boolean, Tpsfakta>,
+                                  val alder: Vurdering<Alder, Tpsfakta>)
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class Sykepengesoknad(val aktorId: String,
@@ -27,6 +31,4 @@ data class Soknadsperiode(val fom: LocalDate,
 
 data class Faktagrunnlag(val tps: Tpsfakta)
 
-data class Tpsfakta(val fodselsdato: LocalDate, val bostedland: String) {
-    fun alder(dato: LocalDate = LocalDate.now()): Int = Period.between(fodselsdato, dato).years
-}
+data class Tpsfakta(val fodselsdato: LocalDate, val bostedland: String)
