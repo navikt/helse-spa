@@ -12,5 +12,5 @@ data class Environment(
 )
 
 private fun getEnvVar(varName: String, defaultValue: String? = null) =
-        System.getenv().getOrDefault(varName, defaultValue)
+        System.getenv(varName) ?: defaultValue ?: throw Exception("mangler verdi for $varName")
 
