@@ -1,11 +1,9 @@
 package no.nav.helse
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.Year
+import java.time.*
 
-data class BeriketSykepengesoknad(
+data class BeriketSykepengesøknad(
         val originalSoknad: Sykepengesoknad,
         val faktagrunnlag: Faktagrunnlag
 )
@@ -30,8 +28,5 @@ data class Soknadsperiode(val fom: LocalDate,
 data class Faktagrunnlag(val tps: Tpsfakta)
 
 data class Tpsfakta(val fodselsdato: LocalDate, val bostedland: String) {
-    fun alder(): Int {
-        val age = Year.now().value - fodselsdato.year
-        return if (LocalDate.now().withYear(fodselsdato.year) >= fodselsdato) age else age - 1
-    }
+    fun alder(dato: LocalDate = LocalDate.now()): Int = Period.between(fodselsdato, dato).years
 }

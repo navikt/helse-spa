@@ -55,10 +55,10 @@ class SaksbehandlingStream(val env: Environment) {
         consumer.stop()
     }
 
-    fun hentRegisterData(input: Sykepengesoknad): BeriketSykepengesoknad =
-            BeriketSykepengesoknad(input, Faktagrunnlag(tps = PersonOppslag(env.sparkelBaseUrl, stsClient).hentTPSData(input)))
+    fun hentRegisterData(input: Sykepengesoknad): BeriketSykepengesøknad =
+            BeriketSykepengesøknad(input, Faktagrunnlag(tps = PersonOppslag(env.sparkelBaseUrl, stsClient).hentTPSData(input)))
 
-    fun fastsettFakta(input: BeriketSykepengesoknad): AvklartSykepengesoknad = AvklartSykepengesoknad(input.originalSoknad, vurderMedlemskap(input))
+    fun fastsettFakta(input: BeriketSykepengesøknad): AvklartSykepengesoknad = AvklartSykepengesoknad(input.originalSoknad, vurderMedlemskap(input))
     fun prøvVilkår(input: AvklartSykepengesoknad): AvklartSykepengesoknad = input
     fun beregnSykepenger(input: AvklartSykepengesoknad): AvklartSykepengesoknad = input
     fun fattVedtak(input: AvklartSykepengesoknad): JSONObject = JSONObject(input.originalSoknad)

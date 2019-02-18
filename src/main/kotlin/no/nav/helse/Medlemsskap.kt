@@ -15,7 +15,7 @@ fun sokerBorI(land: String, tps: Tpsfakta): Evaluering =
         else
             Evaluering.nei("Søker er bosatt i ${tps.bostedland} som ikke er $land")
 
-fun vurderMedlemskap(soknad: BeriketSykepengesoknad): Vurdering<Boolean, Tpsfakta> {
+fun vurderMedlemskap(soknad: BeriketSykepengesøknad): Vurdering<Boolean, Tpsfakta> {
     val evaluering = narePrometheus.tellEvaluering { erMedlem.evaluer(soknad.faktagrunnlag.tps) }
 
     return when (evaluering.resultat) {

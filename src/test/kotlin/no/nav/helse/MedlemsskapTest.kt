@@ -42,6 +42,6 @@ class MedlemsskapTest {
         }
     }
 
-    private fun soknadForLand(land: String): BeriketSykepengesoknad = soknadUtenVerdi.copy(faktagrunnlag = faktagrunnlagUtenVerdi.copy(tpsFaktaUtenVerdi.copy(bostedland = land)))
+    private fun soknadForLand(land: String): BeriketSykepengesøknad = soknadUtenVerdi.copy(faktagrunnlag = faktagrunnlagUtenVerdi.copy(tpsFaktaUtenVerdi.copy(bostedland = land)))
 }
 

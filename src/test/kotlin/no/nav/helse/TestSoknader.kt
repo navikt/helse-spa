@@ -12,16 +12,18 @@ val faktagrunnlagUtenVerdi = Faktagrunnlag(
         tps = tpsFaktaUtenVerdi
 )
 
-val soknadUtenVerdi = BeriketSykepengesoknad(
-        originalSoknad = Sykepengesoknad(
-                aktorId = "1",
-                startSyketilfelle = LocalDate.now(),
-                soktUtenlandsopphold = true,
-                soknadsperioder = emptyList(),
-                sendtNav = LocalDateTime.now(),
-                tom = LocalDate.now(),
-                fom = LocalDate.now(),
-                harVurdertInntekt = false
-        ),
+val originalSoknad = Sykepengesoknad(
+        aktorId = "1",
+        startSyketilfelle = LocalDate.now(),
+        soktUtenlandsopphold = true,
+        soknadsperioder = emptyList(),
+        sendtNav = LocalDateTime.now(),
+        tom = LocalDate.now(),
+        fom = LocalDate.now(),
+        harVurdertInntekt = false
+)
+
+val soknadUtenVerdi = BeriketSykepengesøknad(
+        originalSoknad = originalSoknad,
         faktagrunnlag = faktagrunnlagUtenVerdi
 )
