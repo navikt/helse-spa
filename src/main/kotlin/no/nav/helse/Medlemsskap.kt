@@ -7,9 +7,9 @@ import no.nav.nare.core.specifications.Spesifikasjon
 val erMedlem = Spesifikasjon<Tpsfakta>(
         beskrivelse = "Formålet med sykepenger er å gi kompensasjon for bortfall av arbeidsinntekt for yrkesaktive medlemmer som er arbeidsuføre på grunn av sykdom eller skade.",
         identitet = "§ 8-1"
-) { tps -> søkerBorI("Norge", tps) }
+) { tps -> sokerBorI("NOR", tps) }
 
-fun søkerBorI(land: String, tps: Tpsfakta): Evaluering =
+fun sokerBorI(land: String, tps: Tpsfakta): Evaluering =
         if (tps.bostedland == land)
             Evaluering.ja("Søker er bosatt i $land")
         else
