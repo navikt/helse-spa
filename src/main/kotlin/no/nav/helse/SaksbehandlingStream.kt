@@ -39,6 +39,7 @@ class SaksbehandlingStream(val env: Environment) {
         stream.peek { _, _ -> acceptCounter.labels("accepted").inc() }
                 .mapValues { _, soknad -> hentRegisterData(soknad) }
                 .mapValues { _, soknad -> fastsettFakta(soknad) }
+                .mapValues { _, soknad -> beregnMaksdato(soknad) }
                 .mapValues { _, soknad -> prøvVilkår(soknad) }
                 .mapValues { _, soknad -> beregnSykepenger(soknad) }
                 .mapValues { _, soknad -> fattVedtak(soknad) }
@@ -59,13 +60,15 @@ class SaksbehandlingStream(val env: Environment) {
     fun hentRegisterData(input: Sykepengesoknad): BeriketSykepengesøknad =
             BeriketSykepengesøknad(input, Faktagrunnlag(
                     tps = PersonOppslag(env.sparkelBaseUrl, stsClient).hentTPSData(input),
-                    inntekt = InntektOppslag(env.sparkelBaseUrl, stsClient).hentInntekt(input.aktorId, input.startSyketilfelle, input.startSyketilfelle.minusYears(1)))
+                    inntekt = InntektOppslag(env.sparkelBaseUrl, stsClient).hentInntekt(input.aktorId, input.startSyketilfelle, input.startSyketilfelle.minusYears(1)),
+                    sykepengeliste = SykepengelisteOppslag(env.sparkelBaseUrl, stsClient).hentSykepengeliste(input.aktorId, input.fom))
             )
 
     fun fastsettFakta(input: BeriketSykepengesøknad): AvklartSykepengesoknad = AvklartSykepengesoknad(
             originalSoknad = input.originalSoknad,
             medlemskap = vurderMedlemskap(input),
             alder = vurderAlderPåSisteDagISøknadsPeriode(input))
+    fun beregnMaksdato(soknad: AvklartSykepengesoknad): AvklartSykepengesoknad = soknad.copy(maksdato = vurderMaksdato(soknad))
     fun prøvVilkår(input: AvklartSykepengesoknad): AvklartSykepengesoknad = input
     fun beregnSykepenger(input: AvklartSykepengesoknad): AvklartSykepengesoknad = input
     fun fattVedtak(input: AvklartSykepengesoknad): JSONObject = JSONObject(input.originalSoknad)

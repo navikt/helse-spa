@@ -14,7 +14,8 @@ val inntektFaktaUtenVerdi = Inntektsfakta(
 
 val faktagrunnlagUtenVerdi = Faktagrunnlag(
         tps = tpsFaktaUtenVerdi,
-        inntekt = inntektFaktaUtenVerdi
+        inntekt = inntektFaktaUtenVerdi,
+        sykepengeliste = emptyList()
 )
 
 val originalSoknad = Sykepengesoknad(
