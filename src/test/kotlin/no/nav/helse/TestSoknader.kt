@@ -8,7 +8,7 @@ val tpsFaktaUtenVerdi = Tpsfakta(
         bostedland = "bytt ut dette i tester"
 )
 
-val inntektFaktaUtenVerdi = InntektsFakta(
+val inntektFaktaUtenVerdi = Inntektsfakta(
         arbeidsInntektIdentListe = emptyArray()
 )
 

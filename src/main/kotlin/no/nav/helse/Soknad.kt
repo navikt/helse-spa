@@ -4,7 +4,6 @@ import Alder
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.time.Period
 
 data class BeriketSykepengesøknad(
         val originalSoknad: Sykepengesoknad,
@@ -30,6 +29,6 @@ data class Soknadsperiode(val fom: LocalDate,
                           val sykmeldingsgrad: Int)
 
 data class Faktagrunnlag(val tps: Tpsfakta,
-                         val inntekt: InntektsFakta)
+                         val inntekt: Inntektsfakta)
 
 data class Tpsfakta(val fodselsdato: LocalDate, val bostedland: String)
