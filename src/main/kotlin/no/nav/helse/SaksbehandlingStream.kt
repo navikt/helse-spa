@@ -67,8 +67,9 @@ class SaksbehandlingStream(val env: Environment) {
     fun fastsettFakta(input: BeriketSykepengesøknad): AvklartSykepengesoknad = AvklartSykepengesoknad(
             originalSoknad = input.originalSoknad,
             medlemskap = vurderMedlemskap(input),
-            alder = vurderAlderPåSisteDagISøknadsPeriode(input))
-    fun beregnMaksdato(soknad: AvklartSykepengesoknad): AvklartSykepengesoknad = soknad.copy(maksdato = vurderMaksdato(soknad))
+            alder = vurderAlderPåSisteDagISøknadsPeriode(input),
+            sykepengeliste = input.faktagrunnlag.sykepengeliste)
+    fun beregnMaksdato(soknad: AvklartSykepengesoknad): AvklartSykepengesoknad = soknad.copy(maksdato = MaksdatoOppslag(env.sparkelBaseUrl, stsClient).vurderMaksdato(soknad))
     fun prøvVilkår(input: AvklartSykepengesoknad): AvklartSykepengesoknad = input
     fun beregnSykepenger(input: AvklartSykepengesoknad): AvklartSykepengesoknad = input
     fun fattVedtak(input: AvklartSykepengesoknad): JSONObject = JSONObject(input.originalSoknad)
