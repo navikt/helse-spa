@@ -37,22 +37,23 @@ class InntektOppslagIT {
         val inntektOppslag = InntektOppslag(
                 Konstanter.sparkelUrl,
                 sts)
-        val inntektsFakta = inntektOppslag.hentInntekt(aktørId, LocalDate.now().minusYears(1), LocalDate.now())
+        val inntektsfakta = inntektOppslag.hentInntekt(aktørId, LocalDate.now().minusYears(1), LocalDate.now())
+        val inntekt = inntektsfakta.registerdata
 
-        LOG.info(inntektsFakta.arbeidsInntektIdentListe.toString())
-        Assertions.assertEquals(12, inntektsFakta.arbeidsInntektIdentListe[0].arbeidsInntektMaaned.size)
+        LOG.info(inntekt.arbeidsInntektIdentListe.toString())
+        Assertions.assertEquals(12, inntekt.arbeidsInntektIdentListe[0].arbeidsInntektMaaned.size)
         val startMåned = 2
         for (i in 0..11) {
             Assertions.assertEquals(
                     if (startMåned + i > 12) startMåned + i - 12 else startMåned + i,
-                    inntektsFakta.arbeidsInntektIdentListe[0].arbeidsInntektMaaned[i].aarMaaned.month.value)
+                    inntekt.arbeidsInntektIdentListe[0].arbeidsInntektMaaned[i].aarMaaned.month.value)
             // faktisk ikke tilfelle i testfila per nå:
             /*assertEquals(1,
                     inntektsFakta.arbeidsInntektIdentListe[0].arbeidsInntektMaaned[i].arbeidsInntektInformasjon.inntektListe.size)*/
             Assertions.assertEquals(if (i <= 2) 50000L else 60000L,
-                    inntektsFakta.arbeidsInntektIdentListe[0].arbeidsInntektMaaned[i].arbeidsInntektInformasjon.inntektListe[0].beloep)
+                    inntekt.arbeidsInntektIdentListe[0].arbeidsInntektMaaned[i].arbeidsInntektInformasjon.inntektListe[0].beloep)
         }
-        println(inntektsFakta);
+        println(inntekt);
     }
 
 

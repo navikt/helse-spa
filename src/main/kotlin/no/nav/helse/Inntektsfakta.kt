@@ -4,13 +4,13 @@ import com.fasterxml.jackson.annotation.JsonFormat
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.github.kittinunf.fuel.httpGet
 import no.nav.helse.serde.defaultObjectMapper
+import org.slf4j.LoggerFactory
 import java.time.LocalDate
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 
 class InntektOppslag(val sparkelUrl: String, val stsRestClient: StsRestClient) {
-
-    fun hentInntekt(aktorId: String, fom: LocalDate, tom:LocalDate): Inntektsfakta {
+    private fun hentInntektsliste(aktorId: String, fom: LocalDate, tom: LocalDate): InntektsOppslagResultat {
         val bearer = stsRestClient.token()
 
         val dyFom = fom.format(DateTimeFormatter.ofPattern("yyyy-MM"));
@@ -25,12 +25,37 @@ class InntektOppslag(val sparkelUrl: String, val stsRestClient: StsRestClient) {
                 ))
                 .responseString()
 
-        return defaultObjectMapper.readValue(result.component1(), Inntektsfakta::class.java)
+        return defaultObjectMapper.readValue(result.component1(), InntektsOppslagResultat::class.java)
+    }
+
+    fun hentInntekt(aktorId: String, fom: LocalDate, tom: LocalDate): Inntektsfakta {
+        val registerdata = hentInntektsliste(aktorId, fom, tom)
+        return Inntektsfakta(registerdata, fastsettAktuellMånedsinntekt(registerdata) * 12)
     }
 }
 
+fun fastsettAktuellMånedsinntekt(registerdata : InntektsOppslagResultat) : Long {
+    if (registerdata.arbeidsInntektIdentListe.size != 1) {
+        throw Exception("Forventet kun én ArbeidsInntektIdent")
+    }
+
+    val måneder = registerdata.arbeidsInntektIdentListe[0].arbeidsInntektMaaned
+    if (måneder.size != 12) {
+        throw Exception("Forventet 12 måneder")
+    }
+
+    return måneder.slice(9..11)
+            .map { it.arbeidsInntektInformasjon.inntektListe }
+            .map { if (it.size != 1) throw Exception("Forventet kun én raportert inntekt per måned") else it[0] }
+            .map { it.beloep }
+            .reduce(Long::plus) / 3
+}
+
+data class Inntektsfakta(val registerdata : InntektsOppslagResultat,
+                         val fastsattÅrsinntekt : Long)
+
 @JsonIgnoreProperties(ignoreUnknown = true)
-data class Inntektsfakta(val arbeidsInntektIdentListe : Array<ArbeidsInntektIdent>)
+data class InntektsOppslagResultat(val arbeidsInntektIdentListe : Array<ArbeidsInntektIdent>)
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class ArbeidsInntektIdent(val arbeidsInntektMaaned: Array<ArbeidsInntektMaaned>)

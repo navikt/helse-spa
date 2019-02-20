@@ -9,7 +9,8 @@ val tpsFaktaUtenVerdi = Tpsfakta(
 )
 
 val inntektFaktaUtenVerdi = Inntektsfakta(
-        arbeidsInntektIdentListe = emptyArray()
+        registerdata = InntektsOppslagResultat(arbeidsInntektIdentListe = emptyArray()),
+        fastsattÅrsinntekt = 350000
 )
 
 val arbeidsforholdFaktaUtenVerdi = ArbeidsforholdFakta(
