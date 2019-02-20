@@ -9,13 +9,16 @@ fun vurderArbeidsgiver(soknad : BeriketSykepengesøknad) : Vurdering<Boolean, Ar
     val fakta = soknad.faktagrunnlag.arbeidsforhold
     val evaluering = evaluerArbeidsgiver(orgnummer, fakta)
 
-    return Vurdering.Avklart(evaluering.resultat == Resultat.JA, evaluering.begrunnelse, fakta, "SPA")
+    return when (evaluering.resultat) {
+        Resultat.KANSKJE -> Vurdering.Uavklart(Vurdering.Uavklart.Arsak.SKJONN, evaluering.begrunnelse, fakta)
+        else -> Vurdering.Avklart(evaluering.resultat == Resultat.JA, evaluering.begrunnelse, fakta, "SPA")
+    }
 
 }
 
 fun evaluerArbeidsgiver(orgnummer: String, fakta: ArbeidsforholdFakta): Evaluering =
         when {
-            fakta.arbeidsgiverer.size > 1 -> Evaluering.nei("Søker har mer enn en arbeidsgiver i perioden")
+            fakta.arbeidsgiverer.size > 1 -> Evaluering.kanskje("Søker har flere arbeidsgiverer, systemet støtter ikke dette enda")
             fakta.arbeidsgiverer[0].organisasjonsnummer == orgnummer -> Evaluering.ja("Søker har en arbeidsgiver med orgnummer $orgnummer")
             else -> Evaluering.nei("Søker har ikke en arbeidsgiver med orgnummer $orgnummer")
         }
