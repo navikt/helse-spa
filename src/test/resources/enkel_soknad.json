@@ -1,56 +1,40 @@
 {
-  "id": "a6b6e7c3-4e07-414e-b426-7f572f9bc59c",
+  "id": "8320c034-595c-4202-8874-903890c38147",
   "type": "ARBEIDSTAKERE",
   "status": "NY",
-  "aktorId": "1000",
-  "sykmeldingId": "2cad79a9-b401-49e1-bf56-de3213b216b3",
+  "aktorId": "1733483394485",
+  "sykmeldingId": "62020322-1b72-4f0f-bda1-4b4af90c8467",
   "arbeidsgiver": {
     "navn": "FIRMA AS",
-    "orgnummer": "123"
+    "orgnummer": "1111111111"
   },
   "arbeidssituasjon": "ARBEIDSTAKER",
   "korrigerer": null,
   "korrigertAv": null,
-  "soktUtenlandsopphold": false,
+  "soktUtenlandsopphold": null,
   "arbeidsgiverForskutterer": null,
-  "fom": [
-    2019,
-    1,
-    12
-  ],
-  "tom": [
-    2019,
-    2,
-    2
-  ],
-  "startSyketilfelle": [
-    2018,
-    3,
-    9
-  ],
+  "fom": "2018-11-15",
+  "tom": "2018-12-14",
+  "startSyketilfelle": "2018-10-16",
   "arbeidGjenopptatt": null,
-  "sykmeldingSkrevet": [
-    2019,
-    1,
-    12,
-    0,
-    0
-  ],
-  "opprettet": [
-    2019,
-    1,
-    21,
-    14,
-    52,
-    20,
-    440000000
-  ],
+  "sykmeldingSkrevet": "2018-10-16T00:00:00",
+  "opprettet": "2019-02-06T13:55:56.785",
   "sendtNav": null,
   "sendtArbeidsgiver": null,
   "egenmeldinger": [],
   "papirsykmeldinger": null,
   "fravar": [],
   "andreInntektskilder": [],
-  "soknadsperioder": [],
-  "sporsmal": []
+  "soknadsperioder": [
+    {
+      "fom": "2018-11-15",
+      "tom": "2018-12-14",
+      "sykmeldingsgrad": 100,
+      "faktiskGrad": null,
+      "avtaltTimer": null,
+      "faktiskTimer": null,
+      "sykmeldingstype": null
+    }
+  ],
+  "sporsmal": null
 }

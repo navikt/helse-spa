@@ -12,14 +12,22 @@ val inntektFaktaUtenVerdi = Inntektsfakta(
         arbeidsInntektIdentListe = emptyArray()
 )
 
+val arbeidsforholdFaktaUtenVerdi = ArbeidsforholdFakta(
+        arbeidsgiverer = emptyList(),
+        fom = LocalDate.now(),
+        tom= LocalDate.now()
+)
+
 val faktagrunnlagUtenVerdi = Faktagrunnlag(
         tps = tpsFaktaUtenVerdi,
         inntekt = inntektFaktaUtenVerdi,
-        sykepengeliste = emptyList()
+        sykepengeliste = emptyList(),
+        arbeidsforhold = arbeidsforholdFaktaUtenVerdi
 )
 
 val originalSoknad = Sykepengesoknad(
         aktorId = "1",
+        arbeidsgiver = Arbeidsgiver("Test 1", "1111"),
         startSyketilfelle = LocalDate.now(),
         soktUtenlandsopphold = true,
         soknadsperioder = emptyList(),
@@ -33,3 +41,4 @@ val soknadUtenVerdi = BeriketSykepengesøknad(
         originalSoknad = originalSoknad,
         faktagrunnlag = faktagrunnlagUtenVerdi
 )
+

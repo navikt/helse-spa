@@ -61,13 +61,15 @@ class SaksbehandlingStream(val env: Environment) {
             BeriketSykepengesøknad(input, Faktagrunnlag(
                     tps = PersonOppslag(env.sparkelBaseUrl, stsClient).hentTPSData(input),
                     inntekt = InntektOppslag(env.sparkelBaseUrl, stsClient).hentInntekt(input.aktorId, input.startSyketilfelle, input.startSyketilfelle.minusYears(1)),
-                    sykepengeliste = SykepengelisteOppslag(env.sparkelBaseUrl, stsClient).hentSykepengeliste(input.aktorId, input.fom))
+                    sykepengeliste = SykepengelisteOppslag(env.sparkelBaseUrl, stsClient).hentSykepengeliste(input.aktorId, input.fom),
+                    arbeidsforhold = ArbeidsforholdOppslag(env.sparkelBaseUrl, stsClient).hentArbeidsforhold(input))
             )
 
     fun fastsettFakta(input: BeriketSykepengesøknad): AvklartSykepengesoknad = AvklartSykepengesoknad(
             originalSoknad = input.originalSoknad,
             medlemskap = vurderMedlemskap(input),
             alder = vurderAlderPåSisteDagISøknadsPeriode(input),
+            arbeidsforhold = vurderArbeidsforhold(input),
             sykepengeliste = input.faktagrunnlag.sykepengeliste)
     fun beregnMaksdato(soknad: AvklartSykepengesoknad): AvklartSykepengesoknad = soknad.copy(maksdato = MaksdatoOppslag(env.sparkelBaseUrl, stsClient).vurderMaksdato(soknad))
     fun prøvVilkår(input: AvklartSykepengesoknad): AvklartSykepengesoknad = input
