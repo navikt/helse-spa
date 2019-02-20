@@ -1,0 +1,12 @@
+{
+  "organisasjoner": [
+    {
+      "navn": "FIRMA 1",
+      "organisasjonsnummer": "1111111111"
+    },
+    {
+      "navn": "FIRMA 2",
+      "organisasjonsnummer": "2222222222"
+    }
+  ]
+}

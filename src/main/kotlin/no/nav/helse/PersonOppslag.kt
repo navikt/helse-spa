@@ -2,9 +2,12 @@ package no.nav.helse
 
 import com.github.kittinunf.fuel.httpGet
 import no.nav.helse.serde.defaultObjectMapper
+import org.slf4j.LoggerFactory
 import java.time.LocalDate
 
 class PersonOppslag(val sparkelUrl: String, val stsRestClient: StsRestClient) {
+    private val LOG = LoggerFactory.getLogger(PersonOppslag::class.java.name)
+
     fun hentTPSData(input: Sykepengesoknad): Tpsfakta {
         val person = hentPerson(AktorId(input.aktorId))
         return Tpsfakta(fodselsdato = person.fdato, bostedland = person.bostedsland)
@@ -12,7 +15,7 @@ class PersonOppslag(val sparkelUrl: String, val stsRestClient: StsRestClient) {
 
     private fun hentPerson(aktorId: AktorId): Person {
         val bearer = stsRestClient.token()
-
+        LOG.info("calling hent person with $aktorId")
         val (_, _, result) = "$sparkelUrl/api/person/$aktorId".httpGet()
                 .header(mapOf(
                         "Authorization" to "Bearer $bearer",

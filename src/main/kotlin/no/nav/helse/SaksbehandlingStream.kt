@@ -59,13 +59,15 @@ class SaksbehandlingStream(val env: Environment) {
     fun hentRegisterData(input: Sykepengesoknad): BeriketSykepengesøknad =
             BeriketSykepengesøknad(input, Faktagrunnlag(
                     tps = PersonOppslag(env.sparkelBaseUrl, stsClient).hentTPSData(input),
-                    inntekt = InntektOppslag(env.sparkelBaseUrl, stsClient).hentInntekt(input.aktorId, input.startSyketilfelle, input.startSyketilfelle.minusYears(1)))
+                    inntekt = InntektOppslag(env.sparkelBaseUrl, stsClient).hentInntekt(input.aktorId, input.startSyketilfelle, input.startSyketilfelle.minusYears(1)),
+                    arbeidsforhold = ArbeidsforholdOppslag(env.sparkelBaseUrl, stsClient).hentArbeidsforhold(input))
             )
 
     fun fastsettFakta(input: BeriketSykepengesøknad): AvklartSykepengesoknad = AvklartSykepengesoknad(
             originalSoknad = input.originalSoknad,
             medlemskap = vurderMedlemskap(input),
-            alder = vurderAlderPåSisteDagISøknadsPeriode(input))
+            alder = vurderAlderPåSisteDagISøknadsPeriode(input),
+            arbeidsgiver = vurderArbeidsgiver(input))
     fun prøvVilkår(input: AvklartSykepengesoknad): AvklartSykepengesoknad = input
     fun beregnSykepenger(input: AvklartSykepengesoknad): AvklartSykepengesoknad = input
     fun fattVedtak(input: AvklartSykepengesoknad): JSONObject = JSONObject(input.originalSoknad)
