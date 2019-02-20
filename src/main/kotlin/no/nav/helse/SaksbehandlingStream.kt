@@ -39,6 +39,7 @@ class SaksbehandlingStream(val env: Environment) {
         stream.peek { _, _ -> acceptCounter.labels("accepted").inc() }
                 .mapValues { _, soknad -> hentRegisterData(soknad) }
                 .mapValues { _, soknad -> fastsettFakta(soknad) }
+                .mapValues { _, soknad -> beregnMaksdato(soknad) }
                 .mapValues { _, soknad -> prøvVilkår(soknad) }
                 .mapValues { _, soknad -> beregnSykepenger(soknad) }
                 .mapValues { _, soknad -> fattVedtak(soknad) }
@@ -60,6 +61,7 @@ class SaksbehandlingStream(val env: Environment) {
             BeriketSykepengesøknad(input, Faktagrunnlag(
                     tps = PersonOppslag(env.sparkelBaseUrl, stsClient).hentTPSData(input),
                     inntekt = InntektOppslag(env.sparkelBaseUrl, stsClient).hentInntekt(input.aktorId, input.startSyketilfelle, input.startSyketilfelle.minusYears(1)),
+                    sykepengeliste = SykepengelisteOppslag(env.sparkelBaseUrl, stsClient).hentSykepengeliste(input.aktorId, input.fom),
                     arbeidsforhold = ArbeidsforholdOppslag(env.sparkelBaseUrl, stsClient).hentArbeidsforhold(input))
             )
 
@@ -67,7 +69,9 @@ class SaksbehandlingStream(val env: Environment) {
             originalSoknad = input.originalSoknad,
             medlemskap = vurderMedlemskap(input),
             alder = vurderAlderPåSisteDagISøknadsPeriode(input),
-            arbeidsgiver = vurderArbeidsgiver(input))
+            arbeidsgiver = vurderArbeidsgiver(input),
+            sykepengeliste = input.faktagrunnlag.sykepengeliste)
+    fun beregnMaksdato(soknad: AvklartSykepengesoknad): AvklartSykepengesoknad = soknad.copy(maksdato = MaksdatoOppslag(env.sparkelBaseUrl, stsClient).vurderMaksdato(soknad))
     fun prøvVilkår(input: AvklartSykepengesoknad): AvklartSykepengesoknad = input
     fun beregnSykepenger(input: AvklartSykepengesoknad): AvklartSykepengesoknad = input
     fun fattVedtak(input: AvklartSykepengesoknad): JSONObject = JSONObject(input.originalSoknad)

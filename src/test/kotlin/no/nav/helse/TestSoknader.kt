@@ -8,7 +8,7 @@ val tpsFaktaUtenVerdi = Tpsfakta(
         bostedland = "bytt ut dette i tester"
 )
 
-val inntektFaktaUtenVerdi = InntektsFakta(
+val inntektFaktaUtenVerdi = Inntektsfakta(
         arbeidsInntektIdentListe = emptyArray()
 )
 
@@ -19,6 +19,7 @@ val arbeidsforholdFaktaUtenVerdi = ArbeidsforholdFakta(
 val faktagrunnlagUtenVerdi = Faktagrunnlag(
         tps = tpsFaktaUtenVerdi,
         inntekt = inntektFaktaUtenVerdi,
+        sykepengeliste = emptyList(),
         arbeidsforhold = arbeidsforholdFaktaUtenVerdi
 )
 

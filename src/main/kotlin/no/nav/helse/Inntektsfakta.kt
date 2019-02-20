@@ -10,7 +10,7 @@ import java.time.format.DateTimeFormatter
 
 class InntektOppslag(val sparkelUrl: String, val stsRestClient: StsRestClient) {
 
-    fun hentInntekt(aktorId: String, fom: LocalDate, tom:LocalDate): InntektsFakta {
+    fun hentInntekt(aktorId: String, fom: LocalDate, tom:LocalDate): Inntektsfakta {
         val bearer = stsRestClient.token()
 
         val dyFom = fom.format(DateTimeFormatter.ofPattern("yyyy-MM"));
@@ -25,12 +25,12 @@ class InntektOppslag(val sparkelUrl: String, val stsRestClient: StsRestClient) {
                 ))
                 .responseString()
 
-        return defaultObjectMapper.readValue(result.component1(), InntektsFakta::class.java)
+        return defaultObjectMapper.readValue(result.component1(), Inntektsfakta::class.java)
     }
 }
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-data class InntektsFakta(val arbeidsInntektIdentListe : Array<ArbeidsInntektIdent>)
+data class Inntektsfakta(val arbeidsInntektIdentListe : Array<ArbeidsInntektIdent>)
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class ArbeidsInntektIdent(val arbeidsInntektMaaned: Array<ArbeidsInntektMaaned>)
