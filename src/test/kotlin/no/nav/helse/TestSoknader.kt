@@ -13,7 +13,9 @@ val inntektFaktaUtenVerdi = Inntektsfakta(
 )
 
 val arbeidsforholdFaktaUtenVerdi = ArbeidsforholdFakta(
-        arbeidsgiverer = emptyList()
+        arbeidsgiverer = emptyList(),
+        fom = LocalDate.now(),
+        tom= LocalDate.now()
 )
 
 val faktagrunnlagUtenVerdi = Faktagrunnlag(

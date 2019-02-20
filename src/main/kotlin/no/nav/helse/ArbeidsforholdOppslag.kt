@@ -5,25 +5,26 @@ import com.github.kittinunf.fuel.httpGet
 import no.nav.helse.serde.defaultObjectMapper
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
-import java.time.temporal.TemporalUnit
+
 
 class ArbeidsforholdOppslag(val sparkelUrl: String, val stsRestClient: StsRestClient) {
 
     fun hentArbeidsforhold(sykepengesoknad: Sykepengesoknad) : ArbeidsforholdFakta {
-        val arbeidsforhold = hentArbeidsforholdRest(AktorId(sykepengesoknad.aktorId), sykepengesoknad.fom)
+        val forsteSykdomsdag = sykepengesoknad.fom
+        // Opptjeningstid = minst 4 uker i arbeid fær sykdommen
+        val fireUkerForSykdomsDag = forsteSykdomsdag.minus(4, ChronoUnit.WEEKS)
+
+        val arbeidsforhold = hentArbeidsforholdRest(AktorId(sykepengesoknad.aktorId), fireUkerForSykdomsDag, forsteSykdomsdag)
         return ArbeidsforholdFakta(arbeidsforhold.organisasjoner.map {
-            ArbeidsgiverFakta(it.organisasjonsnummer, it.navn)
-        })
+            ArbeidsgiverFakta(it.organisasjonsnummer, it.navn)}, fireUkerForSykdomsDag, forsteSykdomsdag)
 
     }
 
-    fun hentArbeidsforholdRest(aktorId: AktorId, fom : LocalDate) : Arbeidsforhold {
+    fun hentArbeidsforholdRest(aktorId: AktorId, fom: LocalDate, tom: LocalDate) : Arbeidsforhold {
         val bearer = stsRestClient.token()
-        val forsteSykdomsdag = fom
-        val toManedForSykdomsDag = fom.minus(2, ChronoUnit.MONTHS)
 
         val (_, _, result) =
-                "$sparkelUrl/api/arbeidsforhold/$aktorId?fom=$toManedForSykdomsDag&tom=$forsteSykdomsdag".httpGet()
+                "$sparkelUrl/api/arbeidsforhold/$aktorId?fom=$fom&tom=$tom".httpGet()
                         .header(mapOf(
                                 "Authorization" to "Bearer $bearer",
                                 "Accept" to "application/json",
@@ -41,5 +42,5 @@ data class Arbeidsforhold(val organisasjoner: List<OrganisasjonArbeidsforhold>)
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class OrganisasjonArbeidsforhold(val organisasjonsnummer: String, val navn: String?)
 
-data class ArbeidsforholdFakta(val arbeidsgiverer : List<ArbeidsgiverFakta>)
+data class ArbeidsforholdFakta(val arbeidsgiverer : List<ArbeidsgiverFakta>, val fom : LocalDate, val tom: LocalDate)
 data class ArbeidsgiverFakta(val organisasjonsnummer : String, val navn_: String?)
