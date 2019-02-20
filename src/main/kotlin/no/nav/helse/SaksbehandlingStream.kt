@@ -69,7 +69,7 @@ class SaksbehandlingStream(val env: Environment) {
             originalSoknad = input.originalSoknad,
             medlemskap = vurderMedlemskap(input),
             alder = vurderAlderPåSisteDagISøknadsPeriode(input),
-            arbeidsgiver = vurderArbeidsforhold(input),
+            arbeidsforhold = vurderArbeidsforhold(input),
             sykepengeliste = input.faktagrunnlag.sykepengeliste)
     fun beregnMaksdato(soknad: AvklartSykepengesoknad): AvklartSykepengesoknad = soknad.copy(maksdato = MaksdatoOppslag(env.sparkelBaseUrl, stsClient).vurderMaksdato(soknad))
     fun prøvVilkår(input: AvklartSykepengesoknad): AvklartSykepengesoknad = input

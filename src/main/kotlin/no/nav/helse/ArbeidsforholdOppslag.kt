@@ -11,7 +11,7 @@ class ArbeidsforholdOppslag(val sparkelUrl: String, val stsRestClient: StsRestCl
 
     fun hentArbeidsforhold(sykepengesoknad: Sykepengesoknad) : ArbeidsforholdFakta {
         val forsteSykdomsdag = sykepengesoknad.fom
-        // Opptjeningstid = minst 4 uker i arbeid fær sykdommen
+        // Opptjeningstid = minst 4 uker i arbeid før sykdommen
         val fireUkerForSykdomsDag = forsteSykdomsdag.minus(4, ChronoUnit.WEEKS)
 
         val arbeidsforhold = hentArbeidsforholdRest(AktorId(sykepengesoknad.aktorId), fireUkerForSykdomsDag, forsteSykdomsdag)

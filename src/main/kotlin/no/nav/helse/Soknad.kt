@@ -15,7 +15,7 @@ data class AvklartSykepengesoknad(val originalSoknad: Sykepengesoknad,
                                   val alder: Vurdering<Alder, Tpsfakta>,
                                   val maksdato: Vurdering<LocalDate, MaksdatoGrunnlag> = Vurdering.Uavklart(arsak = Vurdering.Uavklart.Arsak.MANGLENDE_DATA, begrunnelse = "Venter på avklart alder og historiske sykepengeperioder", grunnlag = TomtMaksdatoGrunnlag()),
                                   val sykepengeliste: Collection<SykepengerVedtak>,
-                                  val arbeidsgiver: Vurdering<Boolean, ArbeidsforholdFakta>)
+                                  val arbeidsforhold: Vurdering<Boolean, ArbeidsforholdFakta>)
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class Sykepengesoknad(val aktorId: String,
