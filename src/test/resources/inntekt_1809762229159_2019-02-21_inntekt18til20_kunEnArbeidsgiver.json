@@ -1,0 +1,453 @@
+{
+  "sikkerhetsavvikListe": [],
+  "arbeidsInntektIdentListe": [
+    {
+      "ident": {
+        "personIdent": "07128216116"
+      },
+      "arbeidsInntektMaaned": [
+        {
+          "arbeidsInntektInformasjon": {
+            "arbeidsforholdListe": [],
+            "inntektListe": [
+              {
+                "utloeserArbeidsgiveravgift": true,
+                "inntektsmottaker": {
+                  "personIdent": "07128216116"
+                },
+                "opptjeningsperiode": {
+                  "startDato": "2018-12-01+01:00",
+                  "sluttDato": "2018-12-31+01:00"
+                },
+                "opplysningspliktig": {
+                  "orgnummer": "910825518"
+                },
+                "opptjeningsland": {
+                  "kodeverksRef": "http://nav.no/kodeverk/Kodeverk/Landkoder",
+                  "value": "NO"
+                },
+                "informasjonsstatus": {
+                  "kodeverksRef": "http://nav.no/kodeverk/Kodeverk/Informasjonsstatuser",
+                  "value": "InngaarAlltid"
+                },
+                "virksomhet": {
+                  "orgnummer": "910825518"
+                },
+                "beloep": 18000,
+                "levereringstidspunkt": "2019-02-21T12:35:29.962+01:00",
+                "skattemessigBosattLand": {
+                  "kodeverksRef": "http://nav.no/kodeverk/Kodeverk/Landkoder",
+                  "value": "NO"
+                },
+                "inntektsstatus": {
+                  "kodeverksRef": "http://nav.no/kodeverk/Kodeverk/Inntektsstatuser",
+                  "value": "LoependeInnrapportert"
+                },
+                "inngaarIGrunnlagForTrekk": true,
+                "inntektsperiodetype": {
+                  "kodeverksRef": "http://nav.no/kodeverk/Kodeverk/Inntektsperiodetyper",
+                  "value": "Maaned"
+                },
+                "fordel": {
+                  "kodeverksRef": "http://nav.no/kodeverk/Kodeverk/Fordel",
+                  "value": "kontantytelse"
+                },
+                "beskrivelse": {
+                  "kodeverksRef": "http://nav.no/kodeverk/Kodeverk/Loennsbeskrivelse",
+                  "value": "fastloenn"
+                },
+                "inntektskilde": {
+                  "kodeverksRef": "http://nav.no/kodeverk/Kodeverk/InntektsInformasjonsopphav",
+                  "value": "A-ordningen"
+                },
+                "utbetaltIPeriode": "2018-12"
+              }
+            ],
+            "forskuddstrekkListe": [],
+            "fradragListe": []
+          },
+          "aarMaaned": "2018-12+01:00",
+          "avvikListe": []
+        },
+        {
+          "arbeidsInntektInformasjon": {
+            "arbeidsforholdListe": [],
+            "inntektListe": [
+              {
+                "utloeserArbeidsgiveravgift": true,
+                "inntektsmottaker": {
+                  "personIdent": "07128216116"
+                },
+                "opptjeningsperiode": {
+                  "startDato": "2018-10-01+02:00",
+                  "sluttDato": "2018-11-30+01:00"
+                },
+                "opplysningspliktig": {
+                  "orgnummer": "910825518"
+                },
+                "opptjeningsland": {
+                  "kodeverksRef": "http://nav.no/kodeverk/Kodeverk/Landkoder",
+                  "value": "NO"
+                },
+                "informasjonsstatus": {
+                  "kodeverksRef": "http://nav.no/kodeverk/Kodeverk/Informasjonsstatuser",
+                  "value": "InngaarAlltid"
+                },
+                "virksomhet": {
+                  "orgnummer": "910825518"
+                },
+                "beloep": 36500,
+                "levereringstidspunkt": "2019-02-21T12:35:29.962+01:00",
+                "skattemessigBosattLand": {
+                  "kodeverksRef": "http://nav.no/kodeverk/Kodeverk/Landkoder",
+                  "value": "NO"
+                },
+                "inntektsstatus": {
+                  "kodeverksRef": "http://nav.no/kodeverk/Kodeverk/Inntektsstatuser",
+                  "value": "LoependeInnrapportert"
+                },
+                "inngaarIGrunnlagForTrekk": true,
+                "inntektsperiodetype": {
+                  "kodeverksRef": "http://nav.no/kodeverk/Kodeverk/Inntektsperiodetyper",
+                  "value": "Maaned"
+                },
+                "fordel": {
+                  "kodeverksRef": "http://nav.no/kodeverk/Kodeverk/Fordel",
+                  "value": "kontantytelse"
+                },
+                "beskrivelse": {
+                  "kodeverksRef": "http://nav.no/kodeverk/Kodeverk/Loennsbeskrivelse",
+                  "value": "fastloenn"
+                },
+                "inntektskilde": {
+                  "kodeverksRef": "http://nav.no/kodeverk/Kodeverk/InntektsInformasjonsopphav",
+                  "value": "A-ordningen"
+                },
+                "utbetaltIPeriode": "2018-11"
+              }
+            ],
+            "forskuddstrekkListe": [],
+            "fradragListe": []
+          },
+          "aarMaaned": "2018-11+01:00",
+          "avvikListe": []
+        },
+        {
+          "arbeidsInntektInformasjon": {
+            "arbeidsforholdListe": [],
+            "inntektListe": [
+              {
+                "utloeserArbeidsgiveravgift": true,
+                "inntektsmottaker": {
+                  "personIdent": "07128216116"
+                },
+                "opptjeningsperiode": {
+                  "startDato": "2019-01-01+01:00",
+                  "sluttDato": "2019-01-31+01:00"
+                },
+                "opplysningspliktig": {
+                  "orgnummer": "910825518"
+                },
+                "opptjeningsland": {
+                  "kodeverksRef": "http://nav.no/kodeverk/Kodeverk/Landkoder",
+                  "value": "NO"
+                },
+                "informasjonsstatus": {
+                  "kodeverksRef": "http://nav.no/kodeverk/Kodeverk/Informasjonsstatuser",
+                  "value": "InngaarAlltid"
+                },
+                "virksomhet": {
+                  "orgnummer": "910825518"
+                },
+                "beloep": 18500,
+                "levereringstidspunkt": "2019-02-21T12:35:29.962+01:00",
+                "skattemessigBosattLand": {
+                  "kodeverksRef": "http://nav.no/kodeverk/Kodeverk/Landkoder",
+                  "value": "NO"
+                },
+                "inntektsstatus": {
+                  "kodeverksRef": "http://nav.no/kodeverk/Kodeverk/Inntektsstatuser",
+                  "value": "LoependeInnrapportert"
+                },
+                "inngaarIGrunnlagForTrekk": true,
+                "inntektsperiodetype": {
+                  "kodeverksRef": "http://nav.no/kodeverk/Kodeverk/Inntektsperiodetyper",
+                  "value": "Maaned"
+                },
+                "fordel": {
+                  "kodeverksRef": "http://nav.no/kodeverk/Kodeverk/Fordel",
+                  "value": "kontantytelse"
+                },
+                "beskrivelse": {
+                  "kodeverksRef": "http://nav.no/kodeverk/Kodeverk/Loennsbeskrivelse",
+                  "value": "fastloenn"
+                },
+                "inntektskilde": {
+                  "kodeverksRef": "http://nav.no/kodeverk/Kodeverk/InntektsInformasjonsopphav",
+                  "value": "A-ordningen"
+                },
+                "utbetaltIPeriode": "2019-01"
+              }
+            ],
+            "forskuddstrekkListe": [],
+            "fradragListe": []
+          },
+          "aarMaaned": "2019-01+01:00",
+          "avvikListe": []
+        },
+        {
+          "arbeidsInntektInformasjon": {
+            "arbeidsforholdListe": [],
+            "inntektListe": [
+              {
+                "utloeserArbeidsgiveravgift": true,
+                "inntektsmottaker": {
+                  "personIdent": "07128216116"
+                },
+                "opptjeningsperiode": {
+                  "startDato": "2019-02-01+01:00",
+                  "sluttDato": "2019-02-28+01:00"
+                },
+                "opplysningspliktig": {
+                  "orgnummer": "910825518"
+                },
+                "opptjeningsland": {
+                  "kodeverksRef": "http://nav.no/kodeverk/Kodeverk/Landkoder",
+                  "value": "NO"
+                },
+                "informasjonsstatus": {
+                  "kodeverksRef": "http://nav.no/kodeverk/Kodeverk/Informasjonsstatuser",
+                  "value": "InngaarAlltid"
+                },
+                "virksomhet": {
+                  "orgnummer": "910825518"
+                },
+                "beloep": 19500,
+                "levereringstidspunkt": "2019-02-21T12:35:29.962+01:00",
+                "skattemessigBosattLand": {
+                  "kodeverksRef": "http://nav.no/kodeverk/Kodeverk/Landkoder",
+                  "value": "NO"
+                },
+                "inntektsstatus": {
+                  "kodeverksRef": "http://nav.no/kodeverk/Kodeverk/Inntektsstatuser",
+                  "value": "LoependeInnrapportert"
+                },
+                "inngaarIGrunnlagForTrekk": true,
+                "inntektsperiodetype": {
+                  "kodeverksRef": "http://nav.no/kodeverk/Kodeverk/Inntektsperiodetyper",
+                  "value": "Maaned"
+                },
+                "fordel": {
+                  "kodeverksRef": "http://nav.no/kodeverk/Kodeverk/Fordel",
+                  "value": "kontantytelse"
+                },
+                "beskrivelse": {
+                  "kodeverksRef": "http://nav.no/kodeverk/Kodeverk/Loennsbeskrivelse",
+                  "value": "fastloenn"
+                },
+                "inntektskilde": {
+                  "kodeverksRef": "http://nav.no/kodeverk/Kodeverk/InntektsInformasjonsopphav",
+                  "value": "A-ordningen"
+                },
+                "utbetaltIPeriode": "2019-02"
+              }
+            ],
+            "forskuddstrekkListe": [],
+            "fradragListe": []
+          },
+          "aarMaaned": "2019-02+01:00",
+          "avvikListe": []
+        },
+        {
+          "arbeidsInntektInformasjon": {
+            "arbeidsforholdListe": [],
+            "inntektListe": [
+              {
+                "utloeserArbeidsgiveravgift": true,
+                "inntektsmottaker": {
+                  "personIdent": "07128216116"
+                },
+                "opptjeningsperiode": {
+                  "startDato": "2018-01-01+01:00",
+                  "sluttDato": "2019-04-30+02:00"
+                },
+                "opplysningspliktig": {
+                  "orgnummer": "910825518"
+                },
+                "opptjeningsland": {
+                  "kodeverksRef": "http://nav.no/kodeverk/Kodeverk/Landkoder",
+                  "value": "NO"
+                },
+                "informasjonsstatus": {
+                  "kodeverksRef": "http://nav.no/kodeverk/Kodeverk/Informasjonsstatuser",
+                  "value": "InngaarAlltid"
+                },
+                "virksomhet": {
+                  "orgnummer": "910825518"
+                },
+                "beloep": 45600,
+                "levereringstidspunkt": "2019-02-21T12:35:29.962+01:00",
+                "skattemessigBosattLand": {
+                  "kodeverksRef": "http://nav.no/kodeverk/Kodeverk/Landkoder",
+                  "value": "NO"
+                },
+                "inntektsstatus": {
+                  "kodeverksRef": "http://nav.no/kodeverk/Kodeverk/Inntektsstatuser",
+                  "value": "LoependeInnrapportert"
+                },
+                "inngaarIGrunnlagForTrekk": true,
+                "inntektsperiodetype": {
+                  "kodeverksRef": "http://nav.no/kodeverk/Kodeverk/Inntektsperiodetyper",
+                  "value": "Maaned"
+                },
+                "fordel": {
+                  "kodeverksRef": "http://nav.no/kodeverk/Kodeverk/Fordel",
+                  "value": "kontantytelse"
+                },
+                "beskrivelse": {
+                  "kodeverksRef": "http://nav.no/kodeverk/Kodeverk/Loennsbeskrivelse",
+                  "value": "fastloenn"
+                },
+                "inntektskilde": {
+                  "kodeverksRef": "http://nav.no/kodeverk/Kodeverk/InntektsInformasjonsopphav",
+                  "value": "A-ordningen"
+                },
+                "utbetaltIPeriode": "2018-04"
+              }
+            ],
+            "forskuddstrekkListe": [],
+            "fradragListe": []
+          },
+          "aarMaaned": "2018-04+02:00",
+          "avvikListe": []
+        },
+        {
+          "arbeidsInntektInformasjon": {
+            "arbeidsforholdListe": [],
+            "inntektListe": [
+              {
+                "utloeserArbeidsgiveravgift": true,
+                "inntektsmottaker": {
+                  "personIdent": "07128216116"
+                },
+                "opptjeningsperiode": {
+                  "startDato": "2018-05-01+02:00",
+                  "sluttDato": "2019-07-31+02:00"
+                },
+                "opplysningspliktig": {
+                  "orgnummer": "910825518"
+                },
+                "opptjeningsland": {
+                  "kodeverksRef": "http://nav.no/kodeverk/Kodeverk/Landkoder",
+                  "value": "NO"
+                },
+                "informasjonsstatus": {
+                  "kodeverksRef": "http://nav.no/kodeverk/Kodeverk/Informasjonsstatuser",
+                  "value": "InngaarAlltid"
+                },
+                "virksomhet": {
+                  "orgnummer": "910825518"
+                },
+                "beloep": 41300,
+                "levereringstidspunkt": "2019-02-21T12:35:29.962+01:00",
+                "skattemessigBosattLand": {
+                  "kodeverksRef": "http://nav.no/kodeverk/Kodeverk/Landkoder",
+                  "value": "NO"
+                },
+                "inntektsstatus": {
+                  "kodeverksRef": "http://nav.no/kodeverk/Kodeverk/Inntektsstatuser",
+                  "value": "LoependeInnrapportert"
+                },
+                "inngaarIGrunnlagForTrekk": true,
+                "inntektsperiodetype": {
+                  "kodeverksRef": "http://nav.no/kodeverk/Kodeverk/Inntektsperiodetyper",
+                  "value": "Maaned"
+                },
+                "fordel": {
+                  "kodeverksRef": "http://nav.no/kodeverk/Kodeverk/Fordel",
+                  "value": "kontantytelse"
+                },
+                "beskrivelse": {
+                  "kodeverksRef": "http://nav.no/kodeverk/Kodeverk/Loennsbeskrivelse",
+                  "value": "fastloenn"
+                },
+                "inntektskilde": {
+                  "kodeverksRef": "http://nav.no/kodeverk/Kodeverk/InntektsInformasjonsopphav",
+                  "value": "A-ordningen"
+                },
+                "utbetaltIPeriode": "2018-07"
+              }
+            ],
+            "forskuddstrekkListe": [],
+            "fradragListe": []
+          },
+          "aarMaaned": "2018-07+02:00",
+          "avvikListe": []
+        },
+        {
+          "arbeidsInntektInformasjon": {
+            "arbeidsforholdListe": [],
+            "inntektListe": [
+              {
+                "utloeserArbeidsgiveravgift": true,
+                "inntektsmottaker": {
+                  "personIdent": "07128216116"
+                },
+                "opptjeningsperiode": {
+                  "startDato": "2018-08-01+02:00",
+                  "sluttDato": "2018-09-30+02:00"
+                },
+                "opplysningspliktig": {
+                  "orgnummer": "910825518"
+                },
+                "opptjeningsland": {
+                  "kodeverksRef": "http://nav.no/kodeverk/Kodeverk/Landkoder",
+                  "value": "NO"
+                },
+                "informasjonsstatus": {
+                  "kodeverksRef": "http://nav.no/kodeverk/Kodeverk/Informasjonsstatuser",
+                  "value": "InngaarAlltid"
+                },
+                "virksomhet": {
+                  "orgnummer": "910825518"
+                },
+                "beloep": 34300,
+                "levereringstidspunkt": "2019-02-21T12:35:29.962+01:00",
+                "skattemessigBosattLand": {
+                  "kodeverksRef": "http://nav.no/kodeverk/Kodeverk/Landkoder",
+                  "value": "NO"
+                },
+                "inntektsstatus": {
+                  "kodeverksRef": "http://nav.no/kodeverk/Kodeverk/Inntektsstatuser",
+                  "value": "LoependeInnrapportert"
+                },
+                "inngaarIGrunnlagForTrekk": true,
+                "inntektsperiodetype": {
+                  "kodeverksRef": "http://nav.no/kodeverk/Kodeverk/Inntektsperiodetyper",
+                  "value": "Maaned"
+                },
+                "fordel": {
+                  "kodeverksRef": "http://nav.no/kodeverk/Kodeverk/Fordel",
+                  "value": "kontantytelse"
+                },
+                "beskrivelse": {
+                  "kodeverksRef": "http://nav.no/kodeverk/Kodeverk/Loennsbeskrivelse",
+                  "value": "fastloenn"
+                },
+                "inntektskilde": {
+                  "kodeverksRef": "http://nav.no/kodeverk/Kodeverk/InntektsInformasjonsopphav",
+                  "value": "A-ordningen"
+                },
+                "utbetaltIPeriode": "2018-09"
+              }
+            ],
+            "forskuddstrekkListe": [],
+            "fradragListe": []
+          },
+          "aarMaaned": "2018-09+02:00",
+          "avvikListe": []
+        }
+      ]
+    }
+  ]
+}

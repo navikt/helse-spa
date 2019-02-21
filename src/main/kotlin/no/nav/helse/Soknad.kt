@@ -37,7 +37,7 @@ data class Soknadsperiode(val fom: LocalDate,
                           val sykmeldingsgrad: Int)
 
 data class Faktagrunnlag(val tps: Tpsfakta,
-                         val inntekt: Inntektsfakta,
+                         val inntekt: Collection<Inntekt>,
                          val sykepengeliste: Collection<SykepengerVedtak>,
                          val arbeidsforhold: ArbeidsforholdFakta)
 
