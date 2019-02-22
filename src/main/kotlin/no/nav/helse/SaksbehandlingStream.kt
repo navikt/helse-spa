@@ -15,7 +15,6 @@ import org.apache.kafka.streams.errors.LogAndFailExceptionHandler
 import org.apache.kafka.streams.kstream.*
 import org.json.JSONObject
 import org.slf4j.LoggerFactory
-import vurderAlderPåSisteDagISøknadsPeriode
 import java.util.*
 
 class SaksbehandlingStream(val env: Environment) {

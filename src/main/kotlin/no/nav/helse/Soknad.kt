@@ -1,6 +1,5 @@
 package no.nav.helse
 
-import Alder
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -12,7 +11,7 @@ data class BeriketSykepengesøknad(
 
 data class AvklartSykepengesoknad(val originalSoknad: Sykepengesoknad,
                                   val medlemskap: Vurdering<Boolean, Tpsfakta>,
-                                  val alder: Vurdering<Alder, Tpsfakta>,
+                                  val alder: Vurdering<Alder, Aldersgrunnlag>,
                                   val maksdato: Vurdering<LocalDate, Any> = Vurdering.Uavklart(arsak = Vurdering.Uavklart.Arsak.MANGLENDE_DATA, begrunnelse = "Venter på avklart alder og historiske sykepengeperioder", grunnlag = TomtMaksdatoGrunnlag()),
                                   val sykepengeliste: Collection<SykepengerVedtak>,
                                   val arbeidsforhold: Vurdering<Boolean, ArbeidsforholdFakta>)

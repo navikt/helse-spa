@@ -1,15 +1,16 @@
-import no.nav.helse.BeriketSykepengesøknad
-import no.nav.helse.Tpsfakta
-import no.nav.helse.Vurdering
+package no.nav.helse
+
 import java.time.LocalDate
 import java.time.Period
 
 typealias Alder = Int
 
-fun vurderAlderPåSisteDagISøknadsPeriode(søknad: BeriketSykepengesøknad): Vurdering<Alder, Tpsfakta> {
+data class Aldersgrunnlag(val fodselsdato: LocalDate)
+
+fun vurderAlderPåSisteDagISøknadsPeriode(søknad: BeriketSykepengesøknad): Vurdering<Alder, Aldersgrunnlag> {
     val tpsfakta = søknad.faktagrunnlag.tps
     val tomDato = søknad.originalSoknad.tom
-    return Vurdering.Avklart(tpsfakta.alder(tomDato), "§ 8-51", tpsfakta, "SPA")
+    return Vurdering.Avklart(tpsfakta.alder(tomDato), "§ 8-51", Aldersgrunnlag(fodselsdato = tpsfakta.fodselsdato), "SPA")
 }
 
 fun Tpsfakta.alder(dato: LocalDate = LocalDate.now()): Alder = Period.between(fodselsdato, dato).years
