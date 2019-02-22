@@ -3,11 +3,13 @@ package no.nav.helse
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.github.kittinunf.fuel.httpGet
 import no.nav.helse.serde.defaultObjectMapper
+import org.slf4j.LoggerFactory
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 
 
 class ArbeidsforholdOppslag(val sparkelUrl: String, val stsRestClient: StsRestClient) {
+    private val log = LoggerFactory.getLogger(ArbeidsforholdOppslag::class.java.name)
 
     fun hentArbeidsforhold(sykepengesoknad: Sykepengesoknad) : ArbeidsforholdFakta {
         val forsteSykdomsdag = sykepengesoknad.fom
@@ -22,9 +24,8 @@ class ArbeidsforholdOppslag(val sparkelUrl: String, val stsRestClient: StsRestCl
 
     fun hentArbeidsforholdRest(aktorId: AktorId, fom: LocalDate, tom: LocalDate) : Arbeidsforhold {
         val bearer = stsRestClient.token()
-
         val (_, _, result) =
-                "$sparkelUrl/api/arbeidsforhold/$aktorId?fom=$fom&tom=$tom".httpGet()
+                "$sparkelUrl/api/arbeidsforhold/${aktorId.aktor}?fom=$fom&tom=$tom".httpGet()
                         .header(mapOf(
                                 "Authorization" to "Bearer $bearer",
                                 "Accept" to "application/json",
@@ -42,5 +43,5 @@ data class Arbeidsforhold(val organisasjoner: List<OrganisasjonArbeidsforhold>)
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class OrganisasjonArbeidsforhold(val organisasjonsnummer: String, val navn: String?)
 
-data class ArbeidsforholdFakta(val arbeidsgiverer : List<ArbeidsgiverFakta>, val fom : LocalDate, val tom: LocalDate)
+data class ArbeidsforholdFakta(val arbeidsgivere : List<ArbeidsgiverFakta>, val fom : LocalDate, val tom: LocalDate)
 data class ArbeidsgiverFakta(val organisasjonsnummer : String, val navn_: String?)

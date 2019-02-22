@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory
 import java.time.LocalDate
 
 class PersonOppslag(val sparkelUrl: String, val stsRestClient: StsRestClient) {
-    private val LOG = LoggerFactory.getLogger(PersonOppslag::class.java.name)
+    private val log = LoggerFactory.getLogger(PersonOppslag::class.java.name)
 
     fun hentTPSData(input: Sykepengesoknad): Tpsfakta {
         val person = hentPerson(AktorId(input.aktorId))
@@ -15,8 +15,7 @@ class PersonOppslag(val sparkelUrl: String, val stsRestClient: StsRestClient) {
 
     private fun hentPerson(aktorId: AktorId): Person {
         val bearer = stsRestClient.token()
-        LOG.info("calling hent person with $aktorId")
-        val (_, _, result) = "$sparkelUrl/api/person/$aktorId".httpGet()
+        val (_, _, result) = "$sparkelUrl/api/person/${aktorId.aktor}".httpGet()
                 .header(mapOf(
                         "Authorization" to "Bearer $bearer",
                         "Accept" to "application/json",
@@ -30,7 +29,7 @@ class PersonOppslag(val sparkelUrl: String, val stsRestClient: StsRestClient) {
 }
 
 
-enum class Kjonn {
+enum class Kjønn {
     MANN, KVINNE, UKJENN
 }
 
@@ -40,8 +39,8 @@ data class Person(
         val mellomnavn: String? = null,
         val etternavn: String,
         val fdato: LocalDate,
-        val kjonn: Kjonn,
-        val bostedsland: String
+        val kjønn: Kjønn,
+        val bostedsland: String = ""
 )
 
 data class AktorId(val aktor: String) {

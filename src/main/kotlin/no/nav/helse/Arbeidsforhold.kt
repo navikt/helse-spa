@@ -18,7 +18,7 @@ fun vurderArbeidsforhold(soknad : BeriketSykepengesøknad) : Vurdering<Boolean, 
 
 fun evaluerArbeidsforhold(orgnummer: String, fakta: ArbeidsforholdFakta): Evaluering =
         when {
-            fakta.arbeidsgiverer.size > 1 -> Evaluering.kanskje("Søker har flere arbeidsgiverer, systemet støtter ikke dette enda")
-            fakta.arbeidsgiverer[0].organisasjonsnummer == orgnummer -> Evaluering.ja("Søker har en arbeidsgiver med orgnummer $orgnummer")
+            fakta.arbeidsgivere.size > 1 -> Evaluering.kanskje("Søker har flere arbeidsgivere, systemet støtter ikke dette enda")
+            fakta.arbeidsgivere[0].organisasjonsnummer == orgnummer -> Evaluering.ja("Søker har en arbeidsgiver med orgnummer $orgnummer")
             else -> Evaluering.nei("Søker har ikke en arbeidsgiver med orgnummer $orgnummer")
         }
