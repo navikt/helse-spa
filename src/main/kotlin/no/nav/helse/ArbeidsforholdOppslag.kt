@@ -44,4 +44,4 @@ data class Arbeidsforhold(val organisasjoner: List<OrganisasjonArbeidsforhold>)
 data class OrganisasjonArbeidsforhold(val organisasjonsnummer: String, val navn: String?)
 
 data class ArbeidsforholdFakta(val arbeidsgivere : List<ArbeidsgiverFakta>, val fom : LocalDate, val tom: LocalDate)
-data class ArbeidsgiverFakta(val organisasjonsnummer : String, val navn_: String?)
+data class ArbeidsgiverFakta(val organisasjonsnummer : String, val navn: String?)
