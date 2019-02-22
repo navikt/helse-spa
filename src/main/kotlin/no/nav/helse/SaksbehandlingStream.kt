@@ -54,8 +54,7 @@ class SaksbehandlingStream(val env: Environment) {
         stream.peek { _, _ -> acceptCounter.labels("accepted").inc() }
                 .mapValues { _, soknad -> hentRegisterData(soknad) }
                 .mapValues { _, soknad -> fastsettFakta(soknad) }
-                // TODO
-                //.mapValues { _, soknad -> beregnMaksdato(soknad) }
+                .mapValues { _, soknad -> beregnMaksdato(soknad) }
                 .mapValues { _, soknad -> prøvVilkår(soknad) }
                 .mapValues { _, soknad -> beregnSykepenger(soknad) }
                 .mapValues { _, soknad -> fattVedtak(soknad) }
