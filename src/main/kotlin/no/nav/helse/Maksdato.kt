@@ -18,7 +18,7 @@ fun vurderMaksdato(soknad: AvklartSykepengesoknad): Vurdering<LocalDate, Any> {
             )
             val beregnetMaksdato = maksdato(grunnlag)
 
-            Vurdering.Avklart(fastsattVerdi = beregnetMaksdato, fastsattAv = "SPA", grunnlag = grunnlag, begrunnelse = "")
+            Vurdering.Avklart(fastsattVerdi = beregnetMaksdato, fastsattAv = "SPA", grunnlag = grunnlag, begrunnelse = "§8-12")
         }
     }
 }
