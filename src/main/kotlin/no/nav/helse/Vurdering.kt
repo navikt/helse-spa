@@ -6,7 +6,13 @@ sealed class Vurdering<out V, out G>(val begrunnelse: String, val grunnlag: G, v
     class Avklart<V, G>(val fastsattVerdi: V,
                         begrunnelse: String,
                         grunnlag: G,
-                        val fastsattAv: String): Vurdering<V, G>(begrunnelse, grunnlag)
+                        val fastsattAv: String): Vurdering<V, G>(begrunnelse, grunnlag) {
+
+        override fun toString(): String {
+            return "Avklart(fastsattVerdi=$fastsattVerdi, begrunnelse=$begrunnelse)"
+        }
+
+    }
     class Uavklart<G>(val arsak: Uavklart.Arsak,
                       begrunnelse: String,
                       grunnlag: G): Vurdering<Nothing, G>(begrunnelse, grunnlag) {
@@ -16,5 +22,11 @@ sealed class Vurdering<out V, out G>(val begrunnelse: String, val grunnlag: G, v
             DARLIG_DATA,
             MANGLENDE_DATA
         }
+
+        override fun toString(): String {
+            return "Uavklart(arsak=$arsak, begrunnelse=$begrunnelse)"
+        }
+
+
     }
 }
