@@ -15,7 +15,9 @@ fun sokerBorI(land: String, tps: Tpsfakta): Evaluering =
         else
             Evaluering.nei("Søker er bosatt i ${tps.bostedland} som ikke er $land")
 
-fun vurderMedlemskap(soknad: BeriketSykepengesøknad): Vurdering<Boolean, Tpsfakta> {
+data class Medlemsskapgrunnlag(val bostedsland: String)
+
+fun vurderMedlemskap(soknad: BeriketSykepengesøknad): Vurdering<Boolean, Medlemsskapgrunnlag> {
     val evaluering: Evaluering = with(erMedlem) {
         evaluer(soknad.faktagrunnlag.tps).also {
             narePrometheus.tellEvaluering { it }
@@ -23,8 +25,8 @@ fun vurderMedlemskap(soknad: BeriketSykepengesøknad): Vurdering<Boolean, Tpsfak
     }
 
     return when (evaluering.resultat) {
-        Resultat.KANSKJE -> Vurdering.Uavklart(Vurdering.Uavklart.Arsak.SKJONN, evaluering.begrunnelse, soknad.faktagrunnlag.tps)
-        else -> Vurdering.Avklart(evaluering.resultat == Resultat.JA, evaluering.begrunnelse, soknad.faktagrunnlag.tps
+        Resultat.KANSKJE -> Vurdering.Uavklart(Vurdering.Uavklart.Arsak.SKJONN, evaluering.begrunnelse, Medlemsskapgrunnlag(soknad.faktagrunnlag.tps.bostedland))
+        else -> Vurdering.Avklart(evaluering.resultat == Resultat.JA, evaluering.begrunnelse, Medlemsskapgrunnlag(soknad.faktagrunnlag.tps.bostedland)
                 , "SPA")
     }
 }
