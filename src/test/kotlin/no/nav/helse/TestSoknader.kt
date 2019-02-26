@@ -9,9 +9,7 @@ val tpsFaktaUtenVerdi = Tpsfakta(
 )
 
 val arbeidsforholdFaktaUtenVerdi = ArbeidsforholdFakta(
-        arbeidsgivere = emptyList(),
-        fom = LocalDate.now(),
-        tom= LocalDate.now()
+        arbeidsgivere = emptyList()
 )
 
 val faktagrunnlagUtenVerdi = Faktagrunnlag(

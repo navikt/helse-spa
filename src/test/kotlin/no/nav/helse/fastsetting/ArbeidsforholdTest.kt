@@ -29,7 +29,7 @@ class ArbeidsforholdTest {
 
     @Test
     fun `vurder arbeidsforhold med en arbeidsgiver`() {
-        val arbeidsforholdFakta = ArbeidsforholdFakta(listOf(ArbeidsgiverFakta("1111", "Test 1")), LocalDate.now(), LocalDate.now())
+        val arbeidsforholdFakta = ArbeidsforholdFakta(listOf(ArbeidsgiverFakta("1111", "Test 1", LocalDate.now(), 1)))
         val faktagrunnlag = Faktagrunnlag(tps = tpsFaktaUtenVerdi, beregningsperiode = emptyList(), sammenligningsperiode = emptyList(), arbeidsforhold = arbeidsforholdFakta,
                 sykepengeliste = emptyList())
         val vurdering = vurderArbeidsforhold(BeriketSykepengesøknad(originalSoknad, faktagrunnlag))
@@ -39,7 +39,7 @@ class ArbeidsforholdTest {
 
     @Test
     fun `vurder arbeidsforhold med feil arbeidsgiver`() {
-        val arbeidsforholdFakta = ArbeidsforholdFakta(listOf(ArbeidsgiverFakta("2222", "Test 2")), LocalDate.now(), LocalDate.now())
+        val arbeidsforholdFakta = ArbeidsforholdFakta(listOf(ArbeidsgiverFakta("2222", "Test 2", LocalDate.now(), 1)))
         val faktagrunnlag = Faktagrunnlag(tps = tpsFaktaUtenVerdi, beregningsperiode = emptyList(), sammenligningsperiode = emptyList(), arbeidsforhold = arbeidsforholdFakta,
                 sykepengeliste = emptyList())
         val vurdering = vurderArbeidsforhold(BeriketSykepengesøknad(originalSoknad, faktagrunnlag))
@@ -49,8 +49,8 @@ class ArbeidsforholdTest {
 
     @Test
     fun `vurder arbeidsforhold med flere arbeidsgiverer`() {
-        val arbeidsforholdFakta = ArbeidsforholdFakta(listOf(ArbeidsgiverFakta("1111", "Test 1"),
-                ArbeidsgiverFakta("2222", "Test 2")), LocalDate.now(), LocalDate.now())
+        val arbeidsforholdFakta = ArbeidsforholdFakta(listOf(ArbeidsgiverFakta("1111", "Test 1", LocalDate.now(), 1),
+                ArbeidsgiverFakta("2222", "Test 2", LocalDate.now(), 1)))
         val faktagrunnlag = Faktagrunnlag(tps = tpsFaktaUtenVerdi, beregningsperiode = emptyList(), sammenligningsperiode = emptyList(), arbeidsforhold = arbeidsforholdFakta,
                 sykepengeliste = emptyList())
         val vurdering = vurderArbeidsforhold(BeriketSykepengesøknad(originalSoknad, faktagrunnlag))

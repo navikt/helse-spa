@@ -334,14 +334,14 @@ class EndToEndTest {
   },
   "arbeidsforhold": {
     "grunnlag": {
-      "tom": "2019-01-01",
       "arbeidsgivere": [
         {
           "navn": "EQUINOR ASA, AVD STATOIL SOKKELVIRKSOMHET",
-          "organisasjonsnummer": "97114455"
+          "organisasjonsnummer": "97114455",
+          "startdato":"2017-01-01",
+          "dagerFørSykdom":730
         }
-      ],
-      "fom": "2018-12-04"
+      ]
     },
     "begrunnelse": "Søker har en arbeidsgiver med orgnummer 97114455",
     "fastsattVerdi": true,
