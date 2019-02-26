@@ -16,7 +16,8 @@ val arbeidsforholdFaktaUtenVerdi = ArbeidsforholdFakta(
 
 val faktagrunnlagUtenVerdi = Faktagrunnlag(
         tps = tpsFaktaUtenVerdi,
-        inntekt = emptyList(),
+        beregningsperiode = emptyList(),
+        sammenligningsperiode = emptyList(),
         sykepengeliste = emptyList(),
         arbeidsforhold = arbeidsforholdFaktaUtenVerdi
 )

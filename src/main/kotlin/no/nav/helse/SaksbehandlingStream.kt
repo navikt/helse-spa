@@ -3,6 +3,7 @@ package no.nav.helse
 import io.prometheus.client.CollectorRegistry
 import io.prometheus.client.Counter
 import no.nav.NarePrometheus
+import no.nav.helse.fastsetting.fastsettingAvSykepengegrunnlaget
 import no.nav.helse.fastsetting.fastsettingAvSykepengegrunnlagetNårTrygdenYterSykepenger
 import no.nav.helse.fastsetting.vurderAlderPåSisteDagISøknadsPeriode
 import no.nav.helse.fastsetting.vurderArbeidsforhold
@@ -79,7 +80,8 @@ class SaksbehandlingStream(val env: Environment) {
     fun hentRegisterData(input: Sykepengesoknad): BeriketSykepengesøknad =
             BeriketSykepengesøknad(input, Faktagrunnlag(
                     tps = PersonOppslag(env.sparkelBaseUrl, stsClient).hentTPSData(input),
-                    inntekt = InntektOppslag(env.sparkelBaseUrl, stsClient).hentInntekt(input.aktorId, input.startSyketilfelle, input.startSyketilfelle.minusYears(1)),
+                    beregningsperiode = Inntektsoppslag(env.sparkelBaseUrl, stsClient).hentBeregningsgrunnlag(input.aktorId, input.startSyketilfelle, input.startSyketilfelle.minusMonths(3)),
+                    sammenligningsperiode = Inntektsoppslag(env.sparkelBaseUrl, stsClient).hentSammenligningsgrunnlag(input.aktorId, input.startSyketilfelle, input.startSyketilfelle.minusYears(1)),
                     sykepengeliste = SykepengelisteOppslag(env.sparkelBaseUrl, stsClient).hentSykepengeliste(input.aktorId, input.fom),
                     arbeidsforhold = ArbeidsforholdOppslag(env.sparkelBaseUrl, stsClient).hentArbeidsforhold(input))
             )
@@ -90,7 +92,7 @@ class SaksbehandlingStream(val env: Environment) {
             alder = vurderAlderPåSisteDagISøknadsPeriode(input),
             arbeidsforhold = vurderArbeidsforhold(input),
             sykepengeliste = input.faktagrunnlag.sykepengeliste,
-            sykepengegrunnlag = fastsettingAvSykepengegrunnlagetNårTrygdenYterSykepenger(input.originalSoknad.startSyketilfelle, input.originalSoknad.arbeidsgiver, input.faktagrunnlag.inntekt))
+            sykepengegrunnlag = fastsettingAvSykepengegrunnlaget(input.originalSoknad.startSyketilfelle, input.originalSoknad.arbeidsgiver, input.faktagrunnlag.beregningsperiode, input.faktagrunnlag.sammenligningsperiode))
     fun beregnMaksdato(soknad: AvklartSykepengesoknad): AvklartSykepengesoknad = soknad.copy(maksdato = vurderMaksdato(soknad))
     fun prøvVilkår(input: AvklartSykepengesoknad): AvklartSykepengesoknad = input
     fun beregnSykepenger(input: AvklartSykepengesoknad): AvklartSykepengesoknad = input

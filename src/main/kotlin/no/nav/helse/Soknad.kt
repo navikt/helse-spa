@@ -4,8 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import no.nav.helse.fastsetting.Alder
 import no.nav.helse.fastsetting.Aldersgrunnlag
 import no.nav.helse.fastsetting.FastsattBeregningsperiode
-import no.nav.helse.fastsetting.FastsattSykepengegrunnlag
 import no.nav.helse.fastsetting.Medlemsskapgrunnlag
+import no.nav.helse.fastsetting.Sykepengegrunnlag
 import no.nav.helse.fastsetting.TomtMaksdatoGrunnlag
 import no.nav.helse.fastsetting.Vurdering
 import java.time.LocalDate
@@ -22,7 +22,7 @@ data class AvklartSykepengesoknad(val originalSoknad: Sykepengesoknad,
                                   val maksdato: Vurdering<LocalDate, Any> = Vurdering.Uavklart(årsak = Vurdering.Uavklart.Årsak.MANGELFULL_DATAGRUNNLAG, begrunnelse = "Venter på avklart alder og historiske sykepengeperioder", grunnlag = TomtMaksdatoGrunnlag()),
                                   val sykepengeliste: Collection<SykepengerVedtak>,
                                   val arbeidsforhold: Vurdering<Boolean, ArbeidsforholdFakta>,
-                                  val sykepengegrunnlag: Vurdering<FastsattSykepengegrunnlag, List<FastsattBeregningsperiode>>)
+                                  val sykepengegrunnlag: Vurdering<Sykepengegrunnlag, List<FastsattBeregningsperiode>>)
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class Sykepengesoknad(val aktorId: String,
@@ -44,7 +44,8 @@ data class Soknadsperiode(val fom: LocalDate,
                           val sykmeldingsgrad: Int)
 
 data class Faktagrunnlag(val tps: Tpsfakta,
-                         val inntekt: List<Inntekt>,
+                         val beregningsperiode: List<Inntekt>,
+                         val sammenligningsperiode: List<Inntekt>,
                          val sykepengeliste: Collection<SykepengerVedtak>,
                          val arbeidsforhold: ArbeidsforholdFakta)
 
