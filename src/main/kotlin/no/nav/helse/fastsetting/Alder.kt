@@ -1,5 +1,7 @@
-package no.nav.helse
+package no.nav.helse.fastsetting
 
+import no.nav.helse.BeriketSykepengesøknad
+import no.nav.helse.Tpsfakta
 import java.time.LocalDate
 import java.time.Period
 

@@ -1,5 +1,10 @@
-package no.nav.helse
+package no.nav.helse.fastsetting
 
+import no.nav.helse.AvklartSykepengesoknad
+import no.nav.helse.Grunnlagsdata
+import no.nav.helse.Tidsperiode
+import no.nav.helse.Yrkesstatus
+import no.nav.helse.maksdato
 import java.time.LocalDate
 
 data class TomtMaksdatoGrunnlag(val aarsak: String = "Venter på neste steg i fastsetting av fakta")

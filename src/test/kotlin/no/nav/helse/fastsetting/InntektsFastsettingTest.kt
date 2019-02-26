@@ -1,5 +1,7 @@
-package no.nav.helse
+package no.nav.helse.fastsetting
 
+import no.nav.helse.Arbeidsgiver
+import no.nav.helse.Inntekt
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import java.time.LocalDate

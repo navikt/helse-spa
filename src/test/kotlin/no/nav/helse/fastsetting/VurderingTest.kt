@@ -1,4 +1,4 @@
-package no.nav.helse
+package no.nav.helse.fastsetting
 
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test

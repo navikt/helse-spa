@@ -1,5 +1,6 @@
-package no.nav.helse
+package no.nav.helse.fastsetting
 
+import no.nav.helse.Tpsfakta
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.time.LocalDate

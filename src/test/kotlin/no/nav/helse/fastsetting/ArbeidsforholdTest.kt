@@ -1,7 +1,14 @@
-package no.nav.helse
+package no.nav.helse.fastsetting
 
 import com.fasterxml.jackson.module.kotlin.readValue
+import no.nav.helse.Arbeidsforhold
+import no.nav.helse.ArbeidsforholdFakta
+import no.nav.helse.ArbeidsgiverFakta
+import no.nav.helse.BeriketSykepengesøknad
+import no.nav.helse.Faktagrunnlag
+import no.nav.helse.originalSoknad
 import no.nav.helse.serde.defaultObjectMapper
+import no.nav.helse.tpsFaktaUtenVerdi
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.fail
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -32,7 +39,7 @@ class ArbeidsforholdTest {
 
     @Test
     fun `vurder arbeidsforhold med feil arbeidsgiver`() {
-        val arbeidsforholdFakta = ArbeidsforholdFakta(listOf(ArbeidsgiverFakta("2222", "Test 2")),LocalDate.now(), LocalDate.now())
+        val arbeidsforholdFakta = ArbeidsforholdFakta(listOf(ArbeidsgiverFakta("2222", "Test 2")), LocalDate.now(), LocalDate.now())
         val faktagrunnlag = Faktagrunnlag(tps = tpsFaktaUtenVerdi, inntekt = emptyList(), arbeidsforhold = arbeidsforholdFakta,
                 sykepengeliste = emptyList())
         val vurdering = vurderArbeidsforhold(BeriketSykepengesøknad(originalSoknad, faktagrunnlag))
@@ -47,7 +54,7 @@ class ArbeidsforholdTest {
         val faktagrunnlag = Faktagrunnlag(tps = tpsFaktaUtenVerdi, inntekt = emptyList(), arbeidsforhold = arbeidsforholdFakta,
                 sykepengeliste = emptyList())
         val vurdering = vurderArbeidsforhold(BeriketSykepengesøknad(originalSoknad, faktagrunnlag))
-        if (vurdering is Vurdering.Uavklart) assertThat(vurdering.årsak==Vurdering.Uavklart.Årsak.KREVER_SKJØNNSMESSIG_VURDERING).isTrue() else fail("Feil vurdering!")
+        if (vurdering is Vurdering.Uavklart) assertThat(vurdering.årsak== Vurdering.Uavklart.Årsak.KREVER_SKJØNNSMESSIG_VURDERING).isTrue() else fail("Feil vurdering!")
 
     }
 

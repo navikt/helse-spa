@@ -1,6 +1,13 @@
 package no.nav.helse
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import no.nav.helse.fastsetting.Alder
+import no.nav.helse.fastsetting.Aldersgrunnlag
+import no.nav.helse.fastsetting.FastsattBeregningsperiode
+import no.nav.helse.fastsetting.FastsattSykepengegrunnlag
+import no.nav.helse.fastsetting.Medlemsskapgrunnlag
+import no.nav.helse.fastsetting.TomtMaksdatoGrunnlag
+import no.nav.helse.fastsetting.Vurdering
 import java.time.LocalDate
 import java.time.LocalDateTime
 

@@ -3,6 +3,11 @@ package no.nav.helse
 import io.prometheus.client.CollectorRegistry
 import io.prometheus.client.Counter
 import no.nav.NarePrometheus
+import no.nav.helse.fastsetting.fastsettingAvSykepengegrunnlagetNårTrygdenYterSykepenger
+import no.nav.helse.fastsetting.vurderAlderPåSisteDagISøknadsPeriode
+import no.nav.helse.fastsetting.vurderArbeidsforhold
+import no.nav.helse.fastsetting.vurderMaksdato
+import no.nav.helse.fastsetting.vurderMedlemskap
 import no.nav.helse.serde.sykepengesoknadSerde
 import no.nav.helse.streams.*
 import org.apache.kafka.clients.consumer.ConsumerConfig

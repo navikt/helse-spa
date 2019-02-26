@@ -1,5 +1,7 @@
-package no.nav.helse
+package no.nav.helse.fastsetting
 
+import no.nav.helse.Arbeidsgiver
+import no.nav.helse.Inntekt
 import java.time.LocalDate
 import java.time.YearMonth
 
@@ -53,7 +55,7 @@ fun fastsettSammenligningsgrunnlag(førsteSykdomsdag: LocalDate, inntekter: List
 }
 
 // § 8-30 første ledd
-fun fastsettingAvSykepengegrunnlagetNårTrygdenYterSykepenger(førsteSykdomsdag: LocalDate, arbeidsgiver: Arbeidsgiver, inntekter: List<Inntekt>): Vurdering<FastsattSykepengegrunnlag, List<FastsattBeregningsperiode>>  {
+fun fastsettingAvSykepengegrunnlagetNårTrygdenYterSykepenger(førsteSykdomsdag: LocalDate, arbeidsgiver: Arbeidsgiver, inntekter: List<Inntekt>): Vurdering<FastsattSykepengegrunnlag, List<FastsattBeregningsperiode>> {
     val beregnetAktuellMånedsinntekt = fastsettingAvSykepengegrunnlagetIArbeidsgiverperioden(førsteSykdomsdag, arbeidsgiver, inntekter)
     if (beregnetAktuellMånedsinntekt is Vurdering.Uavklart) {
         return beregnetAktuellMånedsinntekt

@@ -1,5 +1,7 @@
-package no.nav.helse
+package no.nav.helse.fastsetting
 
+import no.nav.helse.ArbeidsforholdFakta
+import no.nav.helse.BeriketSykepengesøknad
 import no.nav.nare.core.evaluations.Evaluering
 import no.nav.nare.core.evaluations.Resultat
 

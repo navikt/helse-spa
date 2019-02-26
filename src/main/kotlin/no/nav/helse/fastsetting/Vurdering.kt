@@ -1,4 +1,4 @@
-package no.nav.helse
+package no.nav.helse.fastsetting
 
 import java.time.LocalDateTime
 
@@ -13,7 +13,7 @@ sealed class Vurdering<out V, out G>(val begrunnelse: String, val grunnlag: G, v
         }
 
     }
-    class Uavklart<G>(val årsak: Uavklart.Årsak,
+    class Uavklart<G>(val årsak: Årsak,
                       begrunnelse: String,
                       grunnlag: G): Vurdering<Nothing, G>(begrunnelse, grunnlag) {
 
