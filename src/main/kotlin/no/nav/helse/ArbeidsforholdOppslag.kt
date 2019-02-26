@@ -12,7 +12,7 @@ class ArbeidsforholdOppslag(val sparkelUrl: String, val stsRestClient: StsRestCl
     private val log = LoggerFactory.getLogger(ArbeidsforholdOppslag::class.java.name)
 
     fun hentArbeidsforhold(sykepengesoknad: Sykepengesoknad) : ArbeidsforholdFakta {
-        val forsteSykdomsdag = sykepengesoknad.fom
+        val forsteSykdomsdag = sykepengesoknad.startSyketilfelle
         // Opptjeningstid = minst 4 uker i arbeid før sykdommen
         val fireUkerForSykdomsDag = forsteSykdomsdag.minus(4, ChronoUnit.WEEKS)
 
