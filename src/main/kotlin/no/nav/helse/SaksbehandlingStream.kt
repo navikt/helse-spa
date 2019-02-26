@@ -38,7 +38,7 @@ class SaksbehandlingStream(val env: Environment) {
 
     init {
         val streamConfig = if ("true"==env.plainTextKafka) streamConfigPlainTextKafka() else streamConfig(appId, env.bootstrapServersUrl,
-                env.username to env.password,
+                env.kafkaUsername to env.kafkaPassword,
                 env.navTruststorePath to env.navTruststorePassword)
         consumer = StreamConsumer(appId, KafkaStreams(topology(), streamConfig))
     }
@@ -63,7 +63,10 @@ class SaksbehandlingStream(val env: Environment) {
                 .mapValues { _, soknad -> prøvVilkår(soknad) }
                 .mapValues { _, soknad -> beregnSykepenger(soknad) }
                 .mapValues { _, soknad -> fattVedtak(soknad) }
-                .peek { _, _ -> acceptCounter.labels("processed").inc() }
+                .peek { _, _ ->
+                    acceptCounter.labels("processed").inc()
+                    log.error("processing message 6")
+                }
                 .toTopic(Topics.VEDTAK_SYKEPENGER)
 
         return builder.build()
@@ -82,7 +85,7 @@ class SaksbehandlingStream(val env: Environment) {
                     tps = PersonOppslag(env.sparkelBaseUrl, stsClient).hentTPSData(input),
                     beregningsperiode = Inntektsoppslag(env.sparkelBaseUrl, stsClient).hentBeregningsgrunnlag(input.aktorId, input.startSyketilfelle, input.startSyketilfelle.minusMonths(3)),
                     sammenligningsperiode = Inntektsoppslag(env.sparkelBaseUrl, stsClient).hentSammenligningsgrunnlag(input.aktorId, input.startSyketilfelle, input.startSyketilfelle.minusYears(1)),
-                    sykepengeliste = SykepengelisteOppslag(env.sparkelBaseUrl, stsClient).hentSykepengeliste(input.aktorId, input.fom),
+                    sykepengeliste = emptyList(),
                     arbeidsforhold = ArbeidsforholdOppslag(env.sparkelBaseUrl, stsClient).hentArbeidsforhold(input))
             )
 

@@ -3,6 +3,8 @@ package no.nav.helse
 data class Environment(
         val username: String = getEnvVar("SERVICEUSER_USERNAME"),
         val password: String = getEnvVar("SERVICEUSER_PASSWORD"),
+        val kafkaUsername: String? = getEnvVarOptional("SERVICEUSER_USERNAME"),
+        val kafkaPassword: String? = getEnvVarOptional("SERVICEUSER_PASSWORD"),
         val bootstrapServersUrl: String = getEnvVar("KAFKA_BOOTSTRAP_SERVERS"),
         val httpPort: Int? = null,
         val navTruststorePath: String? = getEnvVarOptional("NAV_TRUSTSTORE_PATH"),

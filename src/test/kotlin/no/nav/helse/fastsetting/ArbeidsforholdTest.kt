@@ -24,7 +24,7 @@ class ArbeidsforholdTest {
     fun hentArbeidsforhold() {
         val arbeidsforhold : Arbeidsforhold = defaultObjectMapper.readValue(ArbeidsforholdTest::class.java.
                 classLoader.getResourceAsStream("arbeidsforhold.json"))
-        assertEquals("1111111111", arbeidsforhold.organisasjoner.get(0).organisasjonsnummer)
+        assertEquals("1111111111", arbeidsforhold.arbeidsforhold.get(0).arbeidsgiver.organisasjonsnummer)
     }
 
     @Test

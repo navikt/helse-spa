@@ -11,6 +11,7 @@ val junitJupiterVersion = "5.3.1"
 val assertJVersion = "3.11.1"
 val mainClass = "no.nav.helse.AppKt"
 val jacksonVersion = "2.9.7"
+val wireMockVersion = "2.19.0"
 
 plugins {
     kotlin("jvm") version "1.3.20"
@@ -41,7 +42,9 @@ dependencies {
     compile("no.nav:nare-prometheus:0b41ab4")
     compile("com.github.kittinunf.fuel:fuel:$fuelVersion")
 
-
+    testCompile("com.github.tomakehurst:wiremock:$wireMockVersion") {
+        exclude(group = "junit")
+    }
     testCompile ("no.nav:kafka-embedded-env:2.0.1")
     testCompile("org.junit.jupiter:junit-jupiter-api:$junitJupiterVersion")
     testCompile("org.junit.jupiter:junit-jupiter-params:$junitJupiterVersion")
