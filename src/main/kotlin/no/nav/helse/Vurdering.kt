@@ -13,18 +13,18 @@ sealed class Vurdering<out V, out G>(val begrunnelse: String, val grunnlag: G, v
         }
 
     }
-    class Uavklart<G>(val arsak: Uavklart.Arsak,
+    class Uavklart<G>(val årsak: Uavklart.Årsak,
                       begrunnelse: String,
                       grunnlag: G): Vurdering<Nothing, G>(begrunnelse, grunnlag) {
 
-        enum class Arsak {
-            SKJONN,
-            DARLIG_DATA,
-            MANGLENDE_DATA
+        enum class Årsak {
+            KREVER_SKJØNNSMESSIG_VURDERING,
+            DÅRLIG_DATAGRUNNLAG,
+            MANGELFULL_DATAGRUNNLAG
         }
 
         override fun toString(): String {
-            return "Uavklart(arsak=$arsak, begrunnelse=$begrunnelse)"
+            return "Uavklart(årsak=$årsak, begrunnelse=$begrunnelse)"
         }
 
 

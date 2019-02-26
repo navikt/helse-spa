@@ -1,6 +1,5 @@
 package no.nav.helse
 
-import no.nav.nare.core.evaluations.Evaluering
 import java.time.LocalDate
 import java.time.YearMonth
 
@@ -23,11 +22,11 @@ fun fastsettingAvSykepengegrunnlagetIArbeidsgiverperioden(førsteSykdomsdag: Loc
     // TODO: sjekke om listen inneholder mer enn tre elementer? (hva om det er rapportert inn to inntekter for en måned?)
 
     return if (beregningsperiode.isEmpty()) {
-        Vurdering.Uavklart(Vurdering.Uavklart.Arsak.MANGLENDE_DATA, "Kan ikke avklare sykepengegrunnlaget fordi det ikke er inntekter i beregningsperioden", beregningsperiode)
+        Vurdering.Uavklart(Vurdering.Uavklart.Årsak.MANGELFULL_DATAGRUNNLAG, "Kan ikke avklare sykepengegrunnlaget fordi det ikke er inntekter i beregningsperioden", beregningsperiode)
     } else if (beregningsperiode.any { ! it.inntekt.orgnummer.equals(arbeidsgiver.orgnummer) }) {
-        Vurdering.Uavklart(Vurdering.Uavklart.Arsak.SKJONN, "Kan ikke avklare sykepengegrunnlaget fordi det andre inntekter i arbeidsgiverperioden enn i fra aktuell arbeidsgiver", beregningsperiode)
+        Vurdering.Uavklart(Vurdering.Uavklart.Årsak.KREVER_SKJØNNSMESSIG_VURDERING, "Kan ikke avklare sykepengegrunnlaget fordi det andre inntekter i arbeidsgiverperioden enn i fra aktuell arbeidsgiver", beregningsperiode)
     } else if (beregningsperiode.size > 3) {
-        Vurdering.Uavklart(Vurdering.Uavklart.Arsak.DARLIG_DATA, "Kan ikke avklare sykepengegrunnlaget fordi det er ${beregningsperiode.size} inntekter i beregningsperioden, vi forventer tre eller færre.", beregningsperiode)
+        Vurdering.Uavklart(Vurdering.Uavklart.Årsak.DÅRLIG_DATAGRUNNLAG, "Kan ikke avklare sykepengegrunnlaget fordi det er ${beregningsperiode.size} inntekter i beregningsperioden, vi forventer tre eller færre.", beregningsperiode)
     } else {
         // § 8-28 andre ledd
         val aktuellMånedsinntekt = beregningsperiode.sumBy { periode ->
@@ -72,7 +71,7 @@ fun fastsettingAvSykepengegrunnlagetNårTrygdenYterSykepenger(førsteSykdomsdag:
     val avvik = Math.abs(omregnetÅrsinntekt - rapportertInntekt) / rapportertInntekt.toDouble()
 
     if (avvik > 0.25) {
-        return Vurdering.Uavklart(Vurdering.Uavklart.Arsak.SKJONN,
+        return Vurdering.Uavklart(Vurdering.Uavklart.Årsak.KREVER_SKJØNNSMESSIG_VURDERING,
                 "§ 8-30 andre ledd - Sykepengegrunnlaget skal fastsettes ved skjønn fordi omregner årsinntekt ($omregnetÅrsinntekt) avviker mer enn 25% (${avvik * 100}%) fra rapportert inntekt ($rapportertInntekt)",
                 sammenligningsgrunnlag.grunnlag) // FIXME: hva ønsker vi egentlig som referert grunnlag her ?
     }

@@ -7,7 +7,7 @@ data class TomtMaksdatoGrunnlag(val aarsak: String = "Venter på neste steg i fa
 fun vurderMaksdato(soknad: AvklartSykepengesoknad): Vurdering<LocalDate, Any> {
     val alder = soknad.alder
     return when (alder) {
-        is Vurdering.Uavklart -> Vurdering.Uavklart(arsak = Vurdering.Uavklart.Arsak.MANGLENDE_DATA, begrunnelse = "Kan ikke fastsette maksdato for bruker med uavklart alder", grunnlag = TomtMaksdatoGrunnlag(aarsak = "Alder ikke avklart"))
+        is Vurdering.Uavklart -> Vurdering.Uavklart(årsak = Vurdering.Uavklart.Årsak.MANGELFULL_DATAGRUNNLAG, begrunnelse = "Kan ikke fastsette maksdato for bruker med uavklart alder", grunnlag = TomtMaksdatoGrunnlag(aarsak = "Alder ikke avklart"))
         is Vurdering.Avklart -> {
             val grunnlag = Grunnlagsdata(
                     førsteFraværsdag = soknad.originalSoknad.startSyketilfelle,

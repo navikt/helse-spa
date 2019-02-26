@@ -47,7 +47,7 @@ class ArbeidsforholdTest {
         val faktagrunnlag = Faktagrunnlag(tps = tpsFaktaUtenVerdi, inntekt = emptyList(), arbeidsforhold = arbeidsforholdFakta,
                 sykepengeliste = emptyList())
         val vurdering = vurderArbeidsforhold(BeriketSykepengesøknad(originalSoknad, faktagrunnlag))
-        if (vurdering is Vurdering.Uavklart) assertThat(vurdering.arsak==Vurdering.Uavklart.Arsak.SKJONN).isTrue() else fail("Feil vurdering!")
+        if (vurdering is Vurdering.Uavklart) assertThat(vurdering.årsak==Vurdering.Uavklart.Årsak.KREVER_SKJØNNSMESSIG_VURDERING).isTrue() else fail("Feil vurdering!")
 
     }
 

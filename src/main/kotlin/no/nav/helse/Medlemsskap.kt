@@ -26,7 +26,7 @@ fun vurderMedlemskap(soknad: BeriketSykepengesøknad): Vurdering<Boolean, Medlem
     }
 
     return when (evaluering.resultat) {
-        Resultat.KANSKJE -> Vurdering.Uavklart(Vurdering.Uavklart.Arsak.SKJONN, evaluering.begrunnelse, grunnlag)
+        Resultat.KANSKJE -> Vurdering.Uavklart(Vurdering.Uavklart.Årsak.KREVER_SKJØNNSMESSIG_VURDERING, evaluering.begrunnelse, grunnlag)
         else -> Vurdering.Avklart(evaluering.resultat == Resultat.JA, evaluering.begrunnelse, grunnlag, "SPA")
     }
 }

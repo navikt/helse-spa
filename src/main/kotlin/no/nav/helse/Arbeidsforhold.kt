@@ -10,7 +10,7 @@ fun vurderArbeidsforhold(soknad : BeriketSykepengesøknad) : Vurdering<Boolean, 
     val evaluering = evaluerArbeidsforhold(orgnummer, fakta)
 
     return when (evaluering.resultat) {
-        Resultat.KANSKJE -> Vurdering.Uavklart(Vurdering.Uavklart.Arsak.SKJONN, evaluering.begrunnelse, fakta)
+        Resultat.KANSKJE -> Vurdering.Uavklart(Vurdering.Uavklart.Årsak.KREVER_SKJØNNSMESSIG_VURDERING, evaluering.begrunnelse, fakta)
         else -> Vurdering.Avklart(evaluering.resultat == Resultat.JA, evaluering.begrunnelse, fakta, "SPA")
     }
 

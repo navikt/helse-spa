@@ -16,16 +16,16 @@ class ArbeidsforholdOppslag(val sparkelUrl: String, val stsRestClient: StsRestCl
         // Opptjeningstid = minst 4 uker i arbeid før sykdommen
         val fireUkerForSykdomsDag = forsteSykdomsdag.minus(4, ChronoUnit.WEEKS)
 
-        val arbeidsforhold = hentArbeidsforholdRest(AktorId(sykepengesoknad.aktorId), fireUkerForSykdomsDag, forsteSykdomsdag)
+        val arbeidsforhold = hentArbeidsforholdRest(AktørId(sykepengesoknad.aktorId), fireUkerForSykdomsDag, forsteSykdomsdag)
         return ArbeidsforholdFakta(arbeidsforhold.organisasjoner.map {
             ArbeidsgiverFakta(it.organisasjonsnummer, it.navn)}, fireUkerForSykdomsDag, forsteSykdomsdag)
 
     }
 
-    fun hentArbeidsforholdRest(aktorId: AktorId, fom: LocalDate, tom: LocalDate) : Arbeidsforhold {
+    fun hentArbeidsforholdRest(aktørId: AktørId, fom: LocalDate, tom: LocalDate) : Arbeidsforhold {
         val bearer = stsRestClient.token()
         val (_, _, result) =
-                "$sparkelUrl/api/arbeidsforhold/${aktorId.aktor}?fom=$fom&tom=$tom".httpGet()
+                "$sparkelUrl/api/arbeidsforhold/${aktørId.aktor}?fom=$fom&tom=$tom".httpGet()
                         .header(mapOf(
                                 "Authorization" to "Bearer $bearer",
                                 "Accept" to "application/json",

@@ -9,13 +9,13 @@ class PersonOppslag(val sparkelUrl: String, val stsRestClient: StsRestClient) {
     private val log = LoggerFactory.getLogger(PersonOppslag::class.java.name)
 
     fun hentTPSData(input: Sykepengesoknad): Tpsfakta {
-        val person = hentPerson(AktorId(input.aktorId))
+        val person = hentPerson(AktørId(input.aktorId))
         return Tpsfakta(fodselsdato = person.fdato, bostedland = person.bostedsland)
     }
 
-    private fun hentPerson(aktorId: AktorId): Person {
+    private fun hentPerson(aktørId: AktørId): Person {
         val bearer = stsRestClient.token()
-        val (_, _, result) = "$sparkelUrl/api/person/${aktorId.aktor}".httpGet()
+        val (_, _, result) = "$sparkelUrl/api/person/${aktørId.aktor}".httpGet()
                 .header(mapOf(
                         "Authorization" to "Bearer $bearer",
                         "Accept" to "application/json",
@@ -34,7 +34,7 @@ enum class Kjønn {
 }
 
 data class Person(
-        val id: AktorId,
+        val id: AktørId,
         val fornavn: String,
         val mellomnavn: String? = null,
         val etternavn: String,
@@ -43,7 +43,7 @@ data class Person(
         val bostedsland: String = ""
 )
 
-data class AktorId(val aktor: String) {
+data class AktørId(val aktor: String) {
     init {
         if (aktor.isEmpty()) {
             throw IllegalArgumentException("$aktor cannot be empty")

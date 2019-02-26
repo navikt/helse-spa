@@ -118,7 +118,7 @@ class InntektsFastsettingTest {
         println(fastsattSykepengegrunnlag)
 
         Assertions.assertEquals(Vurdering.Uavklart::class, fastsattSykepengegrunnlag::class)
-        Assertions.assertEquals(Vurdering.Uavklart.Arsak.SKJONN, (fastsattSykepengegrunnlag as Vurdering.Uavklart).arsak)
+        Assertions.assertEquals(Vurdering.Uavklart.Årsak.KREVER_SKJØNNSMESSIG_VURDERING, (fastsattSykepengegrunnlag as Vurdering.Uavklart).årsak)
     }
 
 

@@ -12,7 +12,7 @@ data class BeriketSykepengesøknad(
 data class AvklartSykepengesoknad(val originalSoknad: Sykepengesoknad,
                                   val medlemskap: Vurdering<Boolean, Medlemsskapgrunnlag>,
                                   val alder: Vurdering<Alder, Aldersgrunnlag>,
-                                  val maksdato: Vurdering<LocalDate, Any> = Vurdering.Uavklart(arsak = Vurdering.Uavklart.Arsak.MANGLENDE_DATA, begrunnelse = "Venter på avklart alder og historiske sykepengeperioder", grunnlag = TomtMaksdatoGrunnlag()),
+                                  val maksdato: Vurdering<LocalDate, Any> = Vurdering.Uavklart(årsak = Vurdering.Uavklart.Årsak.MANGELFULL_DATAGRUNNLAG, begrunnelse = "Venter på avklart alder og historiske sykepengeperioder", grunnlag = TomtMaksdatoGrunnlag()),
                                   val sykepengeliste: Collection<SykepengerVedtak>,
                                   val arbeidsforhold: Vurdering<Boolean, ArbeidsforholdFakta>,
                                   val sykepengegrunnlag: Vurdering<FastsattSykepengegrunnlag, List<FastsattBeregningsperiode>>)
