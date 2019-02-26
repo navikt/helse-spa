@@ -86,6 +86,8 @@ class EndToEndTest {
         val expected = forventetVedtak()
         val actual = ventPåVedtak()
 
+        println(actual)
+
         assertNotNull(actual)
         assertJsonEquals(JSONObject(expected), actual!!, listOf("vurderingstidspunkt"))
 
@@ -117,36 +119,106 @@ class EndToEndTest {
     "fastsattAv": "SPA"
   },
   "sykepengegrunnlag": {
-    "grunnlag": [
-      {
-        "begrunnelse": "§ 8-30 andre ledd \u2013 rapportert inntekt (se § 8-29) til a-ordningen etter reglene i a-opplysningsloven de siste tolv kalendermånedene før arbeidsuførheten inntraff (2019-01-01) legges til grunn.",
-        "inntekt": {
-          "arbeidsgiver": {
-            "orgnr": "97114455"
+    "grunnlag": [],
+    "begrunnelse": "",
+    "fastsattVerdi": {
+      "sykepengegrunnlagNårTrydenYter": {
+        "grunnlag": [
+          {
+            "begrunnelse": "§ 8-28 tredje ledd bokstav a) \u2013 De tre siste kalendermånedene før arbeidstakeren ble arbeidsufør (2019-01-01) legges til grunn.",
+            "inntekt": {
+              "arbeidsgiver": {
+                "orgnr": "97114455"
+              },
+              "beløp": 25000,
+              "opptjeningsperiode": {
+                "tom": "2018-12-31",
+                "fom": "2018-12-01"
+              }
+            }
           },
-          "beløp": 10000,
-          "opptjeningsperiode": {
-            "tom": "2018-12-31",
-            "fom": "2018-12-01"
+          {
+            "begrunnelse": "§ 8-28 tredje ledd bokstav a) \u2013 De tre siste kalendermånedene før arbeidstakeren ble arbeidsufør (2019-01-01) legges til grunn.",
+            "inntekt": {
+              "arbeidsgiver": {
+                "orgnr": "97114455"
+              },
+              "beløp": 25000,
+              "opptjeningsperiode": {
+                "tom": "2018-11-30",
+                "fom": "2018-11-01"
+              }
+            }
+          },
+          {
+            "begrunnelse": "§ 8-28 tredje ledd bokstav a) \u2013 De tre siste kalendermånedene før arbeidstakeren ble arbeidsufør (2019-01-01) legges til grunn.",
+            "inntekt": {
+              "arbeidsgiver": {
+                "orgnr": "97114455"
+              },
+              "beløp": 25000,
+              "opptjeningsperiode": {
+                "tom": "2018-10-31",
+                "fom": "2018-10-01"
+              }
+            }
           }
-        }
+        ],
+        "begrunnelse": "§ 8-30 første ledd",
+        "fastsattVerdi": 300000,
+        "vurderingstidspunkt": "BLIR_IKKE_MATCHET",
+        "fastsattAv": "spa"
       },
-      {
-        "begrunnelse": "§ 8-30 andre ledd \u2013 rapportert inntekt (se § 8-29) til a-ordningen etter reglene i a-opplysningsloven de siste tolv kalendermånedene før arbeidsuførheten inntraff (2019-01-01) legges til grunn.",
-        "inntekt": {
-          "arbeidsgiver": {
-            "orgnr": "97114455"
+      "sykepengegrunnlagIArbeidsgiverperioden": {
+        "grunnlag": [
+          {
+            "begrunnelse": "§ 8-28 tredje ledd bokstav a) \u2013 De tre siste kalendermånedene før arbeidstakeren ble arbeidsufør (2019-01-01) legges til grunn.",
+            "inntekt": {
+              "arbeidsgiver": {
+                "orgnr": "97114455"
+              },
+              "beløp": 25000,
+              "opptjeningsperiode": {
+                "tom": "2018-12-31",
+                "fom": "2018-12-01"
+              }
+            }
           },
-          "beløp": 25000,
-          "opptjeningsperiode": {
-            "tom": "2018-12-31",
-            "fom": "2018-12-01"
+          {
+            "begrunnelse": "§ 8-28 tredje ledd bokstav a) \u2013 De tre siste kalendermånedene før arbeidstakeren ble arbeidsufør (2019-01-01) legges til grunn.",
+            "inntekt": {
+              "arbeidsgiver": {
+                "orgnr": "97114455"
+              },
+              "beløp": 25000,
+              "opptjeningsperiode": {
+                "tom": "2018-11-30",
+                "fom": "2018-11-01"
+              }
+            }
+          },
+          {
+            "begrunnelse": "§ 8-28 tredje ledd bokstav a) \u2013 De tre siste kalendermånedene før arbeidstakeren ble arbeidsufør (2019-01-01) legges til grunn.",
+            "inntekt": {
+              "arbeidsgiver": {
+                "orgnr": "97114455"
+              },
+              "beløp": 25000,
+              "opptjeningsperiode": {
+                "tom": "2018-10-31",
+                "fom": "2018-10-01"
+              }
+            }
           }
-        }
+        ],
+        "begrunnelse": "§ 8-28 andre ledd",
+        "fastsattVerdi": 25000,
+        "vurderingstidspunkt": "BLIR_IKKE_MATCHET",
+        "fastsattAv": "spa"
       }
-    ],
-    "begrunnelse": "§ 8-30 andre ledd - Sykepengegrunnlaget skal fastsettes ved skjønn fordi omregner årsinntekt (210000) avviker mer enn 25% (500.0%) fra rapportert inntekt (35000)",
-    "vurderingstidspunkt": "BLIR_IKKE_MATCHET"
+    },
+    "vurderingstidspunkt": "BLIR_IKKE_MATCHET",
+    "fastsattAv": "SPA"
   },
   "arbeidsforhold": {
     "grunnlag": {
@@ -319,7 +391,7 @@ class EndToEndTest {
             "arbeidsgiver": {
                 "orgnr": "97114455"
             },
-            "beløp": 10000,
+            "beløp": 25000,
             "opptjeningsperiode": {
                 "tom": "2018-12-31",
                 "fom": "2018-12-01"
@@ -331,8 +403,118 @@ class EndToEndTest {
             },
             "beløp": 25000,
             "opptjeningsperiode": {
-                "tom": "2018-12-31",
-                "fom": "2018-12-01"
+                "tom": "2018-11-30",
+                "fom": "2018-11-01"
+            }
+        },
+        {
+            "arbeidsgiver": {
+                "orgnr": "97114455"
+            },
+            "beløp": 25000,
+            "opptjeningsperiode": {
+                "tom": "2018-10-31",
+                "fom": "2018-10-01"
+            }
+        },
+        {
+            "arbeidsgiver": {
+                "orgnr": "97114455"
+            },
+            "beløp": 25000,
+            "opptjeningsperiode": {
+                "tom": "2018-09-30",
+                "fom": "2018-09-01"
+            }
+        },
+        {
+            "arbeidsgiver": {
+                "orgnr": "97114455"
+            },
+            "beløp": 25000,
+            "opptjeningsperiode": {
+                "tom": "2018-08-31",
+                "fom": "2018-08-01"
+            }
+        },
+        {
+            "arbeidsgiver": {
+                "orgnr": "97114455"
+            },
+            "beløp": 25000,
+            "opptjeningsperiode": {
+                "tom": "2018-07-31",
+                "fom": "2018-07-01"
+            }
+        },
+        {
+            "arbeidsgiver": {
+                "orgnr": "97114455"
+            },
+            "beløp": 25000,
+            "opptjeningsperiode": {
+                "tom": "2018-06-30",
+                "fom": "2018-06-01"
+            }
+        },
+        {
+            "arbeidsgiver": {
+                "orgnr": "97114455"
+            },
+            "beløp": 25000,
+            "opptjeningsperiode": {
+                "tom": "2018-05-31",
+                "fom": "2018-05-01"
+            }
+        },
+        {
+            "arbeidsgiver": {
+                "orgnr": "97114455"
+            },
+            "beløp": 25000,
+            "opptjeningsperiode": {
+                "tom": "2018-04-30",
+                "fom": "2018-04-01"
+            }
+        },
+        {
+            "arbeidsgiver": {
+                "orgnr": "97114455"
+            },
+            "beløp": 25000,
+            "opptjeningsperiode": {
+                "tom": "2018-03-31",
+                "fom": "2018-03-01"
+            }
+        },
+        {
+            "arbeidsgiver": {
+                "orgnr": "97114455"
+            },
+            "beløp": 25000,
+            "opptjeningsperiode": {
+                "tom": "2018-02-28",
+                "fom": "2018-02-01"
+            }
+        },
+        {
+            "arbeidsgiver": {
+                "orgnr": "97114455"
+            },
+            "beløp": 25000,
+            "opptjeningsperiode": {
+                "tom": "2018-01-31",
+                "fom": "2018-01-01"
+            }
+        },
+        {
+            "arbeidsgiver": {
+                "orgnr": "97114455"
+            },
+            "beløp": 25000,
+            "opptjeningsperiode": {
+                "tom": "2017-12-31",
+                "fom": "2017-12-01"
             }
         }
     ]
@@ -345,7 +527,7 @@ class EndToEndTest {
             "arbeidsgiver": {
                 "orgnr": "97114455"
             },
-            "beløp": 10000,
+            "beløp": 25000,
             "opptjeningsperiode": {
                 "tom": "2018-12-31",
                 "fom": "2018-12-01"
@@ -357,8 +539,118 @@ class EndToEndTest {
             },
             "beløp": 25000,
             "opptjeningsperiode": {
-                "tom": "2018-12-31",
-                "fom": "2018-12-01"
+                "tom": "2018-11-30",
+                "fom": "2018-11-01"
+            }
+        },
+        {
+            "arbeidsgiver": {
+                "orgnr": "97114455"
+            },
+            "beløp": 25000,
+            "opptjeningsperiode": {
+                "tom": "2018-10-31",
+                "fom": "2018-10-01"
+            }
+        },
+        {
+            "arbeidsgiver": {
+                "orgnr": "97114455"
+            },
+            "beløp": 25000,
+            "opptjeningsperiode": {
+                "tom": "2018-09-30",
+                "fom": "2018-09-01"
+            }
+        },
+        {
+            "arbeidsgiver": {
+                "orgnr": "97114455"
+            },
+            "beløp": 25000,
+            "opptjeningsperiode": {
+                "tom": "2018-08-31",
+                "fom": "2018-08-01"
+            }
+        },
+        {
+            "arbeidsgiver": {
+                "orgnr": "97114455"
+            },
+            "beløp": 25000,
+            "opptjeningsperiode": {
+                "tom": "2018-07-31",
+                "fom": "2018-07-01"
+            }
+        },
+        {
+            "arbeidsgiver": {
+                "orgnr": "97114455"
+            },
+            "beløp": 25000,
+            "opptjeningsperiode": {
+                "tom": "2018-06-30",
+                "fom": "2018-06-01"
+            }
+        },
+        {
+            "arbeidsgiver": {
+                "orgnr": "97114455"
+            },
+            "beløp": 25000,
+            "opptjeningsperiode": {
+                "tom": "2018-05-31",
+                "fom": "2018-05-01"
+            }
+        },
+        {
+            "arbeidsgiver": {
+                "orgnr": "97114455"
+            },
+            "beløp": 25000,
+            "opptjeningsperiode": {
+                "tom": "2018-04-30",
+                "fom": "2018-04-01"
+            }
+        },
+        {
+            "arbeidsgiver": {
+                "orgnr": "97114455"
+            },
+            "beløp": 25000,
+            "opptjeningsperiode": {
+                "tom": "2018-03-31",
+                "fom": "2018-03-01"
+            }
+        },
+        {
+            "arbeidsgiver": {
+                "orgnr": "97114455"
+            },
+            "beløp": 25000,
+            "opptjeningsperiode": {
+                "tom": "2018-02-28",
+                "fom": "2018-02-01"
+            }
+        },
+        {
+            "arbeidsgiver": {
+                "orgnr": "97114455"
+            },
+            "beløp": 25000,
+            "opptjeningsperiode": {
+                "tom": "2018-01-31",
+                "fom": "2018-01-01"
+            }
+        },
+        {
+            "arbeidsgiver": {
+                "orgnr": "97114455"
+            },
+            "beløp": 25000,
+            "opptjeningsperiode": {
+                "tom": "2017-12-31",
+                "fom": "2017-12-01"
             }
         }
     ]
