@@ -121,7 +121,7 @@ class EndToEndTest {
   "sykepengegrunnlag": {
     "begrunnelse": "",
     "grunnlag": {
-      "begrunnelse": "",
+      "begrunnelse": "§ 8-30 andre ledd – rapportert inntekt (se § 8-29) til a-ordningen etter reglene i a-opplysningsloven de siste tolv kalendermånedene før arbeidsuførheten inntraff (2019-01-01) legges til grunn.",
       "inntekter": [
         {
           "arbeidsgiver": {
@@ -241,16 +241,6 @@ class EndToEndTest {
           "opptjeningsperiode": {
             "tom": "2018-01-31",
             "fom": "2018-01-01"
-          }
-        },
-        {
-          "arbeidsgiver": {
-            "orgnr": "97114455"
-          },
-          "beløp": 25000,
-          "opptjeningsperiode": {
-            "tom": "2017-12-31",
-            "fom": "2017-12-01"
           }
         }
       ]
@@ -515,6 +505,16 @@ class EndToEndTest {
             },
             "beløp": 25000,
             "opptjeningsperiode": {
+                "tom": "2019-01-31",
+                "fom": "2019-01-01"
+            }
+        },
+        {
+            "arbeidsgiver": {
+                "orgnr": "97114455"
+            },
+            "beløp": 25000,
+            "opptjeningsperiode": {
                 "tom": "2018-12-31",
                 "fom": "2018-12-01"
             }
@@ -645,6 +645,16 @@ class EndToEndTest {
         stubFor(any(urlPathEqualTo("/api/inntekt/$aktørId/sammenligningsgrunnlag"))
                 .willReturn(okJson("""{
     "inntekter": [
+        {
+            "arbeidsgiver": {
+                "orgnr": "97114455"
+            },
+            "beløp": 25000,
+            "opptjeningsperiode": {
+                "tom": "2019-01-31",
+                "fom": "2019-01-01"
+            }
+        },
         {
             "arbeidsgiver": {
                 "orgnr": "97114455"

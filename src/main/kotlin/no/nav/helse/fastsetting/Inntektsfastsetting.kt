@@ -28,7 +28,7 @@ fun fastsettingAvSykepengegrunnlaget(førsteSykdomsdag: LocalDate, arbeidsgiver:
         return sykepengegrunnlagNårTrydenYter
     }
 
-    return Vurdering.Avklart(Sykepengegrunnlag(sykepengegrunnlagNårTrydenYter as Vurdering.Avklart, sykepengegrunnlagIArbeidsgiverperioden), "", Beregningsperiode(sammenligningsgrunnlag, "") , "SPA")
+    return Vurdering.Avklart(Sykepengegrunnlag(sykepengegrunnlagNårTrydenYter as Vurdering.Avklart, sykepengegrunnlagIArbeidsgiverperioden), "", fastsattSammenligningsgrunnlag.grunnlag , "SPA")
 }
 
 // https://lovdata.no/lov/1997-02-28-19/§8-28
