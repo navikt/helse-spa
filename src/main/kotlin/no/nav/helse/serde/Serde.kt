@@ -10,14 +10,14 @@ import org.apache.kafka.common.serialization.Serde
 import org.apache.kafka.common.serialization.Serdes
 import org.apache.kafka.common.serialization.Serializer
 
-val sykepengesoknadSerde: Serde<Sykepengesoknad> = Serdes.serdeFrom(SykepengesoknadSerializer, SykepengesoknadDeserializer)
+val sykepengesoknadSerde: Serde<Sykepengesoknad> = Serdes.serdeFrom(JacksonSerializer(), JacksonDeserializer(Sykepengesoknad::class.java))
 
 val defaultObjectMapper: ObjectMapper = jacksonObjectMapper()
         .registerModule(JavaTimeModule())
         .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
 
-object SykepengesoknadSerializer : Serializer<Sykepengesoknad> {
-    override fun serialize(topic: String?, data: Sykepengesoknad?): ByteArray {
+class JacksonSerializer<T> : Serializer<T> {
+    override fun serialize(topic: String?, data: T?): ByteArray {
         return when (data) {
             null -> ByteArray(0)
             else -> defaultObjectMapper.writeValueAsBytes(data)
@@ -28,11 +28,11 @@ object SykepengesoknadSerializer : Serializer<Sykepengesoknad> {
     override fun configure(configs: MutableMap<String, *>?, isKey: Boolean) {}
 }
 
-object SykepengesoknadDeserializer : Deserializer<Sykepengesoknad> {
-    override fun deserialize(topic: String?, data: ByteArray?): Sykepengesoknad? {
+class JacksonDeserializer<T>(private val type: Class<T>) : Deserializer<T> {
+    override fun deserialize(topic: String?, data: ByteArray?): T? {
         return when (data) {
             null -> null
-            else -> defaultObjectMapper.readValue(data, Sykepengesoknad::class.java)
+            else -> defaultObjectMapper.readValue(data, type)
         }
     }
 
