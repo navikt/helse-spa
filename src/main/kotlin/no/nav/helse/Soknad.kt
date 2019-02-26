@@ -3,7 +3,7 @@ package no.nav.helse
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import no.nav.helse.fastsetting.Alder
 import no.nav.helse.fastsetting.Aldersgrunnlag
-import no.nav.helse.fastsetting.FastsattBeregningsperiode
+import no.nav.helse.fastsetting.Beregningsperiode
 import no.nav.helse.fastsetting.Medlemsskapgrunnlag
 import no.nav.helse.fastsetting.Sykepengegrunnlag
 import no.nav.helse.fastsetting.TomtMaksdatoGrunnlag
@@ -22,7 +22,7 @@ data class AvklartSykepengesoknad(val originalSoknad: Sykepengesoknad,
                                   val maksdato: Vurdering<LocalDate, Any> = Vurdering.Uavklart(årsak = Vurdering.Uavklart.Årsak.MANGELFULL_DATAGRUNNLAG, begrunnelse = "Venter på avklart alder og historiske sykepengeperioder", grunnlag = TomtMaksdatoGrunnlag()),
                                   val sykepengeliste: Collection<SykepengerVedtak>,
                                   val arbeidsforhold: Vurdering<Boolean, ArbeidsforholdFakta>,
-                                  val sykepengegrunnlag: Vurdering<Sykepengegrunnlag, List<FastsattBeregningsperiode>>)
+                                  val sykepengegrunnlag: Vurdering<Sykepengegrunnlag, Beregningsperiode>)
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class Sykepengesoknad(val aktorId: String,

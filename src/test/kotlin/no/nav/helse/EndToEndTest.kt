@@ -119,14 +119,149 @@ class EndToEndTest {
     "fastsattAv": "SPA"
   },
   "sykepengegrunnlag": {
-    "grunnlag": [],
     "begrunnelse": "",
+    "grunnlag": {
+      "begrunnelse": "",
+      "inntekter": [
+        {
+          "arbeidsgiver": {
+            "orgnr": "97114455"
+          },
+          "beløp": 25000,
+          "opptjeningsperiode": {
+            "tom": "2018-12-31",
+            "fom": "2018-12-01"
+          }
+        },
+        {
+          "arbeidsgiver": {
+            "orgnr": "97114455"
+          },
+          "beløp": 25000,
+          "opptjeningsperiode": {
+            "tom": "2018-11-30",
+            "fom": "2018-11-01"
+          }
+        },
+        {
+          "arbeidsgiver": {
+            "orgnr": "97114455"
+          },
+          "beløp": 25000,
+          "opptjeningsperiode": {
+            "tom": "2018-10-31",
+            "fom": "2018-10-01"
+          }
+        },
+        {
+          "arbeidsgiver": {
+            "orgnr": "97114455"
+          },
+          "beløp": 25000,
+          "opptjeningsperiode": {
+            "tom": "2018-09-30",
+            "fom": "2018-09-01"
+          }
+        },
+        {
+          "arbeidsgiver": {
+            "orgnr": "97114455"
+          },
+          "beløp": 25000,
+          "opptjeningsperiode": {
+            "tom": "2018-08-31",
+            "fom": "2018-08-01"
+          }
+        },
+        {
+          "arbeidsgiver": {
+            "orgnr": "97114455"
+          },
+          "beløp": 25000,
+          "opptjeningsperiode": {
+            "tom": "2018-07-31",
+            "fom": "2018-07-01"
+          }
+        },
+        {
+          "arbeidsgiver": {
+            "orgnr": "97114455"
+          },
+          "beløp": 25000,
+          "opptjeningsperiode": {
+            "tom": "2018-06-30",
+            "fom": "2018-06-01"
+          }
+        },
+        {
+          "arbeidsgiver": {
+            "orgnr": "97114455"
+          },
+          "beløp": 25000,
+          "opptjeningsperiode": {
+            "tom": "2018-05-31",
+            "fom": "2018-05-01"
+          }
+        },
+        {
+          "arbeidsgiver": {
+            "orgnr": "97114455"
+          },
+          "beløp": 25000,
+          "opptjeningsperiode": {
+            "tom": "2018-04-30",
+            "fom": "2018-04-01"
+          }
+        },
+        {
+          "arbeidsgiver": {
+            "orgnr": "97114455"
+          },
+          "beløp": 25000,
+          "opptjeningsperiode": {
+            "tom": "2018-03-31",
+            "fom": "2018-03-01"
+          }
+        },
+        {
+          "arbeidsgiver": {
+            "orgnr": "97114455"
+          },
+          "beløp": 25000,
+          "opptjeningsperiode": {
+            "tom": "2018-02-28",
+            "fom": "2018-02-01"
+          }
+        },
+        {
+          "arbeidsgiver": {
+            "orgnr": "97114455"
+          },
+          "beløp": 25000,
+          "opptjeningsperiode": {
+            "tom": "2018-01-31",
+            "fom": "2018-01-01"
+          }
+        },
+        {
+          "arbeidsgiver": {
+            "orgnr": "97114455"
+          },
+          "beløp": 25000,
+          "opptjeningsperiode": {
+            "tom": "2017-12-31",
+            "fom": "2017-12-01"
+          }
+        }
+      ]
+    },
     "fastsattVerdi": {
       "sykepengegrunnlagNårTrydenYter": {
-        "grunnlag": [
-          {
-            "begrunnelse": "§ 8-28 tredje ledd bokstav a) \u2013 De tre siste kalendermånedene før arbeidstakeren ble arbeidsufør (2019-01-01) legges til grunn.",
-            "inntekt": {
+        "begrunnelse": "§ 8-30 første ledd",
+        "grunnlag": {
+          "begrunnelse": "§ 8-28 tredje ledd bokstav a) \u2013 De tre siste kalendermånedene før arbeidstakeren ble arbeidsufør (2019-01-01) legges til grunn.",
+          "inntekter": [
+            {
               "arbeidsgiver": {
                 "orgnr": "97114455"
               },
@@ -135,11 +270,8 @@ class EndToEndTest {
                 "tom": "2018-12-31",
                 "fom": "2018-12-01"
               }
-            }
-          },
-          {
-            "begrunnelse": "§ 8-28 tredje ledd bokstav a) \u2013 De tre siste kalendermånedene før arbeidstakeren ble arbeidsufør (2019-01-01) legges til grunn.",
-            "inntekt": {
+            },
+            {
               "arbeidsgiver": {
                 "orgnr": "97114455"
               },
@@ -148,11 +280,8 @@ class EndToEndTest {
                 "tom": "2018-11-30",
                 "fom": "2018-11-01"
               }
-            }
-          },
-          {
-            "begrunnelse": "§ 8-28 tredje ledd bokstav a) \u2013 De tre siste kalendermånedene før arbeidstakeren ble arbeidsufør (2019-01-01) legges til grunn.",
-            "inntekt": {
+            },
+            {
               "arbeidsgiver": {
                 "orgnr": "97114455"
               },
@@ -162,18 +291,18 @@ class EndToEndTest {
                 "fom": "2018-10-01"
               }
             }
-          }
-        ],
-        "begrunnelse": "§ 8-30 første ledd",
+          ]
+        },
         "fastsattVerdi": 300000,
         "vurderingstidspunkt": "BLIR_IKKE_MATCHET",
         "fastsattAv": "spa"
       },
       "sykepengegrunnlagIArbeidsgiverperioden": {
-        "grunnlag": [
-          {
-            "begrunnelse": "§ 8-28 tredje ledd bokstav a) \u2013 De tre siste kalendermånedene før arbeidstakeren ble arbeidsufør (2019-01-01) legges til grunn.",
-            "inntekt": {
+        "begrunnelse": "§ 8-28 andre ledd",
+        "grunnlag": {
+          "begrunnelse": "§ 8-28 tredje ledd bokstav a) \u2013 De tre siste kalendermånedene før arbeidstakeren ble arbeidsufør (2019-01-01) legges til grunn.",
+          "inntekter": [
+            {
               "arbeidsgiver": {
                 "orgnr": "97114455"
               },
@@ -182,11 +311,8 @@ class EndToEndTest {
                 "tom": "2018-12-31",
                 "fom": "2018-12-01"
               }
-            }
-          },
-          {
-            "begrunnelse": "§ 8-28 tredje ledd bokstav a) \u2013 De tre siste kalendermånedene før arbeidstakeren ble arbeidsufør (2019-01-01) legges til grunn.",
-            "inntekt": {
+            },
+            {
               "arbeidsgiver": {
                 "orgnr": "97114455"
               },
@@ -195,11 +321,8 @@ class EndToEndTest {
                 "tom": "2018-11-30",
                 "fom": "2018-11-01"
               }
-            }
-          },
-          {
-            "begrunnelse": "§ 8-28 tredje ledd bokstav a) \u2013 De tre siste kalendermånedene før arbeidstakeren ble arbeidsufør (2019-01-01) legges til grunn.",
-            "inntekt": {
+            },
+            {
               "arbeidsgiver": {
                 "orgnr": "97114455"
               },
@@ -209,9 +332,8 @@ class EndToEndTest {
                 "fom": "2018-10-01"
               }
             }
-          }
-        ],
-        "begrunnelse": "§ 8-28 andre ledd",
+          ]
+        },
         "fastsattVerdi": 25000,
         "vurderingstidspunkt": "BLIR_IKKE_MATCHET",
         "fastsattAv": "spa"
