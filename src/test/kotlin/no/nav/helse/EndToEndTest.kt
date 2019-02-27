@@ -133,7 +133,7 @@ class EndToEndTest {
     "grunnlag": {
       "bostedsland": "NOR"
     },
-    "begrunnelse": "Søker er bosatt i NOR",
+    "begrunnelse": "(Søker er bosatt i Norge. ELLER Vi har ikke nok informasjon til å kunne gi et entydig svar.)",
     "fastsattVerdi": true,
     "vurderingstidspunkt": "BLIR_IKKE_MATCHET",
     "fastsattAv": "SPA"

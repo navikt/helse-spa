@@ -23,26 +23,25 @@ class MedlemsskapTest {
     }
 
     @Test
-    fun `Søker i Sverige skal få avslått medlemsskap`() {
+    fun `Søker i Sverige skal ha uavklart medlemsskap`() {
         val norskSoknad = soknadForLand("SVE")
 
         val vurdering = vurderMedlemskap(norskSoknad)
 
         when (vurdering) {
-            is Vurdering.Uavklart -> fail("Søknad med bostedsland Sverige skal være avklart som avslått")
-            is Vurdering.Avklart -> assertThat(vurdering.fastsattVerdi).isFalse()
+            is Vurdering.Avklart -> fail("Søknad med bostedsland Sverige skal være uavklart siden vi ikke vet noe om medlemsskap utover bostedsland foreløpig.")
         }
     }
 
     @Test
-    fun `Søker med bostedsland som ikke følger landskodeverkref skal få avslått medlemsskap`() {
+    fun `Søker med bostedsland som ikke følger landskodeverkref skal ha uavklart medlemsskap`() {
         val norskSoknad = soknadForLand("NORGE")
 
         val vurdering = vurderMedlemskap(norskSoknad)
 
         when (vurdering) {
-            is Vurdering.Uavklart -> fail("Søknaden har feil i beriket verdi fra TPS")
-            is Vurdering.Avklart -> assertThat(vurdering.fastsattVerdi).isFalse()
+            is Vurdering.Avklart -> fail("Søknad med ukjent bostedsland skal være uavklart siden vi ikke vet noe om medlemsskap utover bostedsland foreløpig, og vi ikke skal ta ansvar for å validere kodeverksreferanser.")
+
         }
     }
 
