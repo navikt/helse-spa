@@ -46,19 +46,43 @@ class EndToEndTest {
 
         val server: WireMockServer = WireMockServer(WireMockConfiguration.options().dynamicPort())
 
+        private lateinit var app: SaksbehandlingStream
 
         @BeforeAll
         @JvmStatic
         fun start() {
             server.start()
             embeddedEnvironment.start()
+
+            startSpa()
         }
 
         @AfterAll
         @JvmStatic
         fun stop() {
+            stopSpa()
+
             server.stop()
             embeddedEnvironment.tearDown()
+        }
+
+        private fun startSpa() {
+            val env = Environment(
+                    username = username,
+                    password = password,
+                    kafkaUsername = username,
+                    kafkaPassword = password,
+                    bootstrapServersUrl = embeddedEnvironment.brokersURL,
+                    sparkelBaseUrl = server.baseUrl(),
+                    stsRestUrl = server.baseUrl()
+            )
+
+            app = SaksbehandlingStream(env)
+            app.start()
+        }
+
+        private fun stopSpa() {
+            app.stop()
         }
     }
 
@@ -74,8 +98,6 @@ class EndToEndTest {
         println("Kafka: ${embeddedEnvironment.brokersURL}")
         println("Zookeeper: ${embeddedEnvironment.serverPark.zookeeper.host}:${embeddedEnvironment.serverPark.zookeeper.port}")
 
-        val app = startSpa()
-
         restStsStub()
         personStub(aktørId)
         inntektStub(aktørId)
@@ -90,8 +112,6 @@ class EndToEndTest {
 
         assertNotNull(actual)
         assertJsonEquals(JSONObject(expected), actual!!, listOf("vurderingstidspunkt"))
-
-        app.stop()
     }
 
     private fun forventetVedtak() = """
@@ -380,24 +400,6 @@ class EndToEndTest {
   }
 }
 """.trimIndent()
-
-    private fun startSpa(): SaksbehandlingStream {
-        val env = Environment(
-                username = username,
-                password = password,
-                kafkaUsername = username,
-                kafkaPassword = password,
-                bootstrapServersUrl = embeddedEnvironment.brokersURL,
-                sparkelBaseUrl = server.baseUrl(),
-                stsRestUrl = server.baseUrl()
-        )
-
-        val app = SaksbehandlingStream(env)
-
-        app.start()
-
-        return app
-    }
 
     private fun produserSøknad(aktørId: String) {
         val søknad = Sykepengesoknad(
