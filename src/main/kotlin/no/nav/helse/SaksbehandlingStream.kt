@@ -101,7 +101,7 @@ class SaksbehandlingStream(val env: Environment) {
             medlemsskap = vurderMedlemskap(input),
             alder = vurderAlderPåSisteDagISøknadsPeriode(input),
             arbeidsforhold = vurderArbeidsforhold(input),
-            opptjeningstid = vurderOpptjeningstid(Opptjeningsgrunnlag(input.originalSoknad.startSyketilfelle, input.faktagrunnlag.arbeidsforhold.arbeidsgivere)),
+            opptjeningstid = vurderOpptjeningstid(Opptjeningsgrunnlag(input.startSyketilfelle, input.faktagrunnlag.arbeidsforhold.arbeidsgivere)),
             sykepengeliste = input.faktagrunnlag.sykepengeliste,
             sykepengegrunnlag = fastsettingAvSykepengegrunnlaget(input.startSyketilfelle, input.arbeidsgiver, input.faktagrunnlag.beregningsperiode, input.faktagrunnlag.sammenligningsperiode))
     fun beregnMaksdato(soknad: AvklartSykepengesoknad): AvklartSykepengesoknad = soknad.copy(maksdato = vurderMaksdato(soknad))
