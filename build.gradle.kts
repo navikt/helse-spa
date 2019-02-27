@@ -36,7 +36,7 @@ dependencies {
     compile("no.nav.helse:streams:$navStreamsVersion")
     compile("com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion")
     compile("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion")
-    compile("no.nav.helse.sykepenger.lovverk:sykepenger-inngangsvilkar:2018-12-20-101.51d0399")
+    compile("no.nav.helse.sykepenger.lovverk:sykepenger-inngangsvilkar:2018-12-20-101.28355fc")
     compile("no.nav.helse.sykepenger.lovverk:sykepenger-beregning:2018-12-20-101.8ef150a")
     compile("no.nav:nare:dfe6569")
 
