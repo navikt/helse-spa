@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import no.nav.helse.fastsetting.*
 import no.nav.helse.fastsetting.Opptjeningsgrunnlag
 import no.nav.helse.fastsetting.Opptjeningstid
+import no.nav.helse.sykepenger.beregning.Beregningsresultat
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -33,6 +34,9 @@ data class AvklartSykepengesoknad(
         val arbeidsforhold: Vurdering<Boolean, ArbeidsforholdFakta>,
                                   val opptjeningstid: Vurdering<Opptjeningstid, Opptjeningsgrunnlag>,
         val sykepengegrunnlag: Vurdering<Sykepengegrunnlag, Beregningsperiode>) : SoknadDefinition by originalSøknad
+
+data class BeregnetSykepengesoknad(val vilkårsprøvdSøknad : AvklartSykepengesoknad/*TODO: SKal være Vilkårsprøvd søknad*/,
+                                   val beregning : Beregningsresultat)
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class Sykepengesoknad(

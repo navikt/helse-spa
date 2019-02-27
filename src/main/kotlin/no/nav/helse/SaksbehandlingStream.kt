@@ -3,13 +3,7 @@ package no.nav.helse
 import io.prometheus.client.CollectorRegistry
 import io.prometheus.client.Counter
 import no.nav.NarePrometheus
-import no.nav.helse.fastsetting.Opptjeningsgrunnlag
-import no.nav.helse.fastsetting.fastsettingAvSykepengegrunnlaget
-import no.nav.helse.fastsetting.vurderAlderPåSisteDagISøknadsPeriode
-import no.nav.helse.fastsetting.vurderArbeidsforhold
-import no.nav.helse.fastsetting.vurderMaksdato
-import no.nav.helse.fastsetting.vurderMedlemskap
-import no.nav.helse.fastsetting.vurderOpptjeningstid
+import no.nav.helse.fastsetting.*
 import no.nav.helse.serde.sykepengesoknadSerde
 import no.nav.helse.streams.StreamConsumer
 import no.nav.helse.streams.Topic
@@ -17,6 +11,7 @@ import no.nav.helse.streams.Topics
 import no.nav.helse.streams.consumeTopic
 import no.nav.helse.streams.streamConfig
 import no.nav.helse.streams.toTopic
+import no.nav.helse.sykepenger.beregning.beregn
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.common.serialization.Serdes
 import org.apache.kafka.streams.KafkaStreams
@@ -106,7 +101,11 @@ class SaksbehandlingStream(val env: Environment) {
             sykepengegrunnlag = fastsettingAvSykepengegrunnlaget(input.startSyketilfelle, input.arbeidsgiver, input.faktagrunnlag.beregningsperiode, input.faktagrunnlag.sammenligningsperiode))
     fun beregnMaksdato(soknad: AvklartSykepengesoknad): AvklartSykepengesoknad = soknad.copy(maksdato = vurderMaksdato(soknad))
     fun prøvVilkår(input: AvklartSykepengesoknad): AvklartSykepengesoknad = input
-    fun beregnSykepenger(input: AvklartSykepengesoknad): AvklartSykepengesoknad = input
+
+    fun beregnSykepenger(soknad: AvklartSykepengesoknad)/*: BeregnetSykepengesoknad =
+            BeregnetSykepengesoknad(vilkårsprøvdSøknad = soknad,
+                    beregning = beregn(lagBeregninggrunnlag(soknad)))*/ = soknad
+
     fun fattVedtak(input: AvklartSykepengesoknad): JSONObject = JSONObject(input)
 }
 
