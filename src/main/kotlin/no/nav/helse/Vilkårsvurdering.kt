@@ -13,7 +13,7 @@ fun gjennomførVilkårsvurdering(søknad: AvklartSykepengesoknad): Evaluering {
             ytelser = emptyList(),
             søknadSendt = søknad.originalSøknad.sendtNav!!.toLocalDate(),
             førsteDagSøknadGjelderFor = søknad.originalSøknad.fom,
-            fastsattÅrsinntekt = (søknad.sykepengegrunnlag as Vurdering.Avklart).fastsattVerdi.sykepengegrunnlagNårTrydenYter.fastsattVerdi,
+            fastsattÅrsinntekt = (søknad.sykepengegrunnlag as Vurdering.Avklart).fastsattVerdi.sykepengegrunnlagNårTrygdenYter.fastsattVerdi,
             grunnbeløp = 96883
     )
 

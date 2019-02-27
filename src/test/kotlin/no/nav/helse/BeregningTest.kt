@@ -58,7 +58,7 @@ class BeregningTest {
                     medlemsskap = Vurdering.Avklart(fastsattVerdi = true, begrunnelse = "derfor", fastsattAv = "test", grunnlag = Medlemsskapgrunnlag("NO")),
                     sykepengegrunnlag = Vurdering.Avklart(fastsattVerdi =
                     Sykepengegrunnlag(
-                            sykepengegrunnlagNårTrydenYter = Vurdering.Avklart(fastsattVerdi = årslønn, grunnlag = Beregningsperiode(emptyList(), "derfor"), begrunnelse = "derfor", fastsattAv = "test"),
+                            sykepengegrunnlagNårTrygdenYter = Vurdering.Avklart(fastsattVerdi = årslønn, grunnlag = Beregningsperiode(emptyList(), "derfor"), begrunnelse = "derfor", fastsattAv = "test"),
                             sykepengegrunnlagIArbeidsgiverperioden = Vurdering.Avklart(fastsattVerdi = årslønn, grunnlag = Beregningsperiode(emptyList(), "derfor"), begrunnelse = "derfor", fastsattAv = "test")),
                             fastsattAv = "test",
                             begrunnelse = "derfor",

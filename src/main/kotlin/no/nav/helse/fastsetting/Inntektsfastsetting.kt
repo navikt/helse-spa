@@ -101,5 +101,5 @@ fun fastsettingAvSykepengegrunnlagetNårTrygdenYterSykepenger(sammenligningsgrun
 
 data class Beregningsperiode(val inntekter: List<Inntekt>, val begrunnelse: String)
 
-data class Sykepengegrunnlag(val sykepengegrunnlagNårTrydenYter: Vurdering.Avklart<Long, Beregningsperiode>, val sykepengegrunnlagIArbeidsgiverperioden: Vurdering.Avklart<Long, Beregningsperiode>)
+data class Sykepengegrunnlag(val sykepengegrunnlagNårTrygdenYter: Vurdering.Avklart<Long, Beregningsperiode>, val sykepengegrunnlagIArbeidsgiverperioden: Vurdering.Avklart<Long, Beregningsperiode>)
 

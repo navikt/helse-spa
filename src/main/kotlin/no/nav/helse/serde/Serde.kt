@@ -1,5 +1,6 @@
 package no.nav.helse.serde
 
+import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
@@ -11,6 +12,7 @@ import org.apache.kafka.common.serialization.Serdes
 import org.apache.kafka.common.serialization.Serializer
 
 val sykepengesoknadSerde: Serde<Sykepengesoknad> = Serdes.serdeFrom(JacksonSerializer(), JacksonDeserializer(Sykepengesoknad::class.java))
+val sykepengevedtakSerde: Serde<JsonNode> = Serdes.serdeFrom(JacksonSerializer(), JacksonNodeDeserializer())
 
 val defaultObjectMapper: ObjectMapper = jacksonObjectMapper()
         .registerModule(JavaTimeModule())
@@ -33,6 +35,18 @@ class JacksonDeserializer<T>(private val type: Class<T>) : Deserializer<T> {
         return when (data) {
             null -> null
             else -> defaultObjectMapper.readValue(data, type)
+        }
+    }
+
+    override fun configure(configs: MutableMap<String, *>?, isKey: Boolean) {}
+    override fun close() {}
+}
+
+class JacksonNodeDeserializer() : Deserializer<JsonNode> {
+    override fun deserialize(topic: String?, data: ByteArray?): JsonNode? {
+        return when (data) {
+            null -> null
+            else -> defaultObjectMapper.readTree(data)
         }
     }
 

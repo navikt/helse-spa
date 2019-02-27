@@ -14,7 +14,7 @@ fun lagBeregninggrunnlag(soknad: AvklartSykepengesoknad) : Beregningsgrunnlag =
                     if (it.size == 1) it[0].sykmeldingsgrad else throw Exception("takler bare én periode per nå")
                 },
                 sykepengegrunnlag =  no.nav.helse.sykepenger.beregning.Sykepengegrunnlag(
-                        fastsattInntekt = (soknad.sykepengegrunnlag as Vurdering.Avklart).fastsattVerdi.sykepengegrunnlagNårTrydenYter.fastsattVerdi,
+                        fastsattInntekt = (soknad.sykepengegrunnlag as Vurdering.Avklart).fastsattVerdi.sykepengegrunnlagNårTrygdenYter.fastsattVerdi,
                         grunnbeløp = grunnbeløp()),
                 sisteUtbetalingsdato = ((soknad.maksdato as Vurdering.Avklart).fastsattVerdi).let {
                     if (it.isBefore(soknad.originalSøknad.tom)) it else soknad.originalSøknad.tom

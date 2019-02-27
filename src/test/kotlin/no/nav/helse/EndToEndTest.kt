@@ -1,7 +1,6 @@
 package no.nav.helse
 
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import com.fasterxml.jackson.module.kotlin.readValue
+import com.fasterxml.jackson.databind.JsonNode
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock.any
 import com.github.tomakehurst.wiremock.client.WireMock.configureFor
@@ -11,6 +10,7 @@ import com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import no.nav.common.JAASCredential
 import no.nav.common.KafkaEnvironment
+import no.nav.helse.serde.JacksonNodeDeserializer
 import no.nav.helse.serde.JacksonSerializer
 import no.nav.helse.streams.JsonDeserializer
 import no.nav.helse.streams.Topics
@@ -21,7 +21,6 @@ import org.apache.kafka.clients.producer.KafkaProducer
 import org.apache.kafka.clients.producer.ProducerConfig
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.apache.kafka.common.config.SaslConfigs
-import org.json.JSONObject
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
@@ -113,11 +112,8 @@ class EndToEndTest {
         println(actual)
 
         assertNotNull(actual)
-        assertEquals(actual.getJSONObject("maksdato").getString("fastsattVerdi"), "2019-12-12")
-        assertEquals(actual.getJSONObject("maksdato").getString("fastsattAv"), "SPA")
-
-        assertEquals(actual.getJSONObject("medlemsskap").getBoolean("fastsattVerdi"), true)
-        assertEquals(actual.getJSONObject("medlemsskap").getString("fastsattAv"), "SPA")
+        assertEquals(actual.get("medlemsskap").get("fastsattVerdi").booleanValue(), true)
+        assertEquals(actual.get("medlemsskap").get("fastsattAv").textValue(), "SPA")
     }
 
     private fun forventetVedtak() = """
@@ -272,7 +268,7 @@ class EndToEndTest {
       ]
     },
     "fastsattVerdi": {
-      "sykepengegrunnlagNårTrydenYter": {
+      "sykepengegrunnlagNårTrygdenYter": {
         "begrunnelse": "§ 8-30 første ledd",
         "grunnlag": {
           "begrunnelse": "§ 8-28 tredje ledd bokstav a) \u2013 De tre siste kalendermånedene før arbeidstakeren ble arbeidsufør (2019-01-01) legges til grunn.",
@@ -442,9 +438,9 @@ class EndToEndTest {
         produceOneMessage(søknad)
     }
 
-    private fun ventPåVedtak(): JSONObject? {
-        val resultConsumer = KafkaConsumer<String, JSONObject>(consumerProperties())
-        resultConsumer.subscribe(listOf(Topics.VEDTAK_SYKEPENGER.name))
+    private fun ventPåVedtak(): JsonNode? {
+        val resultConsumer = KafkaConsumer<String, JsonNode>(consumerProperties())
+        resultConsumer.subscribe(listOf(sykepengevedtakTopic.name))
 
         val end = System.currentTimeMillis() + 60 * 1000
 
@@ -455,7 +451,7 @@ class EndToEndTest {
             if (!records.isEmpty) {
                 assertEquals(1, records.count())
 
-                return records.records(Topics.VEDTAK_SYKEPENGER.name).map {
+                return records.records(sykepengevedtakTopic.name).map {
                     it.value()
                 }.first()
             }
@@ -469,7 +465,7 @@ class EndToEndTest {
             put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, embeddedEnvironment.brokersURL)
 
             put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer")
-            put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer::class.java)
+            put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JacksonNodeDeserializer::class.java)
             put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, "SASL_PLAINTEXT")
             put(SaslConfigs.SASL_MECHANISM, "PLAIN")
             put(SaslConfigs.SASL_JAAS_CONFIG, "org.apache.kafka.common.security.plain.PlainLoginModule required username=\"$username\" password=\"$password\";")

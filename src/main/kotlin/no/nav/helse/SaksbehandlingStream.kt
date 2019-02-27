@@ -1,14 +1,15 @@
 package no.nav.helse
 
+import com.fasterxml.jackson.databind.JsonNode
 import io.prometheus.client.CollectorRegistry
 import io.prometheus.client.Counter
 import no.nav.NarePrometheus
 import no.nav.helse.fastsetting.*
+import no.nav.helse.serde.defaultObjectMapper
 import no.nav.helse.serde.sykepengesoknadSerde
+import no.nav.helse.serde.sykepengevedtakSerde
 import no.nav.helse.streams.StreamConsumer
-import no.nav.helse.streams.Topic
-import no.nav.helse.streams.Topics
-import no.nav.helse.streams.consumeTopic
+import no.nav.helse.streams.*
 import no.nav.helse.streams.streamConfig
 import no.nav.helse.streams.toTopic
 import no.nav.helse.sykepenger.beregning.beregn
@@ -20,7 +21,7 @@ import org.apache.kafka.streams.StreamsConfig
 import org.apache.kafka.streams.Topology
 import org.apache.kafka.streams.errors.LogAndFailExceptionHandler
 import org.apache.kafka.streams.kstream.KStream
-import org.json.JSONObject
+import org.apache.kafka.streams.kstream.Predicate
 import org.slf4j.LoggerFactory
 import java.util.*
 
@@ -38,13 +39,13 @@ class SaksbehandlingStream(val env: Environment) {
     private val consumer: StreamConsumer
 
     init {
-        val streamConfig = if ("true"==env.plainTextKafka) streamConfigPlainTextKafka() else streamConfig(appId, env.bootstrapServersUrl,
+        val streamConfig = if ("true" == env.plainTextKafka) streamConfigPlainTextKafka() else streamConfig(appId, env.bootstrapServersUrl,
                 env.kafkaUsername to env.kafkaPassword,
                 env.navTruststorePath to env.navTruststorePassword)
         consumer = StreamConsumer(appId, KafkaStreams(topology(), streamConfig))
     }
 
-    private fun streamConfigPlainTextKafka() : Properties = Properties().apply {
+    private fun streamConfigPlainTextKafka(): Properties = Properties().apply {
         log.warn("Using kafka plain text config only works in development!")
         put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, env.bootstrapServersUrl)
         put(StreamsConfig.APPLICATION_ID_CONFIG, appId)
@@ -52,23 +53,27 @@ class SaksbehandlingStream(val env: Environment) {
         put(StreamsConfig.DEFAULT_DESERIALIZATION_EXCEPTION_HANDLER_CLASS_CONFIG, LogAndFailExceptionHandler::class.java)
     }
 
-
     private fun topology(): Topology {
         val builder = StreamsBuilder()
         val stream: KStream<String, Sykepengesoknad> = builder.consumeTopic(sykepengesoknadTopic)
 
-        stream.peek { _, _ -> acceptCounter.labels("accepted").inc() }
+        val alleVerdierErAvklart: Predicate<String, AvklartSykepengesoknad> = Predicate { _, søknad -> søknad.erAvklart() }
+
+        val  avklarteEllerUavklarte: Array<out KStream<String, AvklartSykepengesoknad>> = stream.peek { _, _ -> acceptCounter.labels("accepted").inc() }
                 .mapValues { _, soknad -> hentRegisterData(soknad) }
                 .mapValues { _, soknad -> fastsettFakta(soknad) }
                 .mapValues { _, soknad -> beregnMaksdato(soknad) }
-                .mapValues { _, soknad -> prøvVilkår(soknad) }
-                .mapValues { _, soknad -> beregnSykepenger(soknad) }
-                .mapValues { _, soknad -> fattVedtak(soknad) }
-                .peek { _, _ ->
-                    acceptCounter.labels("processed").inc()
-                    log.error("processing message 6")
-                }
-                .toTopic(Topics.VEDTAK_SYKEPENGER)
+                .branch(alleVerdierErAvklart)
+        //avklarteEllerUavklarte[1].to(Topics.UAVKLARTE_SØKNADER)
+
+        avklarteEllerUavklarte[0].mapValues { _, soknad -> prøvVilkår(soknad) }
+                                .mapValues { _, soknad -> beregnSykepenger(soknad) }
+                                .mapValues { _, soknad -> fattVedtak(soknad) }
+                                .peek { _, _ ->
+                                    acceptCounter.labels("processed").inc()
+                                    log.error("processing message 6")
+                                }
+                                .toTopic(sykepengevedtakTopic)
 
         return builder.build()
     }
@@ -99,20 +104,29 @@ class SaksbehandlingStream(val env: Environment) {
             opptjeningstid = vurderOpptjeningstid(Opptjeningsgrunnlag(input.startSyketilfelle, input.faktagrunnlag.arbeidsforhold.arbeidsgivere)),
             sykepengeliste = input.faktagrunnlag.sykepengeliste,
             sykepengegrunnlag = fastsettingAvSykepengegrunnlaget(input.startSyketilfelle, input.arbeidsgiver, input.faktagrunnlag.beregningsperiode, input.faktagrunnlag.sammenligningsperiode))
-    fun beregnMaksdato(soknad: AvklartSykepengesoknad): AvklartSykepengesoknad = soknad.copy(maksdato = vurderMaksdato(soknad))
-    fun prøvVilkår(input: AvklartSykepengesoknad): AvklartSykepengesoknad = input
 
-    fun beregnSykepenger(soknad: AvklartSykepengesoknad)/*: BeregnetSykepengesoknad =
+    fun beregnMaksdato(soknad: AvklartSykepengesoknad): AvklartSykepengesoknad = soknad.copy(maksdato = vurderMaksdato(soknad))
+
+
+    fun beregnSykepenger(soknad: VilkårsprøvdSykepengesøknad)/*: BeregnetSykepengesoknad =
             BeregnetSykepengesoknad(vilkårsprøvdSøknad = soknad,
                     beregning = beregn(lagBeregninggrunnlag(soknad)))*/ = soknad
 
-    fun fattVedtak(input: AvklartSykepengesoknad): JSONObject = JSONObject(input)
+    fun prøvVilkår(input: AvklartSykepengesoknad): VilkårsprøvdSykepengesøknad = VilkårsprøvdSykepengesøknad(input, gjennomførVilkårsvurdering(input))
+
+    fun fattVedtak(input: VilkårsprøvdSykepengesøknad): JsonNode = defaultObjectMapper.readTree(defaultObjectMapper.writeValueAsString(input))
 }
 
 val sykepengesoknadTopic = Topic(
         name = Topics.SYKEPENGESØKNADER_INN.name,
         keySerde = Serdes.String(),
         valueSerde = sykepengesoknadSerde
+)
+
+val sykepengevedtakTopic = Topic(
+        name = Topics.VEDTAK_SYKEPENGER.name,
+        keySerde = Serdes.String(),
+        valueSerde = sykepengevedtakSerde
 )
 
 val narePrometheus = NarePrometheus(CollectorRegistry.defaultRegistry)

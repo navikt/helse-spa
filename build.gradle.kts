@@ -59,6 +59,7 @@ repositories {
     mavenCentral()
     maven("http://packages.confluent.io/maven/")
     maven("https://dl.bintray.com/kotlin/ktor")
+    mavenLocal()
 }
 
 java {
