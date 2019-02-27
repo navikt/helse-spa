@@ -5,14 +5,13 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import no.nav.helse.Sykepengesoknad
 import org.apache.kafka.common.serialization.Deserializer
 import org.apache.kafka.common.serialization.Serde
 import org.apache.kafka.common.serialization.Serdes
 import org.apache.kafka.common.serialization.Serializer
 
-val sykepengesoknadSerde: Serde<Sykepengesoknad> = Serdes.serdeFrom(JacksonSerializer(), JacksonDeserializer(Sykepengesoknad::class.java))
-val sykepengevedtakSerde: Serde<JsonNode> = Serdes.serdeFrom(JacksonSerializer(), JacksonNodeDeserializer())
+val jsonNodeSerde: Serde<JsonNode> = Serdes.serdeFrom(JacksonSerializer(), JacksonNodeDeserializer())
+
 
 val defaultObjectMapper: ObjectMapper = jacksonObjectMapper()
         .registerModule(JavaTimeModule())

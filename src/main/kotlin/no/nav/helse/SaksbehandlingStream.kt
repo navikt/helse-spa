@@ -1,13 +1,13 @@
 package no.nav.helse
 
 import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException
 import io.prometheus.client.CollectorRegistry
 import io.prometheus.client.Counter
 import no.nav.NarePrometheus
 import no.nav.helse.fastsetting.*
 import no.nav.helse.serde.defaultObjectMapper
-import no.nav.helse.serde.sykepengesoknadSerde
-import no.nav.helse.serde.sykepengevedtakSerde
+import no.nav.helse.serde.jsonNodeSerde
 import no.nav.helse.streams.StreamConsumer
 import no.nav.helse.streams.*
 import no.nav.helse.streams.streamConfig
@@ -55,15 +55,19 @@ class SaksbehandlingStream(val env: Environment) {
 
     private fun topology(): Topology {
         val builder = StreamsBuilder()
-        val stream: KStream<String, Sykepengesoknad> = builder.consumeTopic(sykepengesoknadTopic)
+        val stream: KStream<String, JsonNode> = builder.consumeTopic(sykepengesoknadTopic)
 
         val alleVerdierErAvklart: Predicate<String, AvklartSykepengesoknad> = Predicate { _, søknad -> søknad.erAvklart() }
 
-        val  avklarteEllerUavklarte: Array<out KStream<String, AvklartSykepengesoknad>> = stream.peek { _, _ -> acceptCounter.labels("accepted").inc() }
-                .mapValues { _, soknad -> hentRegisterData(soknad) }
-                .mapValues { _, soknad -> fastsettFakta(soknad) }
-                .mapValues { _, soknad -> beregnMaksdato(soknad) }
-                .branch(alleVerdierErAvklart)
+        val  avklarteEllerUavklarte: Array<out KStream<String, AvklartSykepengesoknad>> =
+                stream.peek { _, _ -> acceptCounter.labels("accepted").inc() }
+                        .mapValues { _,soknad ->toSykepengeSoknadOrAny(soknad)}
+                        .filter { _, soknad -> soknad is Sykepengesoknad }
+                        .mapValues { _, soknad -> soknad as Sykepengesoknad}
+                        .mapValues { _, soknad -> hentRegisterData(soknad) }
+                        .mapValues { _, soknad -> fastsettFakta(soknad) }
+                        .mapValues { _, soknad -> beregnMaksdato(soknad) }
+                        .branch(alleVerdierErAvklart)
         //avklarteEllerUavklarte[1].to(Topics.UAVKLARTE_SØKNADER)
 
         avklarteEllerUavklarte[0].mapValues { _, soknad -> prøvVilkår(soknad) }
@@ -77,6 +81,18 @@ class SaksbehandlingStream(val env: Environment) {
 
         return builder.build()
     }
+
+
+    private fun toSykepengeSoknadOrAny(soknad: JsonNode?): Any {
+        try {
+            return defaultObjectMapper.treeToValue(soknad, Sykepengesoknad::class.java)
+        }
+        catch (e: MissingKotlinParameterException) {
+            log.error("Søknaden missing required field/value",e)
+            return Any()
+        }
+    }
+
 
     fun start() {
         consumer.start()
@@ -120,13 +136,13 @@ class SaksbehandlingStream(val env: Environment) {
 val sykepengesoknadTopic = Topic(
         name = Topics.SYKEPENGESØKNADER_INN.name,
         keySerde = Serdes.String(),
-        valueSerde = sykepengesoknadSerde
+        valueSerde = jsonNodeSerde
 )
 
 val sykepengevedtakTopic = Topic(
         name = Topics.VEDTAK_SYKEPENGER.name,
         keySerde = Serdes.String(),
-        valueSerde = sykepengevedtakSerde
+        valueSerde = jsonNodeSerde
 )
 
 val narePrometheus = NarePrometheus(CollectorRegistry.defaultRegistry)
