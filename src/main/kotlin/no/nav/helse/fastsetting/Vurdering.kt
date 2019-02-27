@@ -20,7 +20,8 @@ sealed class Vurdering<out V, out G>(val begrunnelse: String, val grunnlag: G, v
         enum class Årsak {
             KREVER_SKJØNNSMESSIG_VURDERING,
             DÅRLIG_DATAGRUNNLAG,
-            MANGELFULL_DATAGRUNNLAG
+            MANGELFULL_DATAGRUNNLAG,
+            FALLER_UTENFOR_MVP
         }
 
         override fun toString(): String {

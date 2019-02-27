@@ -28,7 +28,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.Duration
 import java.time.LocalDate
-import java.util.Properties
+import java.util.*
 
 class EndToEndTest {
 
@@ -358,13 +358,28 @@ class EndToEndTest {
         {
           "navn": "EQUINOR ASA, AVD STATOIL SOKKELVIRKSOMHET",
           "organisasjonsnummer": "97114455",
-          "startdato":"2017-01-01",
-          "dagerFørSykdom":730
+          "startdato":"2017-01-01"
         }
       ]
     },
     "begrunnelse": "Søker har en arbeidsgiver med orgnummer 97114455",
     "fastsattVerdi": true,
+    "vurderingstidspunkt": "BLIR_IKKE_MATCHET",
+    "fastsattAv": "SPA"
+  },
+  "opptjeningstid": {
+    "grunnlag": {
+      "førsteSykdomsdag": "2019-01-01",
+      "arbeidsforhold": [
+        {
+          "navn": "EQUINOR ASA, AVD STATOIL SOKKELVIRKSOMHET",
+          "organisasjonsnummer": "97114455",
+          "startdato":"2017-01-01"
+        }
+      ]
+    },
+    "begrunnelse": "Søker er i et aktivt arbeidsforhold",
+    "fastsattVerdi": 730,
     "vurderingstidspunkt": "BLIR_IKKE_MATCHET",
     "fastsattAv": "SPA"
   },

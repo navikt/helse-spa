@@ -18,7 +18,7 @@ class ArbeidsforholdOppslag(val sparkelUrl: String, val stsRestClient: StsRestCl
 
         val arbeidsforhold = hentArbeidsforholdRest(AktørId(sykepengesoknad.aktorId), fireUkerForSykdomsDag, forsteSykdomsdag)
         return ArbeidsforholdFakta(arbeidsforhold.arbeidsforhold.map {
-            ArbeidsgiverFakta(it.arbeidsgiver.organisasjonsnummer, it.arbeidsgiver.navn, it.startdato, it.startdato.datesUntil(forsteSykdomsdag).count())
+            ArbeidsgiverFakta(it.arbeidsgiver.organisasjonsnummer, it.arbeidsgiver.navn, it.startdato, it.sluttdato)
         })
 
     }
@@ -44,7 +44,7 @@ data class Arbeidsforhold(val arbeidsforhold: List<OrganisasjonArbeidsforhold>)
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class ArbeidsforholdArbeidsgiver(val navn: String, val organisasjonsnummer: String)
 @JsonIgnoreProperties(ignoreUnknown = true)
-data class OrganisasjonArbeidsforhold(val arbeidsgiver: ArbeidsforholdArbeidsgiver, val startdato: LocalDate)
+data class OrganisasjonArbeidsforhold(val arbeidsgiver: ArbeidsforholdArbeidsgiver, val startdato: LocalDate, val sluttdato: LocalDate? = null)
 
 data class ArbeidsforholdFakta(val arbeidsgivere : List<ArbeidsgiverFakta>)
-data class ArbeidsgiverFakta(val organisasjonsnummer : String, val navn: String?, val startdato: LocalDate, val dagerFørSykdom: Long)
+data class ArbeidsgiverFakta(val organisasjonsnummer : String, val navn: String?, val startdato: LocalDate, val sluttdato: LocalDate?)

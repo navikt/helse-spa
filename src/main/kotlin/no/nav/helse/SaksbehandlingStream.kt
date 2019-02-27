@@ -3,14 +3,20 @@ package no.nav.helse
 import io.prometheus.client.CollectorRegistry
 import io.prometheus.client.Counter
 import no.nav.NarePrometheus
+import no.nav.helse.fastsetting.Opptjeningsgrunnlag
 import no.nav.helse.fastsetting.fastsettingAvSykepengegrunnlaget
-import no.nav.helse.fastsetting.fastsettingAvSykepengegrunnlagetNårTrygdenYterSykepenger
 import no.nav.helse.fastsetting.vurderAlderPåSisteDagISøknadsPeriode
 import no.nav.helse.fastsetting.vurderArbeidsforhold
 import no.nav.helse.fastsetting.vurderMaksdato
 import no.nav.helse.fastsetting.vurderMedlemskap
+import no.nav.helse.fastsetting.vurderOpptjeningstid
 import no.nav.helse.serde.sykepengesoknadSerde
-import no.nav.helse.streams.*
+import no.nav.helse.streams.StreamConsumer
+import no.nav.helse.streams.Topic
+import no.nav.helse.streams.Topics
+import no.nav.helse.streams.consumeTopic
+import no.nav.helse.streams.streamConfig
+import no.nav.helse.streams.toTopic
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.common.serialization.Serdes
 import org.apache.kafka.streams.KafkaStreams
@@ -18,7 +24,7 @@ import org.apache.kafka.streams.StreamsBuilder
 import org.apache.kafka.streams.StreamsConfig
 import org.apache.kafka.streams.Topology
 import org.apache.kafka.streams.errors.LogAndFailExceptionHandler
-import org.apache.kafka.streams.kstream.*
+import org.apache.kafka.streams.kstream.KStream
 import org.json.JSONObject
 import org.slf4j.LoggerFactory
 import java.util.*
@@ -94,6 +100,7 @@ class SaksbehandlingStream(val env: Environment) {
             medlemskap = vurderMedlemskap(input),
             alder = vurderAlderPåSisteDagISøknadsPeriode(input),
             arbeidsforhold = vurderArbeidsforhold(input),
+            opptjeningstid = vurderOpptjeningstid(Opptjeningsgrunnlag(input.originalSoknad.startSyketilfelle, input.faktagrunnlag.arbeidsforhold.arbeidsgivere)),
             sykepengeliste = input.faktagrunnlag.sykepengeliste,
             sykepengegrunnlag = fastsettingAvSykepengegrunnlaget(input.originalSoknad.startSyketilfelle, input.originalSoknad.arbeidsgiver, input.faktagrunnlag.beregningsperiode, input.faktagrunnlag.sammenligningsperiode))
     fun beregnMaksdato(soknad: AvklartSykepengesoknad): AvklartSykepengesoknad = soknad.copy(maksdato = vurderMaksdato(soknad))
