@@ -26,7 +26,7 @@ class AlderTest {
     }
 
     private fun soknadForDato(tom: LocalDate, foedselsDato: LocalDate): BeriketSykepengesøknad = soknadUtenVerdi.copy(
-            originalSoknad = originalSoknad.copy(
+            originalSøknad = originalSoknad.copy(
                     tom = tom
             ),
             faktagrunnlag = faktagrunnlagUtenVerdi.copy(

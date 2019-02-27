@@ -1,5 +1,7 @@
 package no.nav.helse
 
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.fasterxml.jackson.module.kotlin.readValue
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock.any
 import com.github.tomakehurst.wiremock.client.WireMock.configureFor
@@ -106,12 +108,16 @@ class EndToEndTest {
         produserSøknad(aktørId)
 
         val expected = forventetVedtak()
-        val actual = ventPåVedtak()
+        val actual = ventPåVedtak()!!
 
         println(actual)
 
         assertNotNull(actual)
-        assertJsonEquals(JSONObject(expected), actual!!, listOf("vurderingstidspunkt"))
+        assertEquals(actual.getJSONObject("maksdato").getString("fastsattVerdi"), "2019-12-12")
+        assertEquals(actual.getJSONObject("maksdato").getString("fastsattAv"), "SPA")
+
+        assertEquals(actual.getJSONObject("medlemsskap").getBoolean("fastsattVerdi"), true)
+        assertEquals(actual.getJSONObject("medlemsskap").getString("fastsattAv"), "SPA")
     }
 
     private fun forventetVedtak() = """
@@ -129,7 +135,7 @@ class EndToEndTest {
     "vurderingstidspunkt": "BLIR_IKKE_MATCHET",
     "fastsattAv": "SPA"
   },
-  "medlemskap": {
+  "medlemsskap": {
     "grunnlag": {
       "bostedsland": "NOR"
     },
@@ -384,7 +390,6 @@ class EndToEndTest {
     "fastsattAv": "SPA"
   },
   "sykepengeliste": [],
-  "originalSoknad": {
     "aktorId": "11987654321",
     "tom": "2019-01-31",
     "arbeidsgiver": {
@@ -402,8 +407,8 @@ class EndToEndTest {
     ],
     "harVurdertInntekt": false,
     "startSyketilfelle": "2019-01-01",
-    "sendtNav": "2019-01-17T00:00"
-  },
+    "sendtNav": "2019-01-17T00:00",
+
   "alder": {
     "grunnlag": {
       "fodselsdato": "1970-09-01"

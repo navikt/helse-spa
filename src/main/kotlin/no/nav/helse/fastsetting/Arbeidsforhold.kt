@@ -7,7 +7,7 @@ import no.nav.nare.core.evaluations.Resultat
 
 fun vurderArbeidsforhold(soknad : BeriketSykepengesøknad) : Vurdering<Boolean, ArbeidsforholdFakta> {
 
-    val orgnummer= soknad.originalSoknad.arbeidsgiver.orgnummer
+    val orgnummer= soknad.arbeidsgiver.orgnummer
     val fakta = soknad.faktagrunnlag.arbeidsforhold
     val evaluering = evaluerArbeidsforhold(orgnummer, fakta)
 

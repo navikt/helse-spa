@@ -11,7 +11,7 @@ data class Aldersgrunnlag(val fodselsdato: LocalDate)
 
 fun vurderAlderPåSisteDagISøknadsPeriode(søknad: BeriketSykepengesøknad): Vurdering<Alder, Aldersgrunnlag> {
     val tpsfakta = søknad.faktagrunnlag.tps
-    val tomDato = søknad.originalSoknad.tom
+    val tomDato = søknad.tom
     return Vurdering.Avklart(tpsfakta.alder(tomDato), "§ 8-51", Aldersgrunnlag(fodselsdato = tpsfakta.fodselsdato), "SPA")
 }
 

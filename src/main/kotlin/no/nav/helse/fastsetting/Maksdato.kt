@@ -15,8 +15,8 @@ fun vurderMaksdato(soknad: AvklartSykepengesoknad): Vurdering<LocalDate, Any> {
         is Vurdering.Uavklart -> Vurdering.Uavklart(årsak = Vurdering.Uavklart.Årsak.MANGELFULL_DATAGRUNNLAG, begrunnelse = "Kan ikke fastsette maksdato for bruker med uavklart alder", grunnlag = TomtMaksdatoGrunnlag(aarsak = "Alder ikke avklart"))
         is Vurdering.Avklart -> {
             val grunnlag = Grunnlagsdata(
-                    førsteFraværsdag = soknad.originalSoknad.startSyketilfelle,
-                    førsteSykepengedag = soknad.originalSoknad.fom,
+                    førsteFraværsdag = soknad.originalSøknad.startSyketilfelle,
+                    førsteSykepengedag = soknad.originalSøknad.fom,
                     personensAlder = alder.fastsattVerdi,
                     yrkesstatus = Yrkesstatus.ARBEIDSTAKER, // FIXME: this is not necessarily true
                     tidligerePerioder = soknad.sykepengeliste.map { Tidsperiode(fom = it.fom, tom = it.tom) }

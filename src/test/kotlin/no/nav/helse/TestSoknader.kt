@@ -33,7 +33,7 @@ val originalSoknad = Sykepengesoknad(
 )
 
 val soknadUtenVerdi = BeriketSykepengesøknad(
-        originalSoknad = originalSoknad,
+        originalSøknad = originalSoknad,
         faktagrunnlag = faktagrunnlagUtenVerdi
 )
 

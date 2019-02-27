@@ -15,7 +15,7 @@ internal val boddeINorgeISykdomsperioden = Spesifikasjon<Medlemsskapgrunnlag>(
         identitet = "§ 2-1 første ledd") { søkerBorINorge(bostedsland) }
 
 internal val harOppfyltMedlemskap = (boddeINorgeISykdomsperioden eller toBeDecided).med(
-        beskrivelse = "Oppfyller søker krav om medlemskap?",
+        beskrivelse = "Oppfyller søker krav om medlemsskap?",
         identitet = "Kapittel 2. Medlemskap"
 )
 

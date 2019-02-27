@@ -87,22 +87,23 @@ class SaksbehandlingStream(val env: Environment) {
     }
 
     fun hentRegisterData(input: Sykepengesoknad): BeriketSykepengesøknad =
-            BeriketSykepengesøknad(input, Faktagrunnlag(
-                    tps = PersonOppslag(env.sparkelBaseUrl, stsClient).hentTPSData(input),
-                    beregningsperiode = Inntektsoppslag(env.sparkelBaseUrl, stsClient).hentBeregningsgrunnlag(input.aktorId, input.startSyketilfelle, input.startSyketilfelle.minusMonths(3)),
-                    sammenligningsperiode = Inntektsoppslag(env.sparkelBaseUrl, stsClient).hentSammenligningsgrunnlag(input.aktorId, input.startSyketilfelle, input.startSyketilfelle.minusYears(1)),
-                    sykepengeliste = emptyList(),
-                    arbeidsforhold = ArbeidsforholdOppslag(env.sparkelBaseUrl, stsClient).hentArbeidsforhold(input))
+            BeriketSykepengesøknad(input,
+                    faktagrunnlag = Faktagrunnlag(
+                        tps = PersonOppslag(env.sparkelBaseUrl, stsClient).hentTPSData(input),
+                        beregningsperiode = Inntektsoppslag(env.sparkelBaseUrl, stsClient).hentBeregningsgrunnlag(input.aktorId, input.startSyketilfelle, input.startSyketilfelle.minusMonths(3)),
+                        sammenligningsperiode = Inntektsoppslag(env.sparkelBaseUrl, stsClient).hentSammenligningsgrunnlag(input.aktorId, input.startSyketilfelle, input.startSyketilfelle.minusYears(1)),
+                        sykepengeliste = emptyList(),
+                        arbeidsforhold = ArbeidsforholdOppslag(env.sparkelBaseUrl, stsClient).hentArbeidsforhold(input))
             )
 
     fun fastsettFakta(input: BeriketSykepengesøknad): AvklartSykepengesoknad = AvklartSykepengesoknad(
-            originalSoknad = input.originalSoknad,
-            medlemskap = vurderMedlemskap(input),
+            originalSøknad = input,
+            medlemsskap = vurderMedlemskap(input),
             alder = vurderAlderPåSisteDagISøknadsPeriode(input),
             arbeidsforhold = vurderArbeidsforhold(input),
             opptjeningstid = vurderOpptjeningstid(Opptjeningsgrunnlag(input.originalSoknad.startSyketilfelle, input.faktagrunnlag.arbeidsforhold.arbeidsgivere)),
             sykepengeliste = input.faktagrunnlag.sykepengeliste,
-            sykepengegrunnlag = fastsettingAvSykepengegrunnlaget(input.originalSoknad.startSyketilfelle, input.originalSoknad.arbeidsgiver, input.faktagrunnlag.beregningsperiode, input.faktagrunnlag.sammenligningsperiode))
+            sykepengegrunnlag = fastsettingAvSykepengegrunnlaget(input.startSyketilfelle, input.arbeidsgiver, input.faktagrunnlag.beregningsperiode, input.faktagrunnlag.sammenligningsperiode))
     fun beregnMaksdato(soknad: AvklartSykepengesoknad): AvklartSykepengesoknad = soknad.copy(maksdato = vurderMaksdato(soknad))
     fun prøvVilkår(input: AvklartSykepengesoknad): AvklartSykepengesoknad = input
     fun beregnSykepenger(input: AvklartSykepengesoknad): AvklartSykepengesoknad = input
