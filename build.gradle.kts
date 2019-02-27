@@ -4,7 +4,7 @@ val slf4jVersion = "1.7.25"
 val ktorVersion = "1.1.2"
 val prometheusVersion = "0.5.0"
 val gsonVersion = "2.7"
-val navStreamsVersion = "10"
+val navStreamsVersion = "aa320bb"
 val fuelVersion = "1.15.1"
 
 val junitJupiterVersion = "5.3.1"
