@@ -7,7 +7,7 @@ import no.nav.nare.core.evaluations.Evaluering
 
 fun gjennomførVilkårsvurdering(søknad: AvklartSykepengesoknad): Evaluering {
     val grunnlag = Vilkårsgrunnlag(
-            opptjeningstid = (søknad.opptjeningstid as Vurdering.Avklart).fastsattVerdi.toInt(), // this is not right
+            opptjeningstid = (søknad.opptjeningstid as Vurdering.Avklart).fastsattVerdi.toInt(),
             alder = (søknad.alder as Vurdering.Avklart).fastsattVerdi,
             erMedlem = (søknad.medlemsskap as Vurdering.Avklart).fastsattVerdi,
             ytelser = emptyList(),
