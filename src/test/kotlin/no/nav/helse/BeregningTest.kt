@@ -54,7 +54,8 @@ class BeregningTest {
                             sendtNav = LocalDateTime.ofEpochSecond(LocalDate.parse("2019-01-31").toEpochSecond(LocalTime.NOON, ZoneOffset.UTC), 0, ZoneOffset.UTC),
                             soknadsperioder = listOf(Soknadsperiode(LocalDate.parse("2019-01-05"), LocalDate.parse("2019-01-31"), sykmeldingsgrad = sykmeldingsgrad)),
                             soktUtenlandsopphold = false,
-                            startSyketilfelle = LocalDate.parse("2018-12-01")),
+                            startSyketilfelle = LocalDate.parse("2018-12-01"),
+                            status="SENDT"),
                     faktagrunnlag = faktagrunnlagUtenVerdi,
                     avklarteVerdier = AvklarteVerdier(
                             medlemsskap = Vurdering.Avklart(fastsattVerdi = true, begrunnelse = "derfor", fastsattAv = "test", grunnlag = Medlemsskapgrunnlag("NO")),

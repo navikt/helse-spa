@@ -29,7 +29,8 @@ val originalSoknad = Sykepengesøknad(
         sendtNav = LocalDateTime.now(),
         tom = LocalDate.now(),
         fom = LocalDate.now(),
-        harVurdertInntekt = false
+        harVurdertInntekt = false,
+        status = "SENDT"
 )
 
 val soknadUtenVerdi = FaktagrunnlagResultat(
