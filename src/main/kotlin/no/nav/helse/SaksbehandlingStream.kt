@@ -1,15 +1,16 @@
 package no.nav.helse
 
 import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException
 import io.prometheus.client.CollectorRegistry
 import io.prometheus.client.Counter
 import no.nav.NarePrometheus
-import no.nav.helse.fastsetting.*
+import no.nav.helse.fastsetting.vurderFakta
 import no.nav.helse.serde.defaultObjectMapper
 import no.nav.helse.serde.jsonNodeSerde
 import no.nav.helse.streams.StreamConsumer
-import no.nav.helse.streams.*
+import no.nav.helse.streams.Topic
+import no.nav.helse.streams.Topics
+import no.nav.helse.streams.consumeTopic
 import no.nav.helse.streams.streamConfig
 import no.nav.helse.streams.toTopic
 import no.nav.helse.sykepenger.beregning.beregn
@@ -55,15 +56,15 @@ class SaksbehandlingStream(val env: Environment) {
 
     private fun topology(): Topology {
         val builder = StreamsBuilder()
-        val stream: KStream<String, JsonNode> = builder.consumeTopic(sykepengesoknadTopic)
+        val stream = builder.consumeTopic(sykepengesoknadTopic)
+                .peek { _, _ -> acceptCounter.labels("accepted").inc() }
+                .mapValues { _, jsonNode -> deserializeSykepengesøknad(jsonNode) }
+                .filter { _, søknad -> søknad.isPresent }
+                .mapValues { _, søknad -> søknad.get() }
 
         val alleVerdierErAvklart: Predicate<String, AvklaringsResultat> = Predicate { _, søknad -> søknad is AvklarteFakta }
 
-        val avklarteEllerUavklarte: Array<out KStream<String, AvklaringsResultat>> =
-                stream.peek { _, _ -> acceptCounter.labels("accepted").inc() }
-                        .mapValues { _, råSøknad -> toSykepengeSoknadOrAny(råSøknad) }
-                        .filter { _, søknad -> søknad is Sykepengesøknad }
-                        .mapValues { _, søknad -> søknad as Sykepengesøknad }
+        val avklarteEllerUavklarte: Array<out KStream<String, AvklaringsResultat>> = stream
                         .mapValues { _, søknad -> hentRegisterData(søknad) }
                         .mapValues { _, faktagrunnlag -> fastsettFakta(faktagrunnlag) }
                         .branch(alleVerdierErAvklart)
@@ -82,12 +83,12 @@ class SaksbehandlingStream(val env: Environment) {
     }
 
 
-    private fun toSykepengeSoknadOrAny(soknad: JsonNode?): Any =
+    private fun deserializeSykepengesøknad(soknad: JsonNode?): Optional<Sykepengesøknad> =
         try {
-            defaultObjectMapper.treeToValue(soknad, Sykepengesøknad::class.java)
-        } catch (e: MissingKotlinParameterException) {
-            log.error("Søknaden missing required field/value", e)
-            Any()
+            Optional.of(defaultObjectMapper.treeToValue(soknad, Sykepengesøknad::class.java))
+        } catch (e: Exception) {
+            log.error("Failed to deserialize søknad", e)
+            Optional.empty()
         }
 
 
