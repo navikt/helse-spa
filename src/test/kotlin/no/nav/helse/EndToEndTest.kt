@@ -420,6 +420,7 @@ class EndToEndTest {
     private fun produserSøknad(aktørId: String) {
         val søknad = Sykepengesøknad(
                 aktorId = aktørId,
+                status = "SENDT",
                 arbeidsgiver = Arbeidsgiver("NAV", "97114455"),
                 soktUtenlandsopphold = false,
                 fom = LocalDate.parse("2019-01-01"),

@@ -12,6 +12,7 @@ import java.time.LocalDateTime
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class Sykepengesøknad(
         val aktorId: String,
+        val status: String,
         val arbeidsgiver: Arbeidsgiver,
         val soktUtenlandsopphold: Boolean,
         val fom: LocalDate,
