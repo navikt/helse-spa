@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import io.prometheus.client.CollectorRegistry
 import io.prometheus.client.Counter
 import no.nav.NarePrometheus
+import no.nav.helse.fastsetting.Vurdering
 import no.nav.helse.fastsetting.vurderFakta
 import no.nav.helse.serde.*
 import no.nav.helse.streams.StreamConsumer
@@ -22,7 +23,6 @@ import org.apache.kafka.streams.Topology
 import org.apache.kafka.streams.errors.LogAndFailExceptionHandler
 import org.apache.kafka.streams.kstream.KStream
 import org.apache.kafka.streams.kstream.Predicate
-import org.apache.kafka.streams.kstream.Produced
 import org.slf4j.LoggerFactory
 import java.util.*
 
@@ -33,6 +33,11 @@ class SaksbehandlingStream(val env: Environment) {
             .name("spa_behandling_stream_counter")
             .labelNames("state")
             .help("Antall meldinger SaksbehandlingsStream i SPA har godtatt og forsøkt behandlet")
+            .register()
+    private val uavklartCounter: Counter = Counter.build()
+            .name("spa_uavklarte_fakta_counter")
+            .labelNames("fakta")
+            .help("Antall ganger et faktum har gått uavklart")
             .register()
 
     private val appId = "spa-behandling"
@@ -71,6 +76,7 @@ class SaksbehandlingStream(val env: Environment) {
 
         avklarteEllerUavklarte[1]
                 .peek{_, _ -> acceptCounter.labels("rejected_unable_to_determine_facts").inc() }
+                .peek{_, resultat -> tellUavklarte(resultat as UavklarteFakta)}
                 .toTopic(uavklartFaktaTopic)
 
         avklarteEllerUavklarte[0]
@@ -81,6 +87,12 @@ class SaksbehandlingStream(val env: Environment) {
                 .toTopic(sykepengevedtakTopic)
 
         return builder.build()
+    }
+
+    private fun tellUavklarte(uavklarteFakta: UavklarteFakta) {
+        uavklarteFakta.uavklarteVerdier.asNamedList()
+                .filter { it.second is Vurdering.Uavklart<*> }
+                .forEach { uavklartCounter.labels(it.first).inc() }
     }
 
 
