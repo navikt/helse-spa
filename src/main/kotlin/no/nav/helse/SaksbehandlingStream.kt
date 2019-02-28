@@ -69,15 +69,15 @@ class SaksbehandlingStream(val env: Environment) {
                         .mapValues { _, faktagrunnlag -> fastsettFakta(faktagrunnlag) }
                         .branch(alleVerdierErAvklart, Predicate { _, _ -> true} )
 
-        avklarteEllerUavklarte[1].toTopic(uavklartFaktaTopic)
+        avklarteEllerUavklarte[1]
+                .peek{_, _ -> acceptCounter.labels("rejected_unable_to_determine_facts").inc() }
+                .toTopic(uavklartFaktaTopic)
 
-        avklarteEllerUavklarte[0].mapValues { _, avklarteFakta -> prøvVilkår(avklarteFakta as AvklarteFakta) }
+        avklarteEllerUavklarte[0]
+                .mapValues { _, avklarteFakta -> prøvVilkår(avklarteFakta as AvklarteFakta) }
                 .mapValues { _, vilkårsprøving -> beregnSykepenger(vilkårsprøving) }
                 .mapValues { _, sykepengeberegning -> fattVedtak(sykepengeberegning) }
-                .peek { _, _ ->
-                    acceptCounter.labels("processed").inc()
-                    log.error("processing message 6")
-                }
+                .peek { _, _ -> acceptCounter.labels("processed").inc() }
                 .toTopic(sykepengevedtakTopic)
 
         return builder.build()
