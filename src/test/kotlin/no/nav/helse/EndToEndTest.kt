@@ -112,6 +112,7 @@ class EndToEndTest {
         println(actual)
 
         assertNotNull(actual)
+        assertNotNull(actual.get("medlemsskap"))
         assertEquals(actual.get("medlemsskap").get("fastsattVerdi").booleanValue(), true)
         assertEquals(actual.get("medlemsskap").get("fastsattAv").textValue(), "SPA")
     }

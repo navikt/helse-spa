@@ -124,13 +124,13 @@ class SaksbehandlingStream(val env: Environment) {
     fun beregnMaksdato(soknad: AvklartSykepengesoknad): AvklartSykepengesoknad = soknad.copy(maksdato = vurderMaksdato(soknad))
 
 
-    fun beregnSykepenger(soknad: VilkårsprøvdSykepengesøknad)/*: BeregnetSykepengesoknad =
+    fun beregnSykepenger(soknad: VilkårsprøvdSykepengesøknad): BeregnetSykepengesoknad =
             BeregnetSykepengesoknad(vilkårsprøvdSøknad = soknad,
-                    beregning = beregn(lagBeregninggrunnlag(soknad)))*/ = soknad
+                    beregning = beregn(lagBeregninggrunnlag(soknad)))
 
     fun prøvVilkår(input: AvklartSykepengesoknad): VilkårsprøvdSykepengesøknad = VilkårsprøvdSykepengesøknad(input, gjennomførVilkårsvurdering(input))
 
-    fun fattVedtak(input: VilkårsprøvdSykepengesøknad): JsonNode = defaultObjectMapper.readTree(defaultObjectMapper.writeValueAsString(input))
+    fun fattVedtak(input: BeregnetSykepengesoknad): JsonNode = defaultObjectMapper.readTree(defaultObjectMapper.writeValueAsString(input))
 }
 
 val sykepengesoknadTopic = Topic(

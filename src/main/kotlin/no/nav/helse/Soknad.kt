@@ -58,8 +58,8 @@ data class AvklartSykepengesoknad(
     }
 }
 
-data class BeregnetSykepengesoknad(val vilkårsprøvdSøknad : AvklartSykepengesoknad/*TODO: SKal være Vilkårsprøvd søknad*/,
-                                   val beregning : Beregningsresultat)
+data class BeregnetSykepengesoknad(@JsonIgnore val vilkårsprøvdSøknad : VilkårsprøvdSykepengesøknad,
+                                   val beregning : Beregningsresultat) : Søknadsdefinisjon by vilkårsprøvdSøknad, Avklaringer by vilkårsprøvdSøknad
 
 data class VilkårsprøvdSykepengesøknad(
         @JsonIgnore val originalSøknad: AvklartSykepengesoknad,

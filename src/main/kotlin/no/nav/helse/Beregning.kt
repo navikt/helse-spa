@@ -5,7 +5,7 @@ import no.nav.helse.sykepenger.beregning.Beregningsgrunnlag
 
 fun grunnbeløp() = 96883L // TODO: lookup?
 
-fun lagBeregninggrunnlag(soknad: AvklartSykepengesoknad) : Beregningsgrunnlag =
+fun lagBeregninggrunnlag(soknad: VilkårsprøvdSykepengesøknad) : Beregningsgrunnlag =
         Beregningsgrunnlag(
                 fom = soknad.originalSøknad.fom, // er dette første dag etter arbeidsgiverperiode ?
                 ferie = null,
