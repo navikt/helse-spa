@@ -6,7 +6,10 @@ import io.prometheus.client.Counter
 import no.nav.NarePrometheus
 import no.nav.helse.fastsetting.Vurdering
 import no.nav.helse.fastsetting.vurderFakta
-import no.nav.helse.serde.*
+import no.nav.helse.serde.JacksonDeserializer
+import no.nav.helse.serde.JacksonSerializer
+import no.nav.helse.serde.defaultObjectMapper
+import no.nav.helse.serde.jsonNodeSerde
 import no.nav.helse.streams.StreamConsumer
 import no.nav.helse.streams.Topic
 import no.nav.helse.streams.Topics
@@ -63,6 +66,7 @@ class SaksbehandlingStream(val env: Environment) {
         val builder = StreamsBuilder()
         val stream = builder.consumeTopic(sykepengesoknadTopic)
                 .peek { _, _ -> acceptCounter.labels("accepted").inc() }
+                .filter { _, value -> value.has("status") && value.get("status").asText() == "SENDT" }
                 .mapValues { _, jsonNode -> deserializeSykepengesøknad(jsonNode) }
                 .filter { _, søknad -> søknad.isPresent }
                 .mapValues { _, søknad -> søknad.get() }
