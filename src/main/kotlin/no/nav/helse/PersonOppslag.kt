@@ -15,6 +15,7 @@ class PersonOppslag(val sparkelUrl: String, val stsRestClient: StsRestClient) {
 
     private fun hentPerson(aktørId: AktørId): Person {
         val bearer = stsRestClient.token()
+        log.info("got token")
         val (_, _, result) = "$sparkelUrl/api/person/${aktørId.aktor}".httpGet()
                 .header(mapOf(
                         "Authorization" to "Bearer $bearer",
@@ -23,6 +24,12 @@ class PersonOppslag(val sparkelUrl: String, val stsRestClient: StsRestClient) {
                         "Nav-Consumer-Id" to "spa"
                         ))
                 .responseString()
+
+        val (_, error) = result
+
+        error?.exception?.let {
+            log.error("Error in person lookup", it)
+        }
 
         return defaultObjectMapper.readValue(result.component1(), Person::class.java)
     }
