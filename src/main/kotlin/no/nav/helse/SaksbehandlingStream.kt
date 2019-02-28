@@ -69,7 +69,7 @@ class SaksbehandlingStream(val env: Environment) {
                         .mapValues { _, faktagrunnlag -> fastsettFakta(faktagrunnlag) }
                         .branch(alleVerdierErAvklart, Predicate { _, _ -> true} )
 
-        avklarteEllerUavklarte[1].to(uavklartFaktaTopic.name, Produced.with(Serdes.String(), Serdes.serdeFrom(JacksonSerializer<AvklaringsResultat>(), JacksonDeserializer<AvklaringsResultat>(AvklaringsResultat::class.java))))
+        avklarteEllerUavklarte[1].toTopic(uavklartFaktaTopic)
 
         avklarteEllerUavklarte[0].mapValues { _, avklarteFakta -> prøvVilkår(avklarteFakta as AvklarteFakta) }
                 .mapValues { _, vilkårsprøving -> beregnSykepenger(vilkårsprøving) }
@@ -145,7 +145,7 @@ val sykepengevedtakTopic = Topic(
 val uavklartFaktaTopic= Topic(
         name = "privat-helse-sykepenger-uavklart",
         keySerde = Serdes.String(),
-        valueSerde = jsonNodeSerde
+        valueSerde = Serdes.serdeFrom(JacksonSerializer<AvklaringsResultat>(), JacksonDeserializer(AvklaringsResultat::class.java))
 )
 
 val narePrometheus = NarePrometheus(CollectorRegistry.defaultRegistry)
