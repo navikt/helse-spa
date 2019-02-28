@@ -1,13 +1,13 @@
 package no.nav.helse.fastsetting
 
 import no.nav.helse.ArbeidsforholdFakta
-import no.nav.helse.BeriketSykepengesøknad
+import no.nav.helse.FaktagrunnlagResultat
 import no.nav.nare.core.evaluations.Evaluering
 import no.nav.nare.core.evaluations.Resultat
 
-fun vurderArbeidsforhold(soknad : BeriketSykepengesøknad) : Vurdering<Boolean, ArbeidsforholdFakta> {
+fun vurderArbeidsforhold(soknad : FaktagrunnlagResultat) : Vurdering<Boolean, ArbeidsforholdFakta> {
 
-    val orgnummer= soknad.arbeidsgiver.orgnummer
+    val orgnummer= soknad.originalSøknad.arbeidsgiver.orgnummer
     val fakta = soknad.faktagrunnlag.arbeidsforhold
     val evaluering = evaluerArbeidsforhold(orgnummer, fakta)
 

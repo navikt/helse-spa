@@ -32,7 +32,7 @@ val originalSoknad = Sykepengesoknad(
         harVurdertInntekt = false
 )
 
-val soknadUtenVerdi = BeriketSykepengesøknad(
+val soknadUtenVerdi = FaktagrunnlagResultat(
         originalSøknad = originalSoknad,
         faktagrunnlag = faktagrunnlagUtenVerdi
 )

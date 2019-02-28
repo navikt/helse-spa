@@ -1,6 +1,6 @@
 package no.nav.helse.fastsetting
 
-import no.nav.helse.BeriketSykepengesøknad
+import no.nav.helse.FaktagrunnlagResultat
 import no.nav.helse.faktagrunnlagUtenVerdi
 import no.nav.helse.soknadUtenVerdi
 import no.nav.helse.tpsFaktaUtenVerdi
@@ -45,6 +45,6 @@ class MedlemsskapTest {
         }
     }
 
-    private fun soknadForLand(land: String): BeriketSykepengesøknad = soknadUtenVerdi.copy(faktagrunnlag = faktagrunnlagUtenVerdi.copy(tpsFaktaUtenVerdi.copy(bostedland = land)))
+    private fun soknadForLand(land: String): FaktagrunnlagResultat = soknadUtenVerdi.copy(faktagrunnlag = faktagrunnlagUtenVerdi.copy(tpsFaktaUtenVerdi.copy(bostedland = land)))
 }
 

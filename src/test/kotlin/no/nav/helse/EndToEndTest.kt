@@ -112,9 +112,9 @@ class EndToEndTest {
         println(actual)
 
         assertNotNull(actual)
-        assertNotNull(actual.get("medlemsskap"))
-        assertEquals(actual.get("medlemsskap").get("fastsattVerdi").booleanValue(), true)
-        assertEquals(actual.get("medlemsskap").get("fastsattAv").textValue(), "SPA")
+        assertNotNull(actual.get("avklarteVerdier"))
+        assertEquals(actual.get("avklarteVerdier").get("medlemsskap").get("fastsattVerdi").booleanValue(), true)
+        assertEquals(actual.get("avklarteVerdier").get("medlemsskap").get("fastsattAv").textValue(), "SPA")
     }
 
     private fun forventetVedtak() = """

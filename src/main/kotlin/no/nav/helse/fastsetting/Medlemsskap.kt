@@ -1,6 +1,6 @@
 package no.nav.helse.fastsetting
 
-import no.nav.helse.BeriketSykepengesøknad
+import no.nav.helse.FaktagrunnlagResultat
 import no.nav.helse.narePrometheus
 import no.nav.nare.core.evaluations.Evaluering
 import no.nav.nare.core.evaluations.Resultat
@@ -28,7 +28,7 @@ fun søkerBorINorge(bostedland: String) =
 
 data class Medlemsskapgrunnlag(val bostedsland: String)
 
-fun vurderMedlemskap(soknad: BeriketSykepengesøknad): Vurdering<Boolean, Medlemsskapgrunnlag> {
+fun vurderMedlemskap(soknad: FaktagrunnlagResultat): Vurdering<Boolean, Medlemsskapgrunnlag> {
     val grunnlag = Medlemsskapgrunnlag(soknad.faktagrunnlag.tps.bostedland)
     val evaluering: Evaluering = with(harOppfyltMedlemskap) {
         evaluer(grunnlag).also {

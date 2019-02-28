@@ -4,7 +4,7 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import no.nav.helse.Arbeidsforhold
 import no.nav.helse.ArbeidsforholdFakta
 import no.nav.helse.ArbeidsgiverFakta
-import no.nav.helse.BeriketSykepengesøknad
+import no.nav.helse.FaktagrunnlagResultat
 import no.nav.helse.Faktagrunnlag
 import no.nav.helse.originalSoknad
 import no.nav.helse.serde.defaultObjectMapper
@@ -32,7 +32,7 @@ class ArbeidsforholdTest {
         val arbeidsforholdFakta = ArbeidsforholdFakta(listOf(ArbeidsgiverFakta("1111", "Test 1", LocalDate.now(), null)))
         val faktagrunnlag = Faktagrunnlag(tps = tpsFaktaUtenVerdi, beregningsperiode = emptyList(), sammenligningsperiode = emptyList(), arbeidsforhold = arbeidsforholdFakta,
                 sykepengeliste = emptyList())
-        val vurdering = vurderArbeidsforhold(BeriketSykepengesøknad(originalSoknad, faktagrunnlag))
+        val vurdering = vurderArbeidsforhold(FaktagrunnlagResultat(originalSoknad, faktagrunnlag))
         if (vurdering is Vurdering.Avklart) assertThat(vurdering.fastsattVerdi).isTrue() else fail("Feil vurdering!")
 
     }
@@ -42,7 +42,7 @@ class ArbeidsforholdTest {
         val arbeidsforholdFakta = ArbeidsforholdFakta(listOf(ArbeidsgiverFakta("2222", "Test 2", LocalDate.now(), null)))
         val faktagrunnlag = Faktagrunnlag(tps = tpsFaktaUtenVerdi, beregningsperiode = emptyList(), sammenligningsperiode = emptyList(), arbeidsforhold = arbeidsforholdFakta,
                 sykepengeliste = emptyList())
-        val vurdering = vurderArbeidsforhold(BeriketSykepengesøknad(originalSoknad, faktagrunnlag))
+        val vurdering = vurderArbeidsforhold(FaktagrunnlagResultat(originalSoknad, faktagrunnlag))
         if (vurdering is Vurdering.Avklart) assertThat(vurdering.fastsattVerdi).isFalse() else fail("Feil vurdering!")
 
     }
@@ -53,7 +53,7 @@ class ArbeidsforholdTest {
                 ArbeidsgiverFakta("2222", "Test 2", LocalDate.now(), null)))
         val faktagrunnlag = Faktagrunnlag(tps = tpsFaktaUtenVerdi, beregningsperiode = emptyList(), sammenligningsperiode = emptyList(), arbeidsforhold = arbeidsforholdFakta,
                 sykepengeliste = emptyList())
-        val vurdering = vurderArbeidsforhold(BeriketSykepengesøknad(originalSoknad, faktagrunnlag))
+        val vurdering = vurderArbeidsforhold(FaktagrunnlagResultat(originalSoknad, faktagrunnlag))
         if (vurdering is Vurdering.Uavklart) assertThat(vurdering.årsak== Vurdering.Uavklart.Årsak.KREVER_SKJØNNSMESSIG_VURDERING).isTrue() else fail("Feil vurdering!")
 
     }
