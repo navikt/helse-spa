@@ -5,15 +5,15 @@ import no.nav.helse.FaktagrunnlagResultat
 import no.nav.nare.core.evaluations.Evaluering
 import no.nav.nare.core.evaluations.Resultat
 
-fun vurderArbeidsforhold(soknad : FaktagrunnlagResultat) : Vurdering<Boolean, ArbeidsforholdFakta> {
+fun vurderArbeidsforhold(fakta : FaktagrunnlagResultat) : Vurdering<Boolean, ArbeidsforholdFakta> {
 
-    val orgnummer= soknad.originalSøknad.arbeidsgiver.orgnummer
-    val fakta = soknad.faktagrunnlag.arbeidsforhold
-    val evaluering = evaluerArbeidsforhold(orgnummer, fakta)
+    val orgnummer= fakta.originalSøknad.arbeidsgiver.orgnummer
+    val arbeidsforholdFakta = fakta.faktagrunnlag.arbeidsforhold
+    val evaluering = evaluerArbeidsforhold(orgnummer, arbeidsforholdFakta)
 
     return when (evaluering.resultat) {
-        Resultat.KANSKJE -> Vurdering.Uavklart(Vurdering.Uavklart.Årsak.KREVER_SKJØNNSMESSIG_VURDERING, evaluering.begrunnelse, fakta)
-        else -> Vurdering.Avklart(evaluering.resultat == Resultat.JA, evaluering.begrunnelse, fakta, "SPA")
+        Resultat.KANSKJE -> Vurdering.Uavklart(Vurdering.Uavklart.Årsak.KREVER_SKJØNNSMESSIG_VURDERING, evaluering.begrunnelse, arbeidsforholdFakta)
+        else -> Vurdering.Avklart(evaluering.resultat == Resultat.JA, evaluering.begrunnelse, arbeidsforholdFakta, "SPA")
     }
 
 }

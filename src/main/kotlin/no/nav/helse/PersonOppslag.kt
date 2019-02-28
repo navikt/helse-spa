@@ -8,7 +8,7 @@ import java.time.LocalDate
 class PersonOppslag(val sparkelUrl: String, val stsRestClient: StsRestClient) {
     private val log = LoggerFactory.getLogger(PersonOppslag::class.java.name)
 
-    fun hentTPSData(input: Sykepengesoknad): Tpsfakta {
+    fun hentTPSData(input: Sykepengesøknad): Tpsfakta {
         val person = hentPerson(AktørId(input.aktorId))
         return Tpsfakta(fodselsdato = person.fdato, bostedland = person.bostedsland)
     }

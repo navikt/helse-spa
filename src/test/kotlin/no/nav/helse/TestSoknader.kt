@@ -20,7 +20,7 @@ val faktagrunnlagUtenVerdi = Faktagrunnlag(
         arbeidsforhold = arbeidsforholdFaktaUtenVerdi
 )
 
-val originalSoknad = Sykepengesoknad(
+val originalSoknad = Sykepengesøknad(
         aktorId = "1",
         arbeidsgiver = Arbeidsgiver("Test 1", "1111"),
         startSyketilfelle = LocalDate.now(),

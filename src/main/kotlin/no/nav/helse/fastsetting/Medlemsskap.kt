@@ -28,8 +28,8 @@ fun søkerBorINorge(bostedland: String) =
 
 data class Medlemsskapgrunnlag(val bostedsland: String)
 
-fun vurderMedlemskap(soknad: FaktagrunnlagResultat): Vurdering<Boolean, Medlemsskapgrunnlag> {
-    val grunnlag = Medlemsskapgrunnlag(soknad.faktagrunnlag.tps.bostedland)
+fun vurderMedlemskap(fakta: FaktagrunnlagResultat): Vurdering<Boolean, Medlemsskapgrunnlag> {
+    val grunnlag = Medlemsskapgrunnlag(fakta.faktagrunnlag.tps.bostedland)
     val evaluering: Evaluering = with(harOppfyltMedlemskap) {
         evaluer(grunnlag).also {
             narePrometheus.tellEvaluering { it }

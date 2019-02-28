@@ -11,9 +11,9 @@ class SykepengesoknadTest {
 
     @Test
     fun jsonTester() {
-        val sykepengesoknad: Sykepengesoknad = JacksonDeserializer(Sykepengesoknad::class.java)
+        val sykepengesøknad: Sykepengesøknad = JacksonDeserializer(Sykepengesøknad::class.java)
                 .deserialize(null, SykepengesoknadTest::class.java.classLoader.getResourceAsStream("enkel_soknad.json").readBytes())!!
-        LOG.info(sykepengesoknad.aktorId)
-        assertNotNull(sykepengesoknad.fom.toString())
+        LOG.info(sykepengesøknad.aktorId)
+        assertNotNull(sykepengesøknad.fom.toString())
     }
 }

@@ -10,7 +10,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-data class Sykepengesoknad(
+data class Sykepengesøknad(
         val aktorId: String,
         val arbeidsgiver: Arbeidsgiver,
         val soktUtenlandsopphold: Boolean,
@@ -23,14 +23,14 @@ data class Sykepengesoknad(
 )
 
 data class FaktagrunnlagResultat(
-        val originalSøknad: Sykepengesoknad,
+        val originalSøknad: Sykepengesøknad,
         val faktagrunnlag: Faktagrunnlag
 )
 
 sealed class AvklaringsResultat
 
-data class AvklartFakta(
-        val originalSøknad: Sykepengesoknad,
+data class AvklarteFakta(
+        val originalSøknad: Sykepengesøknad,
         val faktagrunnlag: Faktagrunnlag,
         val avklarteVerdier: AvklarteVerdier
 ) : AvklaringsResultat()
@@ -45,8 +45,8 @@ data class AvklarteVerdier(
         val sykepengegrunnlag: Vurdering.Avklart<Sykepengegrunnlag, Beregningsperiode>
 )
 
-data class UavklartFakta(
-        val originalSøknad: Sykepengesoknad,
+data class UavklarteFakta(
+        val originalSøknad: Sykepengesøknad,
         val faktagrunnlag: Faktagrunnlag,
         val uavklarteVerdier: UavklarteVerdier
 ) : AvklaringsResultat()
@@ -62,21 +62,21 @@ data class UavklarteVerdier(
 )
 
 data class Vilkårsprøving(
-        val originalSøknad: Sykepengesoknad,
+        val originalSøknad: Sykepengesøknad,
         val faktagrunnlag: Faktagrunnlag,
         val avklarteVerdier: AvklarteVerdier,
         val vilkårsprøving: Evaluering
 )
 
 data class Sykepengeberegning(
-        val originalSøknad: Sykepengesoknad,
+        val originalSøknad: Sykepengesøknad,
         val faktagrunnlag: Faktagrunnlag,
         val avklarteVerdier: AvklarteVerdier,
         val vilkårsprøving: Evaluering,
         val beregning: Beregningsresultat)
 
 data class SykepengeVedtak(
-        val originalSøknad: Sykepengesoknad,
+        val originalSøknad: Sykepengesøknad,
         val faktagrunnlag: Faktagrunnlag,
         val avklarteVerdier: AvklarteVerdier,
         val vilkårsprøving: Evaluering,

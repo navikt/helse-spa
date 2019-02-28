@@ -9,9 +9,9 @@ typealias Alder = Int
 
 data class Aldersgrunnlag(val fodselsdato: LocalDate)
 
-fun vurderAlderPåSisteDagISøknadsPeriode(søknad: FaktagrunnlagResultat): Vurdering<Alder, Aldersgrunnlag> {
-    val tpsfakta = søknad.faktagrunnlag.tps
-    val tomDato = søknad.originalSøknad.tom
+fun vurderAlderPåSisteDagISøknadsPeriode(fakta: FaktagrunnlagResultat): Vurdering<Alder, Aldersgrunnlag> {
+    val tpsfakta = fakta.faktagrunnlag.tps
+    val tomDato = fakta.originalSøknad.tom
     return Vurdering.Avklart(tpsfakta.alder(tomDato), "§ 8-51", Aldersgrunnlag(fodselsdato = tpsfakta.fodselsdato), "SPA")
 }
 

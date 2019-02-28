@@ -11,12 +11,12 @@ import java.time.temporal.ChronoUnit
 class ArbeidsforholdOppslag(val sparkelUrl: String, val stsRestClient: StsRestClient) {
     private val log = LoggerFactory.getLogger(ArbeidsforholdOppslag::class.java.name)
 
-    fun hentArbeidsforhold(sykepengesoknad: Sykepengesoknad) : ArbeidsforholdFakta {
-        val forsteSykdomsdag = sykepengesoknad.startSyketilfelle
+    fun hentArbeidsforhold(sykepengesøknad: Sykepengesøknad) : ArbeidsforholdFakta {
+        val forsteSykdomsdag = sykepengesøknad.startSyketilfelle
         // Opptjeningstid = minst 4 uker i arbeid før sykdommen
         val fireUkerForSykdomsDag = forsteSykdomsdag.minus(4, ChronoUnit.WEEKS)
 
-        val arbeidsforhold = hentArbeidsforholdRest(AktørId(sykepengesoknad.aktorId), fireUkerForSykdomsDag, forsteSykdomsdag)
+        val arbeidsforhold = hentArbeidsforholdRest(AktørId(sykepengesøknad.aktorId), fireUkerForSykdomsDag, forsteSykdomsdag)
         return ArbeidsforholdFakta(arbeidsforhold.arbeidsforhold.map {
             ArbeidsgiverFakta(it.arbeidsgiver.organisasjonsnummer, it.arbeidsgiver.navn, it.startdato, it.sluttdato)
         })

@@ -4,15 +4,15 @@ import no.nav.helse.sykepenger.vilkar.Vilkårsgrunnlag
 import no.nav.helse.sykepenger.vilkar.sykepengevilkår
 import no.nav.nare.core.evaluations.Evaluering
 
-fun gjennomførVilkårsvurdering(søknad: AvklartFakta): Evaluering {
+fun gjennomførVilkårsvurdering(avklarteFakta: AvklarteFakta): Evaluering {
     val grunnlag = Vilkårsgrunnlag(
-            opptjeningstid = søknad.avklarteVerdier.opptjeningstid.fastsattVerdi.toInt(),
-            alder = søknad.avklarteVerdier.alder.fastsattVerdi,
-            erMedlem = søknad.avklarteVerdier.medlemsskap.fastsattVerdi,
+            opptjeningstid = avklarteFakta.avklarteVerdier.opptjeningstid.fastsattVerdi.toInt(),
+            alder = avklarteFakta.avklarteVerdier.alder.fastsattVerdi,
+            erMedlem = avklarteFakta.avklarteVerdier.medlemsskap.fastsattVerdi,
             ytelser = emptyList(),
-            søknadSendt = søknad.originalSøknad.sendtNav!!.toLocalDate(),
-            førsteDagSøknadGjelderFor = søknad.originalSøknad.fom,
-            fastsattÅrsinntekt = søknad.avklarteVerdier.sykepengegrunnlag.fastsattVerdi.sykepengegrunnlagNårTrygdenYter.fastsattVerdi,
+            søknadSendt = avklarteFakta.originalSøknad.sendtNav!!.toLocalDate(),
+            førsteDagSøknadGjelderFor = avklarteFakta.originalSøknad.fom,
+            fastsattÅrsinntekt = avklarteFakta.avklarteVerdier.sykepengegrunnlag.fastsattVerdi.sykepengegrunnlagNårTrygdenYter.fastsattVerdi,
             grunnbeløp = 96883
     )
 

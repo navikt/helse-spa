@@ -12,7 +12,6 @@ import no.nav.common.JAASCredential
 import no.nav.common.KafkaEnvironment
 import no.nav.helse.serde.JacksonNodeDeserializer
 import no.nav.helse.serde.JacksonSerializer
-import no.nav.helse.streams.JsonDeserializer
 import no.nav.helse.streams.Topics
 import org.apache.kafka.clients.CommonClientConfigs
 import org.apache.kafka.clients.consumer.ConsumerConfig
@@ -419,7 +418,7 @@ class EndToEndTest {
 """.trimIndent()
 
     private fun produserSøknad(aktørId: String) {
-        val søknad = Sykepengesoknad(
+        val søknad = Sykepengesøknad(
                 aktorId = aktørId,
                 arbeidsgiver = Arbeidsgiver("NAV", "97114455"),
                 soktUtenlandsopphold = false,
@@ -474,8 +473,8 @@ class EndToEndTest {
         }
     }
 
-    private fun produceOneMessage(message: Sykepengesoknad) {
-        val producer = KafkaProducer<String, Sykepengesoknad>(producerProperties())
+    private fun produceOneMessage(message: Sykepengesøknad) {
+        val producer = KafkaProducer<String, Sykepengesøknad>(producerProperties())
         producer.send(ProducerRecord(sykepengesoknadTopic.name, null, message))
         producer.flush()
     }

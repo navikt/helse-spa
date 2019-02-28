@@ -45,7 +45,7 @@ class BeregningTest {
 
     fun vilkårsprøvdSøknad(fom: LocalDate, tom: LocalDate, årslønn: Long, sykmeldingsgrad: Int) =
             Vilkårsprøving(
-                    originalSøknad = Sykepengesoknad(
+                    originalSøknad = Sykepengesøknad(
                             aktorId = "123123",
                             fom = fom,
                             tom = tom,

@@ -23,7 +23,6 @@ import org.apache.kafka.streams.errors.LogAndFailExceptionHandler
 import org.apache.kafka.streams.kstream.KStream
 import org.apache.kafka.streams.kstream.Predicate
 import org.slf4j.LoggerFactory
-import java.time.LocalDate
 import java.util.*
 
 class SaksbehandlingStream(val env: Environment) {
@@ -58,21 +57,21 @@ class SaksbehandlingStream(val env: Environment) {
         val builder = StreamsBuilder()
         val stream: KStream<String, JsonNode> = builder.consumeTopic(sykepengesoknadTopic)
 
-        val alleVerdierErAvklart: Predicate<String, AvklaringsResultat> = Predicate { _, søknad -> søknad is AvklartFakta }
+        val alleVerdierErAvklart: Predicate<String, AvklaringsResultat> = Predicate { _, søknad -> søknad is AvklarteFakta }
 
         val avklarteEllerUavklarte: Array<out KStream<String, AvklaringsResultat>> =
                 stream.peek { _, _ -> acceptCounter.labels("accepted").inc() }
-                        .mapValues { _, soknad -> toSykepengeSoknadOrAny(soknad) }
-                        .filter { _, soknad -> soknad is Sykepengesoknad }
-                        .mapValues { _, soknad -> soknad as Sykepengesoknad }
-                        .mapValues { _, soknad -> hentRegisterData(soknad) }
-                        .mapValues { _, soknad -> fastsettFakta(soknad) }
+                        .mapValues { _, råSøknad -> toSykepengeSoknadOrAny(råSøknad) }
+                        .filter { _, søknad -> søknad is Sykepengesøknad }
+                        .mapValues { _, søknad -> søknad as Sykepengesøknad }
+                        .mapValues { _, søknad -> hentRegisterData(søknad) }
+                        .mapValues { _, faktagrunnlag -> fastsettFakta(faktagrunnlag) }
                         .branch(alleVerdierErAvklart)
         //avklarteEllerUavklarte[1].to(Topics.UAVKLARTE_SØKNADER)
 
-        avklarteEllerUavklarte[0].mapValues { _, soknad -> prøvVilkår(soknad as AvklartFakta) }
-                .mapValues { _, soknad -> beregnSykepenger(soknad) }
-                .mapValues { _, soknad -> fattVedtak(soknad) }
+        avklarteEllerUavklarte[0].mapValues { _, avklarteFakta -> prøvVilkår(avklarteFakta as AvklarteFakta) }
+                .mapValues { _, vilkårsprøving -> beregnSykepenger(vilkårsprøving) }
+                .mapValues { _, sykepengeberegning -> fattVedtak(sykepengeberegning) }
                 .peek { _, _ ->
                     acceptCounter.labels("processed").inc()
                     log.error("processing message 6")
@@ -83,14 +82,13 @@ class SaksbehandlingStream(val env: Environment) {
     }
 
 
-    private fun toSykepengeSoknadOrAny(soknad: JsonNode?): Any {
+    private fun toSykepengeSoknadOrAny(soknad: JsonNode?): Any =
         try {
-            return defaultObjectMapper.treeToValue(soknad, Sykepengesoknad::class.java)
+            defaultObjectMapper.treeToValue(soknad, Sykepengesøknad::class.java)
         } catch (e: MissingKotlinParameterException) {
             log.error("Søknaden missing required field/value", e)
-            return Any()
+            Any()
         }
-    }
 
 
     fun start() {
@@ -101,33 +99,33 @@ class SaksbehandlingStream(val env: Environment) {
         consumer.stop()
     }
 
-    fun hentRegisterData(input: Sykepengesoknad): FaktagrunnlagResultat =
-            FaktagrunnlagResultat(originalSøknad = input,
+    fun hentRegisterData(søknad: Sykepengesøknad): FaktagrunnlagResultat =
+            FaktagrunnlagResultat(originalSøknad = søknad,
                     faktagrunnlag = Faktagrunnlag(
-                            tps = PersonOppslag(env.sparkelBaseUrl, stsClient).hentTPSData(input),
-                            beregningsperiode = Inntektsoppslag(env.sparkelBaseUrl, stsClient).hentBeregningsgrunnlag(input.aktorId, input.startSyketilfelle, input.startSyketilfelle.minusMonths(3)),
-                            sammenligningsperiode = Inntektsoppslag(env.sparkelBaseUrl, stsClient).hentSammenligningsgrunnlag(input.aktorId, input.startSyketilfelle, input.startSyketilfelle.minusYears(1)),
+                            tps = PersonOppslag(env.sparkelBaseUrl, stsClient).hentTPSData(søknad),
+                            beregningsperiode = Inntektsoppslag(env.sparkelBaseUrl, stsClient).hentBeregningsgrunnlag(søknad.aktorId, søknad.startSyketilfelle, søknad.startSyketilfelle.minusMonths(3)),
+                            sammenligningsperiode = Inntektsoppslag(env.sparkelBaseUrl, stsClient).hentSammenligningsgrunnlag(søknad.aktorId, søknad.startSyketilfelle, søknad.startSyketilfelle.minusYears(1)),
                             sykepengeliste = emptyList(),
-                            arbeidsforhold = ArbeidsforholdOppslag(env.sparkelBaseUrl, stsClient).hentArbeidsforhold(input))
+                            arbeidsforhold = ArbeidsforholdOppslag(env.sparkelBaseUrl, stsClient).hentArbeidsforhold(søknad))
             )
 
-    fun fastsettFakta(input: FaktagrunnlagResultat): AvklaringsResultat = vurderFakta(input)
+    fun fastsettFakta(fakta: FaktagrunnlagResultat): AvklaringsResultat = vurderFakta(fakta)
 
-    fun prøvVilkår(input: AvklartFakta): Vilkårsprøving = Vilkårsprøving(
-            originalSøknad = input.originalSøknad,
-            faktagrunnlag = input.faktagrunnlag,
-            avklarteVerdier = input.avklarteVerdier,
-            vilkårsprøving = gjennomførVilkårsvurdering(input))
+    fun prøvVilkår(avklarteFakta: AvklarteFakta): Vilkårsprøving = Vilkårsprøving(
+            originalSøknad = avklarteFakta.originalSøknad,
+            faktagrunnlag = avklarteFakta.faktagrunnlag,
+            avklarteVerdier = avklarteFakta.avklarteVerdier,
+            vilkårsprøving = gjennomførVilkårsvurdering(avklarteFakta))
 
-    fun beregnSykepenger(input: Vilkårsprøving): Sykepengeberegning =
+    fun beregnSykepenger(vilkårsprøving: Vilkårsprøving): Sykepengeberegning =
             Sykepengeberegning(
-                    originalSøknad = input.originalSøknad,
-                    faktagrunnlag = input.faktagrunnlag,
-                    avklarteVerdier = input.avklarteVerdier,
-                    vilkårsprøving = input.vilkårsprøving,
-                    beregning = beregn(lagBeregninggrunnlag(input)))
+                    originalSøknad = vilkårsprøving.originalSøknad,
+                    faktagrunnlag = vilkårsprøving.faktagrunnlag,
+                    avklarteVerdier = vilkårsprøving.avklarteVerdier,
+                    vilkårsprøving = vilkårsprøving.vilkårsprøving,
+                    beregning = beregn(lagBeregninggrunnlag(vilkårsprøving)))
 
-    fun fattVedtak(input: Sykepengeberegning): JsonNode = defaultObjectMapper.readTree(defaultObjectMapper.writeValueAsString(input))
+    fun fattVedtak(bergegning: Sykepengeberegning): JsonNode = defaultObjectMapper.readTree(defaultObjectMapper.writeValueAsString(bergegning))
 }
 
 val sykepengesoknadTopic = Topic(
