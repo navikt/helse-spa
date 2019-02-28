@@ -104,8 +104,8 @@ class SaksbehandlingStream(val env: Environment) {
             FaktagrunnlagResultat(originalSøknad = søknad,
                     faktagrunnlag = Faktagrunnlag(
                             tps = PersonOppslag(env.sparkelBaseUrl, stsClient).hentTPSData(søknad),
-                            beregningsperiode = Inntektsoppslag(env.sparkelBaseUrl, stsClient).hentBeregningsgrunnlag(søknad.aktorId, søknad.startSyketilfelle, søknad.startSyketilfelle.minusMonths(3)),
-                            sammenligningsperiode = Inntektsoppslag(env.sparkelBaseUrl, stsClient).hentSammenligningsgrunnlag(søknad.aktorId, søknad.startSyketilfelle, søknad.startSyketilfelle.minusYears(1)),
+                            beregningsperiode = Inntektsoppslag(env.sparkelBaseUrl, stsClient).hentBeregningsgrunnlag(søknad.aktorId, søknad.startSyketilfelle.minusMonths(3), søknad.startSyketilfelle),
+                            sammenligningsperiode = Inntektsoppslag(env.sparkelBaseUrl, stsClient).hentSammenligningsgrunnlag(søknad.aktorId, søknad.startSyketilfelle.minusYears(1), søknad.startSyketilfelle),
                             sykepengeliste = emptyList(),
                             arbeidsforhold = ArbeidsforholdOppslag(env.sparkelBaseUrl, stsClient).hentArbeidsforhold(søknad))
             )
