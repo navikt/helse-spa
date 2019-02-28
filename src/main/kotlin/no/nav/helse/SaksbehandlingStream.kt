@@ -5,8 +5,7 @@ import io.prometheus.client.CollectorRegistry
 import io.prometheus.client.Counter
 import no.nav.NarePrometheus
 import no.nav.helse.fastsetting.vurderFakta
-import no.nav.helse.serde.defaultObjectMapper
-import no.nav.helse.serde.jsonNodeSerde
+import no.nav.helse.serde.*
 import no.nav.helse.streams.StreamConsumer
 import no.nav.helse.streams.Topic
 import no.nav.helse.streams.Topics
@@ -23,6 +22,7 @@ import org.apache.kafka.streams.Topology
 import org.apache.kafka.streams.errors.LogAndFailExceptionHandler
 import org.apache.kafka.streams.kstream.KStream
 import org.apache.kafka.streams.kstream.Predicate
+import org.apache.kafka.streams.kstream.Produced
 import org.slf4j.LoggerFactory
 import java.util.*
 
@@ -67,8 +67,9 @@ class SaksbehandlingStream(val env: Environment) {
         val avklarteEllerUavklarte: Array<out KStream<String, AvklaringsResultat>> = stream
                         .mapValues { _, søknad -> hentRegisterData(søknad) }
                         .mapValues { _, faktagrunnlag -> fastsettFakta(faktagrunnlag) }
-                        .branch(alleVerdierErAvklart)
-        //avklarteEllerUavklarte[1].to(Topics.UAVKLARTE_SØKNADER)
+                        .branch(alleVerdierErAvklart, Predicate { _, _ -> true} )
+
+        avklarteEllerUavklarte[1].to(uavklartFaktaTopic.name, Produced.with(Serdes.String(), Serdes.serdeFrom(JacksonSerializer<AvklaringsResultat>(), JacksonDeserializer<AvklaringsResultat>(AvklaringsResultat::class.java))))
 
         avklarteEllerUavklarte[0].mapValues { _, avklarteFakta -> prøvVilkår(avklarteFakta as AvklarteFakta) }
                 .mapValues { _, vilkårsprøving -> beregnSykepenger(vilkårsprøving) }
@@ -137,6 +138,12 @@ val sykepengesoknadTopic = Topic(
 
 val sykepengevedtakTopic = Topic(
         name = Topics.VEDTAK_SYKEPENGER.name,
+        keySerde = Serdes.String(),
+        valueSerde = jsonNodeSerde
+)
+
+val uavklartFaktaTopic= Topic(
+        name = "privat-helse-sykepenger-uavklart",
         keySerde = Serdes.String(),
         valueSerde = jsonNodeSerde
 )
