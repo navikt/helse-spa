@@ -69,13 +69,9 @@ class SaksbehandlingStream(val env: Environment) {
         val stream = builder.consumeTopic(sykepengesoknadTopic)
                 .peek { _, _ -> acceptCounter.labels("accepted").inc() }
                 .filter { _, value -> value.has("status") && value.get("status").asText() == "SENDT" }
-                .peek{ _, _ -> println("---- filtered sendt ----") }
                 .mapValues { _, jsonNode -> deserializeSykepengesøknad(jsonNode) }
-                .peek{ _, _ -> println("---- deserialized ----") }
                 .filter { _, søknad -> søknad.isPresent }
-                .peek{ _, _ -> println("---- filtered søknad ----") }
                 .mapValues { _, søknad -> søknad.get() }
-                .peek{ _, _ -> println("---- mapped søknad.get() ----") }
 
         val alleVerdierErAvklart: Predicate<String, AvklaringsResultat> = Predicate { _, søknad -> søknad is AvklarteFakta }
 
