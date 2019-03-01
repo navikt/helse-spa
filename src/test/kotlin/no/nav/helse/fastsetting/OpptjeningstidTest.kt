@@ -1,6 +1,6 @@
 package no.nav.helse.fastsetting
 
-import no.nav.helse.ArbeidsgiverFakta
+import no.nav.helse.oppslag.ArbeidsgiverFakta
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.fail
 import org.junit.jupiter.api.Test

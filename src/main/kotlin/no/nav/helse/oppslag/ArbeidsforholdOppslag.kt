@@ -1,7 +1,8 @@
-package no.nav.helse
+package no.nav.helse.oppslag
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.github.kittinunf.fuel.httpGet
+import no.nav.helse.behandling.*
 import no.nav.helse.serde.defaultObjectMapper
 import org.slf4j.LoggerFactory
 import java.time.LocalDate

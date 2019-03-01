@@ -1,7 +1,7 @@
 package no.nav.helse.fastsetting
 
-import no.nav.helse.Arbeidsgiver
-import no.nav.helse.Inntekt
+import no.nav.helse.behandling.Arbeidsgiver
+import no.nav.helse.oppslag.Inntekt
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.YearMonth

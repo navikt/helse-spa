@@ -10,6 +10,7 @@ import com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import no.nav.common.JAASCredential
 import no.nav.common.KafkaEnvironment
+import no.nav.helse.behandling.*
 import no.nav.helse.serde.JacksonNodeDeserializer
 import no.nav.helse.serde.JacksonSerializer
 import no.nav.helse.streams.Topics

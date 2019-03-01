@@ -1,7 +1,7 @@
 package no.nav.helse.fastsetting
 
-import no.nav.helse.ArbeidsforholdFakta
-import no.nav.helse.FaktagrunnlagResultat
+import no.nav.helse.oppslag.ArbeidsforholdFakta
+import no.nav.helse.behandling.FaktagrunnlagResultat
 import no.nav.nare.core.evaluations.Evaluering
 import no.nav.nare.core.evaluations.Resultat
 

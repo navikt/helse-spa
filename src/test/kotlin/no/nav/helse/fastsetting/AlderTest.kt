@@ -1,6 +1,7 @@
 package no.nav.helse.fastsetting
 
 import no.nav.helse.*
+import no.nav.helse.behandling.*
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail

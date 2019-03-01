@@ -1,6 +1,8 @@
 package no.nav.helse.fastsetting
 
 import no.nav.helse.*
+import no.nav.helse.behandling.*
+import no.nav.helse.oppslag.*
 import java.time.LocalDate
 import java.time.LocalDateTime
 

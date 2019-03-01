@@ -4,8 +4,10 @@ import com.fasterxml.jackson.databind.JsonNode
 import io.prometheus.client.CollectorRegistry
 import io.prometheus.client.Counter
 import no.nav.NarePrometheus
+import no.nav.helse.behandling.*
 import no.nav.helse.fastsetting.Vurdering
 import no.nav.helse.fastsetting.vurderFakta
+import no.nav.helse.oppslag.*
 import no.nav.helse.serde.JacksonDeserializer
 import no.nav.helse.serde.JacksonSerializer
 import no.nav.helse.serde.defaultObjectMapper

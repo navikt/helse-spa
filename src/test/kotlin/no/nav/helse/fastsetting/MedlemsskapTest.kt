@@ -1,6 +1,6 @@
 package no.nav.helse.fastsetting
 
-import no.nav.helse.FaktagrunnlagResultat
+import no.nav.helse.behandling.FaktagrunnlagResultat
 import no.nav.helse.faktagrunnlagUtenVerdi
 import no.nav.helse.soknadUtenVerdi
 import no.nav.helse.tpsFaktaUtenVerdi

@@ -1,4 +1,4 @@
-package no.nav.helse
+package no.nav.helse.behandling
 
 import no.nav.helse.sykepenger.beregning.Beregningsgrunnlag
 

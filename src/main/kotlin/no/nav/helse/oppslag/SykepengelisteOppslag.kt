@@ -1,4 +1,4 @@
-package no.nav.helse
+package no.nav.helse.oppslag
 
 import com.github.kittinunf.fuel.httpGet
 import no.nav.helse.serde.defaultObjectMapper

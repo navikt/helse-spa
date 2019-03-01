@@ -1,5 +1,6 @@
 package no.nav.helse
 
+import no.nav.helse.behandling.*
 import no.nav.helse.fastsetting.*
 import no.nav.helse.sykepenger.beregning.beregn
 import no.nav.nare.core.evaluations.Evaluering
@@ -55,7 +56,7 @@ class BeregningTest {
                             soknadsperioder = listOf(Soknadsperiode(LocalDate.parse("2019-01-05"), LocalDate.parse("2019-01-31"), sykmeldingsgrad = sykmeldingsgrad)),
                             soktUtenlandsopphold = false,
                             startSyketilfelle = LocalDate.parse("2018-12-01"),
-                            status="SENDT"),
+                            status = "SENDT"),
                     faktagrunnlag = faktagrunnlagUtenVerdi,
                     avklarteVerdier = AvklarteVerdier(
                             medlemsskap = Vurdering.Avklart(fastsattVerdi = true, begrunnelse = "derfor", fastsattAv = "test", grunnlag = Medlemsskapgrunnlag("NO")),

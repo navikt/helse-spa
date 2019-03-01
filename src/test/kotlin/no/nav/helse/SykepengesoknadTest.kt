@@ -1,5 +1,6 @@
 package no.nav.helse
 
+import no.nav.helse.behandling.*
 import no.nav.helse.serde.JacksonDeserializer
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test

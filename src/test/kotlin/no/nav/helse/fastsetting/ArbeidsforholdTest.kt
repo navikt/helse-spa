@@ -1,11 +1,11 @@
 package no.nav.helse.fastsetting
 
 import com.fasterxml.jackson.module.kotlin.readValue
-import no.nav.helse.Arbeidsforhold
-import no.nav.helse.ArbeidsforholdFakta
-import no.nav.helse.ArbeidsgiverFakta
-import no.nav.helse.FaktagrunnlagResultat
-import no.nav.helse.Faktagrunnlag
+import no.nav.helse.oppslag.Arbeidsforhold
+import no.nav.helse.oppslag.ArbeidsforholdFakta
+import no.nav.helse.oppslag.ArbeidsgiverFakta
+import no.nav.helse.behandling.FaktagrunnlagResultat
+import no.nav.helse.behandling.Faktagrunnlag
 import no.nav.helse.originalSoknad
 import no.nav.helse.serde.defaultObjectMapper
 import no.nav.helse.tpsFaktaUtenVerdi

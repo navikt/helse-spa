@@ -1,6 +1,6 @@
 package no.nav.helse.fastsetting
 
-import no.nav.helse.ArbeidsgiverFakta
+import no.nav.helse.oppslag.ArbeidsgiverFakta
 import java.time.LocalDate
 
 typealias Opptjeningstid = Long

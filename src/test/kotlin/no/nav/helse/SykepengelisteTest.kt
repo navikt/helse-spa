@@ -1,6 +1,7 @@
 package no.nav.helse
 
 import com.fasterxml.jackson.module.kotlin.readValue
+import no.nav.helse.oppslag.*
 import no.nav.helse.serde.defaultObjectMapper
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test

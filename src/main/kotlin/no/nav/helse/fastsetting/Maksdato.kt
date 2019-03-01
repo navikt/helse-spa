@@ -1,6 +1,7 @@
 package no.nav.helse.fastsetting
 
 import no.nav.helse.*
+import no.nav.helse.oppslag.*
 import java.time.LocalDate
 
 data class TomtMaksdatoGrunnlag(val aarsak: String = "Venter på neste steg i fastsetting av fakta")

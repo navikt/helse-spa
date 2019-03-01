@@ -1,9 +1,9 @@
 package no.nav.helse.fastsetting
 
-import no.nav.helse.Arbeidsgiver
-import no.nav.helse.Inntekt
-import no.nav.helse.Inntektsarbeidsgiver
-import no.nav.helse.Opptjeningsperiode
+import no.nav.helse.behandling.Arbeidsgiver
+import no.nav.helse.oppslag.Inntekt
+import no.nav.helse.oppslag.Inntektsarbeidsgiver
+import no.nav.helse.oppslag.Opptjeningsperiode
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
