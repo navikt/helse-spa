@@ -1,11 +1,11 @@
 package no.nav.helse.fastsetting
 
-import no.nav.helse.oppslag.ArbeidsgiverFakta
-import java.time.LocalDate
+import no.nav.helse.domain.*
+import java.time.*
 
 typealias Opptjeningstid = Long
 
-data class Opptjeningsgrunnlag(val førsteSykdomsdag: LocalDate, val arbeidsforhold: List<ArbeidsgiverFakta>)
+data class Opptjeningsgrunnlag(val førsteSykdomsdag: LocalDate, val arbeidsforhold: List<Arbeidsforhold>)
 
 fun vurderOpptjeningstid(opptjeningsgrunnlag: Opptjeningsgrunnlag): Vurdering<Opptjeningstid, Opptjeningsgrunnlag> =
     if (opptjeningsgrunnlag.arbeidsforhold.size != 1) {

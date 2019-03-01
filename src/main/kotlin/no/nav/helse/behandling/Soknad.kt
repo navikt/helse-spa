@@ -1,6 +1,7 @@
 package no.nav.helse.behandling
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import no.nav.helse.domain.*
 import no.nav.helse.fastsetting.*
 import no.nav.helse.fastsetting.Opptjeningsgrunnlag
 import no.nav.helse.fastsetting.Opptjeningstid
@@ -42,7 +43,7 @@ data class AvklarteVerdier(
         val alder: Vurdering.Avklart<Alder, Aldersgrunnlag>,
         val maksdato: Vurdering.Avklart<LocalDate, Any>,
         val sykepengeliste: Collection<SykepengerVedtak>,
-        val arbeidsforhold: Vurdering.Avklart<Boolean, ArbeidsforholdFakta>,
+        val arbeidsforhold: Vurdering.Avklart<Boolean, List<Arbeidsforhold>>,
         val opptjeningstid: Vurdering.Avklart<Opptjeningstid, Opptjeningsgrunnlag>,
         val sykepengegrunnlag: Vurdering.Avklart<Sykepengegrunnlag, Beregningsperiode>
 )
@@ -58,7 +59,7 @@ data class UavklarteVerdier(
         val alder: Vurdering<Alder, Aldersgrunnlag>,
         val maksdato: Vurdering<LocalDate, Any>,
         val sykepengeliste: Collection<SykepengerVedtak>,
-        val arbeidsforhold: Vurdering<Boolean, ArbeidsforholdFakta>,
+        val arbeidsforhold: Vurdering<Boolean, List<Arbeidsforhold>>,
         val opptjeningstid: Vurdering<Opptjeningstid, Opptjeningsgrunnlag>,
         val sykepengegrunnlag: Vurdering<Sykepengegrunnlag, Beregningsperiode>
 ) {
@@ -97,8 +98,6 @@ data class SykepengeVedtak(
 
 data class Vedtak(val resultat: String = "Jeg har ikke laget noe vedtak")
 
-data class Arbeidsgiver(val navn: String, val orgnummer: String)
-
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class Soknadsperiode(val fom: LocalDate,
                           val tom: LocalDate,
@@ -108,6 +107,6 @@ data class Faktagrunnlag(val tps: Tpsfakta,
                          val beregningsperiode: List<Inntekt>,
                          val sammenligningsperiode: List<Inntekt>,
                          val sykepengeliste: Collection<SykepengerVedtak>,
-                         val arbeidsforhold: ArbeidsforholdFakta)
+                         val arbeidsforhold: List<Arbeidsforhold>)
 
 data class Tpsfakta(val fodselsdato: LocalDate, val bostedland: String)

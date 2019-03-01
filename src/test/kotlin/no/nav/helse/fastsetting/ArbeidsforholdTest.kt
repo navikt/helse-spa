@@ -1,20 +1,16 @@
 package no.nav.helse.fastsetting
 
-import com.fasterxml.jackson.module.kotlin.readValue
-import no.nav.helse.oppslag.Arbeidsforhold
-import no.nav.helse.oppslag.ArbeidsforholdFakta
-import no.nav.helse.oppslag.ArbeidsgiverFakta
-import no.nav.helse.behandling.FaktagrunnlagResultat
-import no.nav.helse.behandling.Faktagrunnlag
-import no.nav.helse.originalSoknad
-import no.nav.helse.serde.defaultObjectMapper
-import no.nav.helse.tpsFaktaUtenVerdi
-import org.assertj.core.api.Assertions.assertThat
+import com.fasterxml.jackson.module.kotlin.*
+import no.nav.helse.*
+import no.nav.helse.behandling.*
+import no.nav.helse.domain.*
+import no.nav.helse.serde.*
+import org.assertj.core.api.Assertions.*
 import org.assertj.core.api.Assertions.fail
-import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
-import org.slf4j.LoggerFactory
-import java.time.LocalDate
+import org.slf4j.*
+import java.time.*
 
 class ArbeidsforholdTest {
 
@@ -22,15 +18,15 @@ class ArbeidsforholdTest {
 
     @Test
     fun hentArbeidsforhold() {
-        val arbeidsforhold : Arbeidsforhold = defaultObjectMapper.readValue(ArbeidsforholdTest::class.java.
+        val arbeidsforhold : List<Arbeidsforhold> = defaultObjectMapper.readValue(ArbeidsforholdTest::class.java.
                 classLoader.getResourceAsStream("arbeidsforhold.json"))
-        assertEquals("1111111111", arbeidsforhold.arbeidsforhold.get(0).arbeidsgiver.organisasjonsnummer)
+        assertEquals("1111111111", arbeidsforhold[0].arbeidsgiver.orgnummer)
     }
 
     @Test
     fun `vurder arbeidsforhold med en arbeidsgiver`() {
-        val arbeidsforholdFakta = ArbeidsforholdFakta(listOf(ArbeidsgiverFakta("1111", "Test 1", LocalDate.now(), null)))
-        val faktagrunnlag = Faktagrunnlag(tps = tpsFaktaUtenVerdi, beregningsperiode = emptyList(), sammenligningsperiode = emptyList(), arbeidsforhold = arbeidsforholdFakta,
+        val arbeidsforhold = listOf(Arbeidsforhold(Arbeidsgiver("Test 1", "1111"), LocalDate.now(), null))
+        val faktagrunnlag = Faktagrunnlag(tps = tpsFaktaUtenVerdi, beregningsperiode = emptyList(), sammenligningsperiode = emptyList(), arbeidsforhold = arbeidsforhold,
                 sykepengeliste = emptyList())
         val vurdering = vurderArbeidsforhold(FaktagrunnlagResultat(originalSoknad, faktagrunnlag))
         if (vurdering is Vurdering.Avklart) assertThat(vurdering.fastsattVerdi).isTrue() else fail("Feil vurdering!")
@@ -39,8 +35,8 @@ class ArbeidsforholdTest {
 
     @Test
     fun `vurder arbeidsforhold med feil arbeidsgiver`() {
-        val arbeidsforholdFakta = ArbeidsforholdFakta(listOf(ArbeidsgiverFakta("2222", "Test 2", LocalDate.now(), null)))
-        val faktagrunnlag = Faktagrunnlag(tps = tpsFaktaUtenVerdi, beregningsperiode = emptyList(), sammenligningsperiode = emptyList(), arbeidsforhold = arbeidsforholdFakta,
+        val arbeidsforhold = listOf(Arbeidsforhold(Arbeidsgiver("Test 2", "2222"), LocalDate.now(), null))
+        val faktagrunnlag = Faktagrunnlag(tps = tpsFaktaUtenVerdi, beregningsperiode = emptyList(), sammenligningsperiode = emptyList(), arbeidsforhold = arbeidsforhold,
                 sykepengeliste = emptyList())
         val vurdering = vurderArbeidsforhold(FaktagrunnlagResultat(originalSoknad, faktagrunnlag))
         if (vurdering is Vurdering.Avklart) assertThat(vurdering.fastsattVerdi).isFalse() else fail("Feil vurdering!")
@@ -49,9 +45,9 @@ class ArbeidsforholdTest {
 
     @Test
     fun `vurder arbeidsforhold med flere arbeidsgiverer`() {
-        val arbeidsforholdFakta = ArbeidsforholdFakta(listOf(ArbeidsgiverFakta("1111", "Test 1", LocalDate.now(), null),
-                ArbeidsgiverFakta("2222", "Test 2", LocalDate.now(), null)))
-        val faktagrunnlag = Faktagrunnlag(tps = tpsFaktaUtenVerdi, beregningsperiode = emptyList(), sammenligningsperiode = emptyList(), arbeidsforhold = arbeidsforholdFakta,
+        val arbeidsforhold = listOf(Arbeidsforhold(Arbeidsgiver("Test 1", "1111"), LocalDate.now(), null),
+                Arbeidsforhold(Arbeidsgiver("Test 2", "2222"), LocalDate.now(), null))
+        val faktagrunnlag = Faktagrunnlag(tps = tpsFaktaUtenVerdi, beregningsperiode = emptyList(), sammenligningsperiode = emptyList(), arbeidsforhold = arbeidsforhold,
                 sykepengeliste = emptyList())
         val vurdering = vurderArbeidsforhold(FaktagrunnlagResultat(originalSoknad, faktagrunnlag))
         if (vurdering is Vurdering.Uavklart) assertThat(vurdering.årsak== Vurdering.Uavklart.Årsak.KREVER_SKJØNNSMESSIG_VURDERING).isTrue() else fail("Feil vurdering!")

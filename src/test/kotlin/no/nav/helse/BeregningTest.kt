@@ -1,17 +1,15 @@
 package no.nav.helse
 
 import no.nav.helse.behandling.*
+import no.nav.helse.domain.*
 import no.nav.helse.fastsetting.*
-import no.nav.helse.sykepenger.beregning.beregn
-import no.nav.nare.core.evaluations.Evaluering
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Test
-import java.math.BigDecimal
-import java.math.RoundingMode
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.LocalTime
-import java.time.ZoneOffset
+import no.nav.helse.fastsetting.Sykepengegrunnlag
+import no.nav.helse.sykepenger.beregning.*
+import no.nav.nare.core.evaluations.*
+import org.junit.jupiter.api.*
+import org.junit.jupiter.api.Assertions.*
+import java.math.*
+import java.time.*
 
 class BeregningTest {
 
@@ -68,7 +66,7 @@ class BeregningTest {
                                     begrunnelse = "derfor",
                                     grunnlag = Beregningsperiode(emptyList(), "derfor")),
                             alder = Vurdering.Avklart(fastsattVerdi = 40, grunnlag = Aldersgrunnlag(LocalDate.parse("1979-01-01")), begrunnelse = "derfor", fastsattAv = "test"),
-                            arbeidsforhold = Vurdering.Avklart(fastsattVerdi = true, grunnlag = arbeidsforholdFaktaUtenVerdi, begrunnelse = "derfor", fastsattAv = "test"),
+                            arbeidsforhold = Vurdering.Avklart(fastsattVerdi = true, grunnlag = arbeidsforholdUtenVerdi, begrunnelse = "derfor", fastsattAv = "test"),
                             maksdato = Vurdering.Avklart(fastsattVerdi = LocalDate.parse("2019-03-03"), grunnlag = emptyList<LocalDate>(), begrunnelse = "derfor", fastsattAv = "test"),
                             sykepengeliste = emptyList(),
                             opptjeningstid = Vurdering.Avklart(fastsattVerdi = 20, grunnlag = Opptjeningsgrunnlag(førsteSykdomsdag = LocalDate.parse("2018-12-01"), arbeidsforhold = emptyList()), begrunnelse = "defor", fastsattAv = "test")),

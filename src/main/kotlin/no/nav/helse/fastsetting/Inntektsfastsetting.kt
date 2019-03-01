@@ -1,6 +1,6 @@
 package no.nav.helse.fastsetting
 
-import no.nav.helse.behandling.Arbeidsgiver
+import no.nav.helse.domain.*
 import no.nav.helse.oppslag.Inntekt
 import java.math.BigDecimal
 import java.time.LocalDate

@@ -1,18 +1,17 @@
-{
-  "arbeidsforhold": [
+[
     {
       "arbeidsgiver": {
         "navn": "FIRMA 1",
-        "organisasjonsnummer": "1111111111"
+        "orgnummer": "1111111111"
       },
       "startdato": "2017-01-01"
     },
     {
       "arbeidsgiver": {
         "navn": "FIRMA 2",
-        "organisasjonsnummer": "2222222222"
+        "orgnummer": "2222222222"
       },
       "startdato": "2017-01-01"
     }
-  ]
-}
+]
+

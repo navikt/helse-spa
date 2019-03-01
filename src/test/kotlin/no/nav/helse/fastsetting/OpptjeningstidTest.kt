@@ -1,17 +1,17 @@
 package no.nav.helse.fastsetting
 
-import no.nav.helse.oppslag.ArbeidsgiverFakta
-import org.junit.jupiter.api.Assertions.assertEquals
+import no.nav.helse.domain.*
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Assertions.fail
 import org.junit.jupiter.api.Test
-import java.time.LocalDate
+import java.time.*
 
 class OpptjeningstidTest {
 
     @Test
     fun `kan ikke fastsette opptjeningstid om søker ikke har noen arbeidsgivere`() {
         val førsteSykdomsdag = LocalDate.parse("2019-01-01")
-        val arbeidsforhold = emptyList<ArbeidsgiverFakta>()
+        val arbeidsforhold = emptyList<Arbeidsforhold>()
         val actual = vurderOpptjeningstid(Opptjeningsgrunnlag(førsteSykdomsdag, arbeidsforhold))
 
         when (actual) {
@@ -27,8 +27,8 @@ class OpptjeningstidTest {
     fun `kan ikke fastsette opptjeningstid om søker har flere enn 1 arbeidsgiver`() {
         val førsteSykdomsdag = LocalDate.parse("2019-01-01")
         val arbeidsforhold = listOf(
-                ArbeidsgiverFakta("11223344", null, LocalDate.now(), null),
-                ArbeidsgiverFakta("11223344", null, LocalDate.now(), null)
+                Arbeidsforhold(Arbeidsgiver("ukjent", "11223344"), LocalDate.now(), null),
+                Arbeidsforhold(Arbeidsgiver("ukjwnt", "11223344"), LocalDate.now(), null)
         )
         val actual = vurderOpptjeningstid(Opptjeningsgrunnlag(førsteSykdomsdag, arbeidsforhold))
 
@@ -45,7 +45,7 @@ class OpptjeningstidTest {
     fun `kan ikke fastsette opptjeningstid om søker har avsluttet arbeidsforholdet`() {
         val førsteSykdomsdag = LocalDate.parse("2019-01-01")
         val arbeidsforhold = listOf(
-                ArbeidsgiverFakta("11223344", null, LocalDate.now(), LocalDate.now())
+                Arbeidsforhold(Arbeidsgiver("ukjwnt", "11223344"), LocalDate.now(), LocalDate.now())
         )
         val actual = vurderOpptjeningstid(Opptjeningsgrunnlag(førsteSykdomsdag, arbeidsforhold))
 
@@ -62,7 +62,7 @@ class OpptjeningstidTest {
     fun `opptjeningstid er lik antall dager søker har vært i arbeid før han eller hun ble syk`() {
         val førsteSykdomsdag = LocalDate.parse("2019-01-01")
         val arbeidsforhold = listOf(
-                ArbeidsgiverFakta("11223344", null, LocalDate.parse("2018-12-01"), null)
+                Arbeidsforhold(Arbeidsgiver("ukjwnt", "11223344"), LocalDate.parse("2018-12-01"), null)
         )
         val actual = vurderOpptjeningstid(Opptjeningsgrunnlag(førsteSykdomsdag, arbeidsforhold))
 

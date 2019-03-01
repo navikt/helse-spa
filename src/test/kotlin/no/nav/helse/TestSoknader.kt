@@ -1,25 +1,22 @@
 package no.nav.helse
 
 import no.nav.helse.behandling.*
-import no.nav.helse.oppslag.*
-import java.time.LocalDate
-import java.time.LocalDateTime
+import no.nav.helse.domain.*
+import java.time.*
 
 val tpsFaktaUtenVerdi = Tpsfakta(
         fodselsdato = LocalDate.now(),
         bostedland = "bytt ut dette i tester"
 )
 
-val arbeidsforholdFaktaUtenVerdi = ArbeidsforholdFakta(
-        arbeidsgivere = emptyList()
-)
+val arbeidsforholdUtenVerdi = emptyList<Arbeidsforhold>()
 
 val faktagrunnlagUtenVerdi = Faktagrunnlag(
         tps = tpsFaktaUtenVerdi,
         beregningsperiode = emptyList(),
         sammenligningsperiode = emptyList(),
         sykepengeliste = emptyList(),
-        arbeidsforhold = arbeidsforholdFaktaUtenVerdi
+        arbeidsforhold = arbeidsforholdUtenVerdi
 )
 
 val originalSoknad = Sykepengesøknad(

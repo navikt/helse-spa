@@ -2,6 +2,7 @@ package no.nav.helse.fastsetting
 
 import no.nav.helse.*
 import no.nav.helse.behandling.*
+import no.nav.helse.domain.*
 import no.nav.helse.oppslag.*
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -40,7 +41,7 @@ fun vurderFakta(fakta: FaktagrunnlagResultat): AvklaringsResultat {
     val medlemsskap = vurderMedlemskap(fakta)
     val alder = vurderAlderPåSisteDagISøknadsPeriode(fakta)
     val arbeidsforhold = vurderArbeidsforhold(fakta)
-    val opptjeningstid = vurderOpptjeningstid(Opptjeningsgrunnlag(fakta.originalSøknad.startSyketilfelle, fakta.faktagrunnlag.arbeidsforhold.arbeidsgivere))
+    val opptjeningstid = vurderOpptjeningstid(Opptjeningsgrunnlag(fakta.originalSøknad.startSyketilfelle, fakta.faktagrunnlag.arbeidsforhold))
     val sykepengegrunnlag = fastsettingAvSykepengegrunnlaget(fakta.originalSøknad.startSyketilfelle, fakta.originalSøknad.arbeidsgiver, fakta.faktagrunnlag.beregningsperiode, fakta.faktagrunnlag.sammenligningsperiode)
     val maksdato = vurderMaksdato(alder,
             fakta.originalSøknad.startSyketilfelle,
@@ -69,7 +70,7 @@ fun vurderFakta(fakta: FaktagrunnlagResultat): AvklaringsResultat {
                 avklarteVerdier = AvklarteVerdier(
                         medlemsskap = medlemsskap as Vurdering.Avklart<Boolean, Medlemsskapgrunnlag>,
                         alder = alder as Vurdering.Avklart<Alder, Aldersgrunnlag>,
-                        arbeidsforhold = arbeidsforhold as Vurdering.Avklart<Boolean, ArbeidsforholdFakta>,
+                        arbeidsforhold = arbeidsforhold as Vurdering.Avklart<Boolean, List<Arbeidsforhold>>,
                         opptjeningstid = opptjeningstid as Vurdering.Avklart<Opptjeningstid, Opptjeningsgrunnlag>,
                         sykepengegrunnlag = sykepengegrunnlag as Vurdering.Avklart<Sykepengegrunnlag, Beregningsperiode>,
                         sykepengeliste = fakta.faktagrunnlag.sykepengeliste,

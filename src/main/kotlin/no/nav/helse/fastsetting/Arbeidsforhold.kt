@@ -1,11 +1,10 @@
 package no.nav.helse.fastsetting
 
-import no.nav.helse.oppslag.ArbeidsforholdFakta
-import no.nav.helse.behandling.FaktagrunnlagResultat
-import no.nav.nare.core.evaluations.Evaluering
-import no.nav.nare.core.evaluations.Resultat
+import no.nav.helse.behandling.*
+import no.nav.helse.domain.*
+import no.nav.nare.core.evaluations.*
 
-fun vurderArbeidsforhold(fakta : FaktagrunnlagResultat) : Vurdering<Boolean, ArbeidsforholdFakta> {
+fun vurderArbeidsforhold(fakta : FaktagrunnlagResultat) : Vurdering<Boolean, List<Arbeidsforhold>> {
 
     val orgnummer= fakta.originalSøknad.arbeidsgiver.orgnummer
     val arbeidsforholdFakta = fakta.faktagrunnlag.arbeidsforhold
@@ -18,9 +17,9 @@ fun vurderArbeidsforhold(fakta : FaktagrunnlagResultat) : Vurdering<Boolean, Arb
 
 }
 
-fun evaluerArbeidsforhold(orgnummer: String, fakta: ArbeidsforholdFakta): Evaluering =
+fun evaluerArbeidsforhold(orgnummer: String, fakta: List<Arbeidsforhold>): Evaluering =
         when {
-            fakta.arbeidsgivere.size > 1 -> Evaluering.kanskje("Søker har flere arbeidsgivere, systemet støtter ikke dette enda")
-            fakta.arbeidsgivere[0].organisasjonsnummer == orgnummer -> Evaluering.ja("Søker har en arbeidsgiver med orgnummer $orgnummer")
+            fakta.size > 1 -> Evaluering.kanskje("Søker har flere arbeidsgivere, systemet støtter ikke dette enda")
+            fakta[0].arbeidsgiver.orgnummer == orgnummer -> Evaluering.ja("Søker har en arbeidsgiver med orgnummer $orgnummer")
             else -> Evaluering.nei("Søker har ikke en arbeidsgiver med orgnummer $orgnummer")
         }

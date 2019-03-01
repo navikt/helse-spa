@@ -1,34 +1,25 @@
 package no.nav.helse
 
-import com.fasterxml.jackson.databind.JsonNode
-import com.github.tomakehurst.wiremock.WireMockServer
+import com.fasterxml.jackson.databind.*
+import com.github.tomakehurst.wiremock.*
 import com.github.tomakehurst.wiremock.client.WireMock.any
 import com.github.tomakehurst.wiremock.client.WireMock.configureFor
 import com.github.tomakehurst.wiremock.client.WireMock.okJson
 import com.github.tomakehurst.wiremock.client.WireMock.stubFor
 import com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo
-import com.github.tomakehurst.wiremock.core.WireMockConfiguration
-import no.nav.common.JAASCredential
-import no.nav.common.KafkaEnvironment
+import com.github.tomakehurst.wiremock.core.*
+import no.nav.common.*
 import no.nav.helse.behandling.*
-import no.nav.helse.serde.JacksonNodeDeserializer
-import no.nav.helse.serde.JacksonSerializer
-import no.nav.helse.streams.Topics
-import org.apache.kafka.clients.CommonClientConfigs
-import org.apache.kafka.clients.consumer.ConsumerConfig
-import org.apache.kafka.clients.consumer.KafkaConsumer
-import org.apache.kafka.clients.producer.KafkaProducer
-import org.apache.kafka.clients.producer.ProducerConfig
-import org.apache.kafka.clients.producer.ProducerRecord
-import org.apache.kafka.common.config.SaslConfigs
-import org.junit.jupiter.api.AfterAll
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertNotNull
-import org.junit.jupiter.api.BeforeAll
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
-import java.time.Duration
-import java.time.LocalDate
+import no.nav.helse.domain.*
+import no.nav.helse.serde.*
+import no.nav.helse.streams.*
+import org.apache.kafka.clients.*
+import org.apache.kafka.clients.consumer.*
+import org.apache.kafka.clients.producer.*
+import org.apache.kafka.common.config.*
+import org.junit.jupiter.api.*
+import org.junit.jupiter.api.Assertions.*
+import java.time.*
 import java.util.*
 
 class EndToEndTest {
@@ -96,9 +87,6 @@ class EndToEndTest {
     fun `behandle en søknad`() {
         val aktørId = "11987654321"
 
-        println("Kafka: ${embeddedEnvironment.brokersURL}")
-        println("Zookeeper: ${embeddedEnvironment.serverPark.zookeeper.host}:${embeddedEnvironment.serverPark.zookeeper.port}")
-
         restStsStub()
         personStub(aktørId)
         inntektStub(aktørId)
@@ -106,317 +94,13 @@ class EndToEndTest {
 
         produserSøknad(aktørId)
 
-        val expected = forventetVedtak()
         val actual = ventPåVedtak()!!
-
-        println(actual)
 
         assertNotNull(actual)
         assertNotNull(actual.get("avklarteVerdier"))
         assertEquals(actual.get("avklarteVerdier").get("medlemsskap").get("fastsattVerdi").booleanValue(), true)
         assertEquals(actual.get("avklarteVerdier").get("medlemsskap").get("fastsattAv").textValue(), "SPA")
     }
-
-    private fun forventetVedtak() = """
-{
-  "maksdato": {
-    "grunnlag": {
-      "førsteFraværsdag": "2019-01-01",
-      "førsteSykepengedag": "2019-01-01",
-      "personensAlder": 48,
-      "yrkesstatus": "ARBEIDSTAKER",
-      "tidligerePerioder": []
-    },
-    "begrunnelse": "§ 8-12: ARBEIDSTAKER på 48 år gir maks 248 dager. 0 av disse er forbrukt",
-    "fastsattVerdi": "2019-12-12",
-    "vurderingstidspunkt": "BLIR_IKKE_MATCHET",
-    "fastsattAv": "SPA"
-  },
-  "medlemsskap": {
-    "grunnlag": {
-      "bostedsland": "NOR"
-    },
-    "begrunnelse": "(Søker er bosatt i Norge. ELLER Vi har ikke nok informasjon til å kunne gi et entydig svar.)",
-    "fastsattVerdi": true,
-    "vurderingstidspunkt": "BLIR_IKKE_MATCHET",
-    "fastsattAv": "SPA"
-  },
-  "sykepengegrunnlag": {
-    "begrunnelse": "",
-    "grunnlag": {
-      "begrunnelse": "§ 8-30 andre ledd – rapportert inntekt (se § 8-29) til a-ordningen etter reglene i a-opplysningsloven de siste tolv kalendermånedene før arbeidsuførheten inntraff (2019-01-01) legges til grunn.",
-      "inntekter": [
-        {
-          "arbeidsgiver": {
-            "orgnr": "97114455"
-          },
-          "beløp": 25000,
-          "opptjeningsperiode": {
-            "tom": "2018-12-31",
-            "fom": "2018-12-01"
-          }
-        },
-        {
-          "arbeidsgiver": {
-            "orgnr": "97114455"
-          },
-          "beløp": 25000,
-          "opptjeningsperiode": {
-            "tom": "2018-11-30",
-            "fom": "2018-11-01"
-          }
-        },
-        {
-          "arbeidsgiver": {
-            "orgnr": "97114455"
-          },
-          "beløp": 25000,
-          "opptjeningsperiode": {
-            "tom": "2018-10-31",
-            "fom": "2018-10-01"
-          }
-        },
-        {
-          "arbeidsgiver": {
-            "orgnr": "97114455"
-          },
-          "beløp": 25000,
-          "opptjeningsperiode": {
-            "tom": "2018-09-30",
-            "fom": "2018-09-01"
-          }
-        },
-        {
-          "arbeidsgiver": {
-            "orgnr": "97114455"
-          },
-          "beløp": 25000,
-          "opptjeningsperiode": {
-            "tom": "2018-08-31",
-            "fom": "2018-08-01"
-          }
-        },
-        {
-          "arbeidsgiver": {
-            "orgnr": "97114455"
-          },
-          "beløp": 25000,
-          "opptjeningsperiode": {
-            "tom": "2018-07-31",
-            "fom": "2018-07-01"
-          }
-        },
-        {
-          "arbeidsgiver": {
-            "orgnr": "97114455"
-          },
-          "beløp": 25000,
-          "opptjeningsperiode": {
-            "tom": "2018-06-30",
-            "fom": "2018-06-01"
-          }
-        },
-        {
-          "arbeidsgiver": {
-            "orgnr": "97114455"
-          },
-          "beløp": 25000,
-          "opptjeningsperiode": {
-            "tom": "2018-05-31",
-            "fom": "2018-05-01"
-          }
-        },
-        {
-          "arbeidsgiver": {
-            "orgnr": "97114455"
-          },
-          "beløp": 25000,
-          "opptjeningsperiode": {
-            "tom": "2018-04-30",
-            "fom": "2018-04-01"
-          }
-        },
-        {
-          "arbeidsgiver": {
-            "orgnr": "97114455"
-          },
-          "beløp": 25000,
-          "opptjeningsperiode": {
-            "tom": "2018-03-31",
-            "fom": "2018-03-01"
-          }
-        },
-        {
-          "arbeidsgiver": {
-            "orgnr": "97114455"
-          },
-          "beløp": 25000,
-          "opptjeningsperiode": {
-            "tom": "2018-02-28",
-            "fom": "2018-02-01"
-          }
-        },
-        {
-          "arbeidsgiver": {
-            "orgnr": "97114455"
-          },
-          "beløp": 25000,
-          "opptjeningsperiode": {
-            "tom": "2018-01-31",
-            "fom": "2018-01-01"
-          }
-        }
-      ]
-    },
-    "fastsattVerdi": {
-      "sykepengegrunnlagNårTrygdenYter": {
-        "begrunnelse": "§ 8-30 første ledd",
-        "grunnlag": {
-          "begrunnelse": "§ 8-28 tredje ledd bokstav a) \u2013 De tre siste kalendermånedene før arbeidstakeren ble arbeidsufør (2019-01-01) legges til grunn.",
-          "inntekter": [
-            {
-              "arbeidsgiver": {
-                "orgnr": "97114455"
-              },
-              "beløp": 25000,
-              "opptjeningsperiode": {
-                "tom": "2018-12-31",
-                "fom": "2018-12-01"
-              }
-            },
-            {
-              "arbeidsgiver": {
-                "orgnr": "97114455"
-              },
-              "beløp": 25000,
-              "opptjeningsperiode": {
-                "tom": "2018-11-30",
-                "fom": "2018-11-01"
-              }
-            },
-            {
-              "arbeidsgiver": {
-                "orgnr": "97114455"
-              },
-              "beløp": 25000,
-              "opptjeningsperiode": {
-                "tom": "2018-10-31",
-                "fom": "2018-10-01"
-              }
-            }
-          ]
-        },
-        "fastsattVerdi": 300000,
-        "vurderingstidspunkt": "BLIR_IKKE_MATCHET",
-        "fastsattAv": "spa"
-      },
-      "sykepengegrunnlagIArbeidsgiverperioden": {
-        "begrunnelse": "§ 8-28 andre ledd",
-        "grunnlag": {
-          "begrunnelse": "§ 8-28 tredje ledd bokstav a) \u2013 De tre siste kalendermånedene før arbeidstakeren ble arbeidsufør (2019-01-01) legges til grunn.",
-          "inntekter": [
-            {
-              "arbeidsgiver": {
-                "orgnr": "97114455"
-              },
-              "beløp": 25000,
-              "opptjeningsperiode": {
-                "tom": "2018-12-31",
-                "fom": "2018-12-01"
-              }
-            },
-            {
-              "arbeidsgiver": {
-                "orgnr": "97114455"
-              },
-              "beløp": 25000,
-              "opptjeningsperiode": {
-                "tom": "2018-11-30",
-                "fom": "2018-11-01"
-              }
-            },
-            {
-              "arbeidsgiver": {
-                "orgnr": "97114455"
-              },
-              "beløp": 25000,
-              "opptjeningsperiode": {
-                "tom": "2018-10-31",
-                "fom": "2018-10-01"
-              }
-            }
-          ]
-        },
-        "fastsattVerdi": 25000,
-        "vurderingstidspunkt": "BLIR_IKKE_MATCHET",
-        "fastsattAv": "spa"
-      }
-    },
-    "vurderingstidspunkt": "BLIR_IKKE_MATCHET",
-    "fastsattAv": "SPA"
-  },
-  "arbeidsforhold": {
-    "grunnlag": {
-      "arbeidsgivere": [
-        {
-          "navn": "EQUINOR ASA, AVD STATOIL SOKKELVIRKSOMHET",
-          "organisasjonsnummer": "97114455",
-          "startdato":"2017-01-01"
-        }
-      ]
-    },
-    "begrunnelse": "Søker har en arbeidsgiver med orgnummer 97114455",
-    "fastsattVerdi": true,
-    "vurderingstidspunkt": "BLIR_IKKE_MATCHET",
-    "fastsattAv": "SPA"
-  },
-  "opptjeningstid": {
-    "grunnlag": {
-      "førsteSykdomsdag": "2019-01-01",
-      "arbeidsforhold": [
-        {
-          "navn": "EQUINOR ASA, AVD STATOIL SOKKELVIRKSOMHET",
-          "organisasjonsnummer": "97114455",
-          "startdato":"2017-01-01"
-        }
-      ]
-    },
-    "begrunnelse": "Søker er i et aktivt arbeidsforhold",
-    "fastsattVerdi": 730,
-    "vurderingstidspunkt": "BLIR_IKKE_MATCHET",
-    "fastsattAv": "SPA"
-  },
-  "sykepengeliste": [],
-    "aktorId": "11987654321",
-    "tom": "2019-01-31",
-    "arbeidsgiver": {
-      "orgnummer": "97114455",
-      "navn": "NAV"
-    },
-    "soktUtenlandsopphold": false,
-    "fom": "2019-01-01",
-    "soknadsperioder": [
-      {
-        "tom": "2019-01-31",
-        "fom": "2019-01-01",
-        "sykmeldingsgrad": 100
-      }
-    ],
-    "harVurdertInntekt": false,
-    "startSyketilfelle": "2019-01-01",
-    "sendtNav": "2019-01-17T00:00",
-
-  "alder": {
-    "grunnlag": {
-      "fodselsdato": "1970-09-01"
-    },
-    "begrunnelse": "§ 8-51",
-    "fastsattVerdi": 48,
-    "vurderingstidspunkt": "BLIR_IKKE_MATCHET",
-    "fastsattAv": "SPA"
-  }
-}
-""".trimIndent()
 
     private fun produserSøknad(aktørId: String) {
         val søknad = Sykepengesøknad(
@@ -477,7 +161,7 @@ class EndToEndTest {
 
     private fun produceOneMessage(message: Sykepengesøknad) {
         val producer = KafkaProducer<String, Sykepengesøknad>(producerProperties())
-        producer.send(ProducerRecord(sykepengesoknadTopic.name, null, message))
+        producer.send(ProducerRecord(sykepengesoknadTopic.name, message))
         producer.flush()
     }
 
@@ -811,16 +495,15 @@ class EndToEndTest {
 
     private fun arbeidsforholdStub(aktørId: String) {
         stubFor(any(urlPathEqualTo("/api/arbeidsforhold/$aktørId"))
-                .willReturn(okJson("""{
-    "arbeidsforhold": [
+                .willReturn(okJson("""[
         {
             "arbeidsgiver": {
                 "navn": "EQUINOR ASA, AVD STATOIL SOKKELVIRKSOMHET",
-                "organisasjonsnummer": "97114455"
+                "orgnummer": "97114455"
             },
             "startdato": "2017-01-01"
         }
     ]
-}""")))
+""")))
     }
 }
