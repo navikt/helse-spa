@@ -35,7 +35,6 @@ sealed class Vurdering<out V, out G>(val begrunnelse: String, val grunnlag: G, v
 }
 
 fun vurderFakta(fakta: FaktagrunnlagResultat): AvklaringsResultat {
-    println("VURDERER FAKTA!")
     val medlemsskap = vurderMedlemskap(fakta)
     val alder = vurderAlderPåSisteDagISøknadsPeriode(fakta)
     val arbeidsforhold = vurderArbeidsforhold(fakta)
@@ -63,7 +62,6 @@ fun vurderFakta(fakta: FaktagrunnlagResultat): AvklaringsResultat {
         )
 
     } else {
-        println("AVKLART!")
         AvklarteFakta(
                 originalSøknad = fakta.originalSøknad,
                 faktagrunnlag = fakta.faktagrunnlag,
