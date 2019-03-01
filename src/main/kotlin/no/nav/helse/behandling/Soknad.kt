@@ -61,7 +61,7 @@ data class UavklarteVerdier(
         val sykepengeliste: Collection<SykepengerVedtak>,
         val arbeidsforhold: Vurdering<Boolean, List<Arbeidsforhold>>,
         val opptjeningstid: Vurdering<Opptjeningstid, Opptjeningsgrunnlag>,
-        val sykepengegrunnlag: Vurdering<Sykepengegrunnlag, Beregningsperiode>
+        val sykepengegrunnlag: Vurdering<Long, Beregningsperiode>
 ) {
     fun asNamedList(): List<Pair<String, Vurdering<*, *>>> = listOf(
             Pair("medlemsskap", medlemsskap),

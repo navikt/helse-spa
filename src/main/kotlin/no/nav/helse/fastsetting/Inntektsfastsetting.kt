@@ -8,7 +8,7 @@ import java.time.YearMonth
 
 fun LocalDate.yearMonth() = YearMonth.of(year, month.value)
 
-fun fastsettingAvSykepengegrunnlaget(førsteSykdomsdag: LocalDate, arbeidsgiver: Arbeidsgiver, beregningsgrunnlag: List<Inntekt>, sammenligningsgrunnlag: List<Inntekt>): Vurdering<Sykepengegrunnlag, Beregningsperiode> {
+fun fastsettingAvSykepengegrunnlaget(førsteSykdomsdag: LocalDate, arbeidsgiver: Arbeidsgiver, beregningsgrunnlag: List<Inntekt>, sammenligningsgrunnlag: List<Inntekt>): Vurdering<*, *> {
     val sykepengegrunnlagIArbeidsgiverperioden = fastsettingAvSykepengegrunnlagetIArbeidsgiverperioden(førsteSykdomsdag,
             arbeidsgiver, beregningsgrunnlag)
 

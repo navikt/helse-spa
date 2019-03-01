@@ -18,9 +18,9 @@ sealed class Vurdering<out V, out G>(val begrunnelse: String, val grunnlag: G, v
         }
 
     }
-    class Uavklart<G>(val årsak: Årsak,
+    class Uavklart<V,G>(val årsak: Årsak,
                       begrunnelse: String,
-                      grunnlag: G): Vurdering<Nothing, G>(begrunnelse, grunnlag) {
+                      grunnlag: G): Vurdering<V, G>(begrunnelse, grunnlag) {
 
         enum class Årsak {
             KREVER_SKJØNNSMESSIG_VURDERING,
@@ -49,7 +49,7 @@ fun vurderFakta(fakta: FaktagrunnlagResultat): AvklaringsResultat {
             Yrkesstatus.ARBEIDSTAKER,
             fakta.faktagrunnlag.sykepengeliste)
 
-    return if (listOf(medlemsskap, alder, arbeidsforhold, opptjeningstid, sykepengegrunnlag, maksdato).filter { it is Vurdering.Uavklart<*> }.isNotEmpty()) {
+    return if (listOf(medlemsskap, alder, arbeidsforhold, opptjeningstid, sykepengegrunnlag, maksdato).filter { it is Vurdering.Uavklart<*,*> }.isNotEmpty()) {
         UavklarteFakta(
                 originalSøknad = fakta.originalSøknad,
                 faktagrunnlag = fakta.faktagrunnlag,
@@ -58,12 +58,13 @@ fun vurderFakta(fakta: FaktagrunnlagResultat): AvklaringsResultat {
                         alder = alder,
                         arbeidsforhold = arbeidsforhold,
                         opptjeningstid = opptjeningstid,
-                        sykepengegrunnlag = sykepengegrunnlag,
+                        sykepengegrunnlag = sykepengegrunnlag as Vurdering<Long, Beregningsperiode>,
                         sykepengeliste = fakta.faktagrunnlag.sykepengeliste,
                         maksdato = maksdato
                 )
         )
-    } else
+
+    } else {
         AvklarteFakta(
                 originalSøknad = fakta.originalSøknad,
                 faktagrunnlag = fakta.faktagrunnlag,
@@ -77,4 +78,5 @@ fun vurderFakta(fakta: FaktagrunnlagResultat): AvklaringsResultat {
                         maksdato = maksdato as Vurdering.Avklart<LocalDate, Any>
                 )
         )
+    }
 }
