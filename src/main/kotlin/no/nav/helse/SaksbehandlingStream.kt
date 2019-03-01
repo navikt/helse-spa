@@ -78,10 +78,10 @@ class SaksbehandlingStream(val env: Environment) {
                         .mapValues { _, faktagrunnlag -> fastsettFakta(faktagrunnlag) }
                         .branch(alleVerdierErAvklart, Predicate { _, _ -> true} )
 
-        /*avklarteEllerUavklarte[1]
+        avklarteEllerUavklarte[1]
                 .peek{_, _ -> acceptCounter.labels("rejected_unable_to_determine_facts").inc() }
                 .peek{_, resultat -> tellUavklarte(resultat as UavklarteFakta)}
-                .toTopic(uavklartFaktaTopic)*/
+                .toTopic(uavklartFaktaTopic)
 
         avklarteEllerUavklarte[0]
                 .mapValues { _, avklarteFakta -> prøvVilkår(avklarteFakta as AvklarteFakta) }
@@ -95,7 +95,7 @@ class SaksbehandlingStream(val env: Environment) {
 
     private fun tellUavklarte(uavklarteFakta: UavklarteFakta) {
         uavklarteFakta.uavklarteVerdier.asNamedList()
-                .filter { it.second is Vurdering.Uavklart<*> }
+                .filter { it.second is Vurdering.Uavklart<*,*> }
                 .forEach { uavklartCounter.labels(it.first).inc() }
     }
 
