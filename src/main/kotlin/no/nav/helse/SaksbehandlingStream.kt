@@ -149,7 +149,7 @@ class SaksbehandlingStream(val env: Environment) {
                     vilkårsprøving = vilkårsprøving.vilkårsprøving,
                     beregning = beregn(lagBeregninggrunnlag(vilkårsprøving)))
 
-    fun fattVedtak(bergegning: Sykepengeberegning): JsonNode = defaultObjectMapper.readTree(defaultObjectMapper.writeValueAsString(bergegning))
+    fun fattVedtak(beregning: Sykepengeberegning): JsonNode = defaultObjectMapper.readTree(defaultObjectMapper.writeValueAsString(beregning))
 }
 
 val sykepengesoknadTopic = Topic(
