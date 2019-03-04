@@ -1,5 +1,6 @@
 package no.nav.helse.oppslag
 
+import com.fasterxml.jackson.module.kotlin.readValue
 import com.github.kittinunf.fuel.*
 import no.nav.helse.behandling.*
 import no.nav.helse.domain.*
@@ -31,7 +32,7 @@ class ArbeidsforholdOppslag(val sparkelUrl: String, val stsRestClient: StsRestCl
                         ))
                         .responseString()
 
-        return defaultObjectMapper.readValue(result.component1(), Array<Arbeidsforhold>::class.java)
+        return defaultObjectMapper.readValue<ArbeidsforholdWrapper>(result.component1()!!).arbeidsforhold
     }
 }
 

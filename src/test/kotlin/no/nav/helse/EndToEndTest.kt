@@ -495,7 +495,9 @@ class EndToEndTest {
 
     private fun arbeidsforholdStub(aktørId: String) {
         stubFor(any(urlPathEqualTo("/api/arbeidsforhold/$aktørId"))
-                .willReturn(okJson("""[
+                .willReturn(okJson("""
+{
+    "arbeidsforhold": [
         {
             "arbeidsgiver": {
                 "navn": "EQUINOR ASA, AVD STATOIL SOKKELVIRKSOMHET",
@@ -504,6 +506,7 @@ class EndToEndTest {
             "startdato": "2017-01-01"
         }
     ]
+}
 """)))
     }
 }

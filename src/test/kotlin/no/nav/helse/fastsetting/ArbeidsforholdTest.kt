@@ -54,4 +54,22 @@ class ArbeidsforholdTest {
 
     }
 
+    @Test
+    fun `skal parse json fra sparkel`() {
+        val result = defaultObjectMapper.readValue<ArbeidsforholdWrapper>(jsonFromSparkel)
+        assertNotNull(result)
+    }
+
 }
+
+val jsonFromSparkel = """{
+  "arbeidsforhold": [
+    {
+      "arbeidsgiver": {
+        "navn": "ÅSEN BOFELLESSKAP",
+        "orgnummer": "995816598"
+      },
+      "startdato": "2009-01-15"
+    }
+  ]
+}""".trimIndent()
