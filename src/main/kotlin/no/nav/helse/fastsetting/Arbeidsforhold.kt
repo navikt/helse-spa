@@ -19,6 +19,7 @@ fun vurderArbeidsforhold(fakta : FaktagrunnlagResultat) : Vurdering<Boolean, Lis
 
 fun evaluerArbeidsforhold(orgnummer: String, fakta: List<Arbeidsforhold>): Evaluering =
         when {
+            fakta.isEmpty() -> Evaluering.nei("Søker har ikke en arbeidsgiver med orgnummer $orgnummer")
             fakta.size > 1 -> Evaluering.kanskje("Søker har flere arbeidsgivere, systemet støtter ikke dette enda")
             fakta[0].arbeidsgiver.orgnummer == orgnummer -> Evaluering.ja("Søker har en arbeidsgiver med orgnummer $orgnummer")
             else -> Evaluering.nei("Søker har ikke en arbeidsgiver med orgnummer $orgnummer")
