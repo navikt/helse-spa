@@ -14,8 +14,7 @@ fun vurderAlderPåSisteDagISøknadsPeriode(fakta: FaktagrunnlagResultat): Vurder
     val tpsfakta = fakta.faktagrunnlag.tps
     val tomDato = fakta.originalSøknad.tom
     val alder = tpsfakta.alder(tomDato)
-    return if (alder<62) Vurdering.Avklart(alder, "§ 8-51", Aldersgrunnlag(fodselsdato = tpsfakta.fodselsdato), "SPA") else
-        Vurdering.Uavklart(Vurdering.Uavklart.Årsak.FALLER_UTENFOR_MVP, "Søker må være under 62 år", Aldersgrunnlag(fodselsdato = tpsfakta.fodselsdato))
+    return Vurdering.Avklart(alder, "§ 8-51", Aldersgrunnlag(fodselsdato = tpsfakta.fodselsdato), "SPA")
 }
 
 fun Tpsfakta.alder(dato: LocalDate = LocalDate.now()): Alder = Period.between(fodselsdato, dato).years
