@@ -1,6 +1,7 @@
 package no.nav.helse
 
 import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException
 import io.prometheus.client.CollectorRegistry
 import io.prometheus.client.Counter
 import no.nav.NarePrometheus
@@ -105,6 +106,9 @@ class SaksbehandlingStream(val env: Environment) {
     private fun deserializeSykepengesøknad(soknad: JsonNode?): Optional<Sykepengesøknad> =
         try {
             Optional.of(defaultObjectMapper.treeToValue(soknad, Sykepengesøknad::class.java))
+        } catch(e: MissingKotlinParameterException) {
+            log.error("Failed to deserialize søknad due to missing non-nullable parameter: ${e.parameter.name} of type ${e.parameter.type}")
+            Optional.empty()
         } catch (e: Exception) {
             log.error("Failed to deserialize søknad", e)
             Optional.empty()
