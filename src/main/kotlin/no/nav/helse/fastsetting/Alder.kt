@@ -2,6 +2,7 @@ package no.nav.helse.fastsetting
 
 import no.nav.helse.behandling.FaktagrunnlagResultat
 import no.nav.helse.behandling.Tpsfakta
+import no.nav.nare.core.evaluations.Evaluering
 import java.time.LocalDate
 import java.time.Period
 
@@ -12,7 +13,9 @@ data class Aldersgrunnlag(val fodselsdato: LocalDate)
 fun vurderAlderPåSisteDagISøknadsPeriode(fakta: FaktagrunnlagResultat): Vurdering<Alder, Aldersgrunnlag> {
     val tpsfakta = fakta.faktagrunnlag.tps
     val tomDato = fakta.originalSøknad.tom
-    return Vurdering.Avklart(tpsfakta.alder(tomDato), "§ 8-51", Aldersgrunnlag(fodselsdato = tpsfakta.fodselsdato), "SPA")
+    val alder = tpsfakta.alder(tomDato)
+    return if (alder<62) Vurdering.Avklart(alder, "§ 8-51", Aldersgrunnlag(fodselsdato = tpsfakta.fodselsdato), "SPA") else
+        Vurdering.Uavklart(Vurdering.Uavklart.Årsak.FALLER_UTENFOR_MVP, "Søker må være under 62 år", Aldersgrunnlag(fodselsdato = tpsfakta.fodselsdato))
 }
 
 fun Tpsfakta.alder(dato: LocalDate = LocalDate.now()): Alder = Period.between(fodselsdato, dato).years
