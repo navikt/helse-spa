@@ -19,7 +19,10 @@ import org.apache.kafka.clients.producer.*
 import org.apache.kafka.common.config.*
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*
+import java.math.BigDecimal
+import java.math.RoundingMode
 import java.time.*
+import java.time.temporal.ChronoUnit
 import java.util.*
 
 class EndToEndTest {
@@ -92,7 +95,7 @@ class EndToEndTest {
         inntektStub(aktørId)
         arbeidsforholdStub(aktørId)
 
-        produserSøknad(aktørId)
+        val søknad = produserSøknad(aktørId)
 
         val actual = ventPåVedtak()!!
 
@@ -100,9 +103,22 @@ class EndToEndTest {
         assertNotNull(actual.get("avklarteVerdier"))
         assertEquals(actual.get("avklarteVerdier").get("medlemsskap").get("fastsattVerdi").booleanValue(), true)
         assertEquals(actual.get("avklarteVerdier").get("medlemsskap").get("fastsattAv").textValue(), "SPA")
+
+        assertNotNull(actual.get("beregning"))
+        val dagsatser = actual.get("beregning").get("dagsatser")
+        assertNotNull(dagsatser)
+        assertTrue(dagsatser.isArray)
+        assertEquals(finnPeriode(søknad.fom, søknad.tom).filterNot(::erHelg).size, dagsatser.size())
+        assertEquals(BigDecimal.valueOf(25000 * 12).divide(BigDecimal(260), 0, RoundingMode.HALF_UP).longValueExact(), dagsatser[0].get("sats").longValue())
     }
 
-    private fun produserSøknad(aktørId: String) {
+    private fun finnPeriode(fom: LocalDate, tom: LocalDate) =
+            (0 .. ChronoUnit.DAYS.between(fom, tom)).map { fom.plusDays(it) }
+
+    private fun erHelg(dato: LocalDate) =
+            dato.dayOfWeek == DayOfWeek.SATURDAY || dato.dayOfWeek == DayOfWeek.SUNDAY
+
+    private fun produserSøknad(aktørId: String) : Sykepengesøknad {
         val søknad = Sykepengesøknad(
                 aktorId = aktørId,
                 status = "SENDT",
@@ -122,6 +138,7 @@ class EndToEndTest {
                 harVurdertInntekt = false
         )
         produceOneMessage(søknad)
+        return søknad
     }
 
     private fun ventPåVedtak(): JsonNode? {
