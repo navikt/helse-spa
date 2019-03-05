@@ -7,10 +7,7 @@ import io.prometheus.client.Counter
 import no.nav.NarePrometheus
 import no.nav.helse.behandling.*
 import no.nav.helse.fastsetting.vurderFakta
-import no.nav.helse.oppslag.*
 import no.nav.helse.streams.StreamConsumer
-import no.nav.helse.streams.Topic
-import no.nav.helse.streams.Topics
 import no.nav.helse.streams.consumeTopic
 import no.nav.helse.streams.streamConfig
 import no.nav.helse.streams.toTopic
@@ -43,7 +40,7 @@ class SaksbehandlingStream(val env: Environment) {
             .register()
     private val behandlingsfeilCounter: Counter = Counter.build()
             .name("spa_behandlingsfeil_counter")
-            .labelNames("deserialisering", "avklaring", "vilkarsproving", "beregning")
+            .labelNames("steg")
             .help("Antall ganger en søknad er forsøkt behandlet uten at vi kommer til et vedtak")
             .register()
 
@@ -87,7 +84,7 @@ class SaksbehandlingStream(val env: Environment) {
         streams[0]
                 .mapValues { _, behandlingsfeil -> (behandlingsfeil as Either.Left).left }
                 .peek { _, behandlingsfeil -> logAndCountFail(behandlingsfeil) }
-                .mapValues { _, behandlingsfeil -> serialize(behandlingsfeil) }
+                .mapValues { _, behandlingsfeil -> serializeBehandlingsfeil(behandlingsfeil) }
                 .toTopic(SYKEPENGEBEHANDLINGSFEIL) // TODO : should be a generic failure-topic
 
         streams[1]
@@ -102,6 +99,7 @@ class SaksbehandlingStream(val env: Environment) {
     private fun logAndCountFail(behandlingsfeil: Behandlingsfeil) {
         when(behandlingsfeil) {
             is Behandlingsfeil.Deserialiseringsfeil -> behandlingsfeilCounter.labels("deserialisering").inc()
+            is Behandlingsfeil.RegisterFeil -> behandlingsfeilCounter.labels("register").inc()
             is Behandlingsfeil.Avklaringsfeil -> behandlingsfeilCounter.labels("avklaring").inc()
             is Behandlingsfeil.Vilkårsprøvingsfeil -> behandlingsfeilCounter.labels("vilkarsproving").inc()
             is Behandlingsfeil.Beregningsfeil -> behandlingsfeilCounter.labels("beregning").inc()
@@ -135,9 +133,9 @@ class SaksbehandlingStream(val env: Environment) {
     private fun prøvVilkår(fakta: AvklarteFakta): Either<Behandlingsfeil, Vilkårsprøving> = vilkårsprøving(fakta)
     private fun beregnSykepenger(vilkårsprøving: Vilkårsprøving): Either<Behandlingsfeil, Sykepengeberegning> = sykepengeBeregning(vilkårsprøving)
     private fun fattVedtak(beregning: Sykepengeberegning): Either<Behandlingsfeil, SykepengeVedtak> = vedtak(beregning)
-    private fun serialize(vedtak: SykepengeVedtak): JsonNode = defaultObjectMapper.readTree(defaultObjectMapper.writeValueAsString(vedtak))
-    private fun serialize(feil: Behandlingsfeil): JsonNode = defaultObjectMapper.readTree(defaultObjectMapper.writeValueAsString(feil))
 }
 
+fun serialize(vedtak: SykepengeVedtak): JsonNode = defaultObjectMapper.readTree(defaultObjectMapper.writeValueAsString(vedtak))
+fun serializeBehandlingsfeil(feil: Behandlingsfeil): JsonNode = defaultObjectMapper.readTree(defaultObjectMapper.writeValueAsString(feil))
 
 val narePrometheus = NarePrometheus(CollectorRegistry.defaultRegistry)
