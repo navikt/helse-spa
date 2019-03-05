@@ -6,11 +6,8 @@ import io.prometheus.client.CollectorRegistry
 import io.prometheus.client.Counter
 import no.nav.NarePrometheus
 import no.nav.helse.behandling.*
-import no.nav.helse.fastsetting.Vurdering
 import no.nav.helse.fastsetting.vurderFakta
 import no.nav.helse.oppslag.*
-import no.nav.helse.serde.JacksonDeserializer
-import no.nav.helse.serde.JacksonSerializer
 import no.nav.helse.serde.defaultObjectMapper
 import no.nav.helse.serde.jsonNodeSerde
 import no.nav.helse.streams.StreamConsumer
@@ -20,7 +17,6 @@ import no.nav.helse.streams.consumeTopic
 import no.nav.helse.streams.streamConfig
 import no.nav.helse.streams.toTopic
 import no.nav.helse.sykepenger.beregning.beregn
-import no.nav.nare.core.evaluations.Resultat
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.common.serialization.Serdes
 import org.apache.kafka.streams.KafkaStreams
@@ -67,7 +63,6 @@ class SaksbehandlingStream(val env: Environment) {
 
     private fun topology(): Topology {
         val builder = StreamsBuilder()
-        val behandlingFeilet: Predicate<String, Either<Behandlingsfeil, *>> = Predicate { _, søknad -> søknad is Either.Left }
 
         val streams = builder.consumeTopic(sykepengesoknadTopic)
                 .peek { _, _ -> acceptCounter.labels("accepted").inc() }
@@ -79,7 +74,10 @@ class SaksbehandlingStream(val env: Environment) {
                 .mapValues { _, vilkårsprøving -> beregnSykepenger(vilkårsprøving) }
                 .mapValues { _, sykepengeberegning -> fattVedtak(sykepengeberegning) }
                 .peek { _, _ -> acceptCounter.labels("processed").inc() }
-                .branch(behandlingFeilet, Predicate { _, _ -> true} )
+                .branch(
+                        Predicate { _, søknad -> søknad is Either.Left },
+                        Predicate { _, søknad -> søknad is Either.Right }
+                )
 
         streams[0]
                 .mapValues { _, behandlingsfeil -> (behandlingsfeil as Either.Left).left }
@@ -100,12 +98,6 @@ class SaksbehandlingStream(val env: Environment) {
     private fun logAndCountFail(behandlingsfeil: Behandlingsfeil) {}
     private fun logAndCountVedtak(vedtak: SykepengeVedtak) {}
 
-    private fun tellUavklarte(uavklarteFakta: UavklarteFakta) {
-        uavklarteFakta.uavklarteVerdier.asNamedList()
-                .filter { it.second is Vurdering.Uavklart<*,*> }
-                .forEach { uavklartCounter.labels(it.first).inc() }
-    }
-
     private fun deserializeSykepengesøknad(soknad: JsonNode): Either<Behandlingsfeil, Sykepengesøknad> =
         try {
             Either.Right(defaultObjectMapper.treeToValue(soknad, Sykepengesøknad::class.java))
@@ -117,7 +109,6 @@ class SaksbehandlingStream(val env: Environment) {
             Either.Left(Behandlingsfeil.from(soknad, e))
         }
 
-
     fun start() {
         consumer.start()
     }
@@ -126,62 +117,11 @@ class SaksbehandlingStream(val env: Environment) {
         consumer.stop()
     }
 
-    fun hentRegisterData(eitherSøknadOrFail: Either<Behandlingsfeil, Sykepengesøknad>): Either<Behandlingsfeil, FaktagrunnlagResultat> =
-            eitherSøknadOrFail.flatMap {
-                Either.Right(FaktagrunnlagResultat(
-                        originalSøknad = it,
-                        faktagrunnlag = Faktagrunnlag(
-                                tps = PersonOppslag(env.sparkelBaseUrl, stsClient).hentTPSData(it),
-                                beregningsperiode = Inntektsoppslag(env.sparkelBaseUrl, stsClient).hentBeregningsgrunnlag(it.aktorId, it.startSyketilfelle.minusMonths(3), it.startSyketilfelle.minusMonths(1)),
-                                sammenligningsperiode = Inntektsoppslag(env.sparkelBaseUrl, stsClient).hentSammenligningsgrunnlag(it.aktorId, it.startSyketilfelle.minusYears(1), it.startSyketilfelle.minusMonths(1)),
-                                sykepengeliste = emptyList(),
-                                arbeidsforhold = ArbeidsforholdOppslag(env.sparkelBaseUrl, stsClient).hentArbeidsforhold(it))
-                )
-                )
-            }
-
-
+    fun hentRegisterData(eitherSøknadOrFail: Either<Behandlingsfeil, Sykepengesøknad>): Either<Behandlingsfeil, FaktagrunnlagResultat> = Oppslag(env.sparkelBaseUrl, stsClient).hentRegisterData(eitherSøknadOrFail)
     fun fastsettFakta(eitherFaktaOrFail: Either<Behandlingsfeil, FaktagrunnlagResultat>): Either<Behandlingsfeil, AvklarteFakta> = vurderFakta(eitherFaktaOrFail)
-
-    fun prøvVilkår(eitherAvklarteFakta: Either<Behandlingsfeil, AvklarteFakta>): Either<Behandlingsfeil, Vilkårsprøving> = eitherAvklarteFakta.flatMap { avklarteFakta ->
-        val vilkårsprøving = Vilkårsprøving(
-                originalSøknad = avklarteFakta.originalSøknad,
-                faktagrunnlag = avklarteFakta.faktagrunnlag,
-                avklarteVerdier = avklarteFakta.avklarteVerdier,
-                vilkårsprøving = gjennomførVilkårsvurdering(avklarteFakta))
-        when(vilkårsprøving.vilkårsprøving.resultat) {
-            Resultat.JA -> Either.Right(vilkårsprøving)
-            else -> Either.Left(Behandlingsfeil.from(vilkårsprøving))
-        }
-    }
-
-    fun beregnSykepenger(eitherVilkårsprøving: Either<Behandlingsfeil, Vilkårsprøving>): Either<Behandlingsfeil, Sykepengeberegning> = eitherVilkårsprøving.flatMap { vilkårsprøving ->
-        try {
-            val beregningsresultat= beregn(lagBeregninggrunnlag(vilkårsprøving))
-            Either.Right(Sykepengeberegning(
-                    originalSøknad = vilkårsprøving.originalSøknad,
-                    faktagrunnlag = vilkårsprøving.faktagrunnlag,
-                    avklarteVerdier = vilkårsprøving.avklarteVerdier,
-                    vilkårsprøving = vilkårsprøving.vilkårsprøving,
-                    beregning = beregningsresultat))
-        } catch(e: Exception) {
-            Either.Left(Behandlingsfeil.from(vilkårsprøving, e))
-        }
-    }
-
-
-    fun fattVedtak(eitherBeregning: Either<Behandlingsfeil, Sykepengeberegning>): Either<Behandlingsfeil, SykepengeVedtak> = eitherBeregning.flatMap { beregning ->
-        Either.Right(
-                SykepengeVedtak(
-                        originalSøknad = beregning.originalSøknad,
-                        faktagrunnlag = beregning.faktagrunnlag,
-                        vilkårsprøving = beregning.vilkårsprøving,
-                        avklarteVerdier = beregning.avklarteVerdier,
-                        beregning = beregning.beregning,
-                        vedtak = Vedtak("Burde antagelig gjøre noe med dette.")
-                )
-        )
-    }
+    fun prøvVilkår(eitherAvklarteFakta: Either<Behandlingsfeil, AvklarteFakta>): Either<Behandlingsfeil, Vilkårsprøving> = vilkårsprøving(eitherAvklarteFakta)
+    fun beregnSykepenger(eitherVilkårsprøving: Either<Behandlingsfeil, Vilkårsprøving>): Either<Behandlingsfeil, Sykepengeberegning> = sykepengeBeregning(eitherVilkårsprøving)
+    fun fattVedtak(eitherBeregning: Either<Behandlingsfeil, Sykepengeberegning>): Either<Behandlingsfeil, SykepengeVedtak> = vedtak(eitherBeregning)
 
     fun serialize(vedtak: SykepengeVedtak): JsonNode = defaultObjectMapper.readTree(defaultObjectMapper.writeValueAsString(vedtak))
     fun serialize(feil: Behandlingsfeil): JsonNode = defaultObjectMapper.readTree(defaultObjectMapper.writeValueAsString(feil))
