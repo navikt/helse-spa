@@ -16,7 +16,6 @@ import no.nav.helse.streams.Topics
 import no.nav.helse.streams.consumeTopic
 import no.nav.helse.streams.streamConfig
 import no.nav.helse.streams.toTopic
-import no.nav.helse.sykepenger.beregning.beregn
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.common.serialization.Serdes
 import org.apache.kafka.streams.KafkaStreams
@@ -68,11 +67,11 @@ class SaksbehandlingStream(val env: Environment) {
                 .peek { _, _ -> acceptCounter.labels("accepted").inc() }
                 .filter { _, value -> value.has("status") && value.get("status").asText() == "SENDT" }
                 .mapValues { _, jsonNode -> deserializeSykepengesøknad(jsonNode) }
-                .mapValues { _, søknad -> hentRegisterData(søknad) }
-                .mapValues { _, faktagrunnlag -> fastsettFakta(faktagrunnlag) }
-                .mapValues { _, avklarteFakta -> prøvVilkår(avklarteFakta) }
-                .mapValues { _, vilkårsprøving -> beregnSykepenger(vilkårsprøving) }
-                .mapValues { _, sykepengeberegning -> fattVedtak(sykepengeberegning) }
+                .mapValues { _, søknad -> søknad.flatMap { hentRegisterData(it) } }
+                .mapValues { _, faktagrunnlag -> faktagrunnlag.flatMap { fastsettFakta(it) } }
+                .mapValues { _, avklarteFakta -> avklarteFakta.flatMap { prøvVilkår(it) } }
+                .mapValues { _, vilkårsprøving -> vilkårsprøving.flatMap { beregnSykepenger(it) } }
+                .mapValues { _, sykepengeberegning -> sykepengeberegning.flatMap { fattVedtak(it) } }
                 .peek { _, _ -> acceptCounter.labels("processed").inc() }
                 .branch(
                         Predicate { _, søknad -> søknad is Either.Left },
@@ -117,11 +116,11 @@ class SaksbehandlingStream(val env: Environment) {
         consumer.stop()
     }
 
-    fun hentRegisterData(eitherSøknadOrFail: Either<Behandlingsfeil, Sykepengesøknad>): Either<Behandlingsfeil, FaktagrunnlagResultat> = Oppslag(env.sparkelBaseUrl, stsClient).hentRegisterData(eitherSøknadOrFail)
-    fun fastsettFakta(eitherFaktaOrFail: Either<Behandlingsfeil, FaktagrunnlagResultat>): Either<Behandlingsfeil, AvklarteFakta> = vurderFakta(eitherFaktaOrFail)
-    fun prøvVilkår(eitherAvklarteFakta: Either<Behandlingsfeil, AvklarteFakta>): Either<Behandlingsfeil, Vilkårsprøving> = vilkårsprøving(eitherAvklarteFakta)
-    fun beregnSykepenger(eitherVilkårsprøving: Either<Behandlingsfeil, Vilkårsprøving>): Either<Behandlingsfeil, Sykepengeberegning> = sykepengeBeregning(eitherVilkårsprøving)
-    fun fattVedtak(eitherBeregning: Either<Behandlingsfeil, Sykepengeberegning>): Either<Behandlingsfeil, SykepengeVedtak> = vedtak(eitherBeregning)
+    fun hentRegisterData(søknad: Sykepengesøknad): Either<Behandlingsfeil, FaktagrunnlagResultat> = Oppslag(env.sparkelBaseUrl, stsClient).hentRegisterData(søknad)
+    fun fastsettFakta(fakta: FaktagrunnlagResultat): Either<Behandlingsfeil, AvklarteFakta> = vurderFakta(fakta)
+    fun prøvVilkår(fakta: AvklarteFakta): Either<Behandlingsfeil, Vilkårsprøving> = vilkårsprøving(fakta)
+    fun beregnSykepenger(vilkårsprøving: Vilkårsprøving): Either<Behandlingsfeil, Sykepengeberegning> = sykepengeBeregning(vilkårsprøving)
+    fun fattVedtak(beregning: Sykepengeberegning): Either<Behandlingsfeil, SykepengeVedtak> = vedtak(beregning)
 
     fun serialize(vedtak: SykepengeVedtak): JsonNode = defaultObjectMapper.readTree(defaultObjectMapper.writeValueAsString(vedtak))
     fun serialize(feil: Behandlingsfeil): JsonNode = defaultObjectMapper.readTree(defaultObjectMapper.writeValueAsString(feil))

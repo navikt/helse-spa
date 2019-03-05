@@ -16,7 +16,7 @@ class BeregningTest {
     @Test
     fun `skal beregne for 50% grad`() {
         val soknad = vilkårsprøvdSøknad(LocalDate.parse("2019-01-01"), LocalDate.parse("2019-01-02"), 400000, 50)
-        val beregningsresultat = (sykepengeBeregning(Either.Right(soknad)) as Either.Right).right.beregning
+        val beregningsresultat = (sykepengeBeregning(soknad) as Either.Right).right.beregning
 
         assertEquals(2, beregningsresultat.dagsatser.size)
         assertEquals((400000 / 260) / 2, beregningsresultat.dagsatser[0].sats)
@@ -25,7 +25,7 @@ class BeregningTest {
     @Test
     fun `skal beregne for 100% grad`() {
         val soknad = vilkårsprøvdSøknad(LocalDate.parse("2019-01-01"), LocalDate.parse("2019-01-02"), 500000, 100)
-        val beregningsresultat = (sykepengeBeregning(Either.Right(soknad)) as Either.Right).right.beregning
+        val beregningsresultat = (sykepengeBeregning(soknad) as Either.Right).right.beregning
 
         assertEquals(2, beregningsresultat.dagsatser.size)
         assertEquals((500000 / 260), beregningsresultat.dagsatser[0].sats)
@@ -34,7 +34,7 @@ class BeregningTest {
     @Test
     fun `skal skrelle av ved 6G`() {
         val soknad = vilkårsprøvdSøknad(LocalDate.parse("2019-01-01"), LocalDate.parse("2019-01-02"), 10 * grunnbeløp(), 100)
-        val beregningsresultat = (sykepengeBeregning(Either.Right(soknad)) as Either.Right).right.beregning
+        val beregningsresultat = (sykepengeBeregning(soknad) as Either.Right).right.beregning
 
         assertEquals(2, beregningsresultat.dagsatser.size)
         assertEquals(BigDecimal.valueOf(6 * grunnbeløp()).divide(BigDecimal(260), 0, RoundingMode.HALF_UP).longValueExact(),

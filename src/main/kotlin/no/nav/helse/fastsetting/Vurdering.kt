@@ -37,47 +37,46 @@ sealed class Vurdering<out V, out G>(val begrunnelse: String, val grunnlag: G, v
 }
 
 
-fun vurderFakta(faktaOrFail: Either<Behandlingsfeil, FaktagrunnlagResultat>): Either<Behandlingsfeil, AvklarteFakta> =
-        faktaOrFail.flatMap { fakta ->
-            val medlemsskap = vurderMedlemskap(fakta)
-            val alder = vurderAlderPåSisteDagISøknadsPeriode(fakta)
-            val arbeidsforhold = vurderArbeidsforhold(fakta)
-            val opptjeningstid = vurderOpptjeningstid(Opptjeningsgrunnlag(fakta.originalSøknad.startSyketilfelle, fakta.faktagrunnlag.arbeidsforhold))
-            val sykepengegrunnlag = fastsettingAvSykepengegrunnlaget(fakta.originalSøknad.startSyketilfelle, fakta.originalSøknad.arbeidsgiver, fakta.faktagrunnlag.beregningsperiode, fakta.faktagrunnlag.sammenligningsperiode)
-            val maksdato = vurderMaksdato(alder,
-                    fakta.originalSøknad.startSyketilfelle,
-                    fakta.originalSøknad.fom,
-                    Yrkesstatus.ARBEIDSTAKER,
-                    fakta.faktagrunnlag.sykepengeliste)
+fun vurderFakta(fakta: FaktagrunnlagResultat): Either<Behandlingsfeil, AvklarteFakta> {
+    val medlemsskap = vurderMedlemskap(fakta)
+    val alder = vurderAlderPåSisteDagISøknadsPeriode(fakta)
+    val arbeidsforhold = vurderArbeidsforhold(fakta)
+    val opptjeningstid = vurderOpptjeningstid(Opptjeningsgrunnlag(fakta.originalSøknad.startSyketilfelle, fakta.faktagrunnlag.arbeidsforhold))
+    val sykepengegrunnlag = fastsettingAvSykepengegrunnlaget(fakta.originalSøknad.startSyketilfelle, fakta.originalSøknad.arbeidsgiver, fakta.faktagrunnlag.beregningsperiode, fakta.faktagrunnlag.sammenligningsperiode)
+    val maksdato = vurderMaksdato(alder,
+            fakta.originalSøknad.startSyketilfelle,
+            fakta.originalSøknad.fom,
+            Yrkesstatus.ARBEIDSTAKER,
+            fakta.faktagrunnlag.sykepengeliste)
 
-            if (listOf(medlemsskap, alder, arbeidsforhold, opptjeningstid, sykepengegrunnlag, maksdato).filter { it is Vurdering.Uavklart<*, *> }.isNotEmpty()) {
-                Either.Left(Behandlingsfeil.from(UavklarteFakta(
-                        originalSøknad = fakta.originalSøknad,
-                        faktagrunnlag = fakta.faktagrunnlag,
-                        uavklarteVerdier = UavklarteVerdier(
-                                medlemsskap = medlemsskap,
-                                alder = alder,
-                                arbeidsforhold = arbeidsforhold,
-                                opptjeningstid = opptjeningstid,
-                                sykepengegrunnlag = sykepengegrunnlag as Vurdering<Long, Beregningsperiode>,
-                                sykepengeliste = fakta.faktagrunnlag.sykepengeliste,
-                                maksdato = maksdato
-                        )
-                )))
+    return if (listOf(medlemsskap, alder, arbeidsforhold, opptjeningstid, sykepengegrunnlag, maksdato).filter { it is Vurdering.Uavklart<*, *> }.isNotEmpty()) {
+        Either.Left(Behandlingsfeil.from(UavklarteFakta(
+                originalSøknad = fakta.originalSøknad,
+                faktagrunnlag = fakta.faktagrunnlag,
+                uavklarteVerdier = UavklarteVerdier(
+                        medlemsskap = medlemsskap,
+                        alder = alder,
+                        arbeidsforhold = arbeidsforhold,
+                        opptjeningstid = opptjeningstid,
+                        sykepengegrunnlag = sykepengegrunnlag as Vurdering<Long, Beregningsperiode>,
+                        sykepengeliste = fakta.faktagrunnlag.sykepengeliste,
+                        maksdato = maksdato
+                )
+        )))
 
-            } else {
-                Either.Right(AvklarteFakta(
-                        originalSøknad = fakta.originalSøknad,
-                        faktagrunnlag = fakta.faktagrunnlag,
-                        avklarteVerdier = AvklarteVerdier(
-                                medlemsskap = medlemsskap as Vurdering.Avklart<Boolean, Medlemsskapgrunnlag>,
-                                alder = alder as Vurdering.Avklart<Alder, Aldersgrunnlag>,
-                                arbeidsforhold = arbeidsforhold as Vurdering.Avklart<Boolean, List<Arbeidsforhold>>,
-                                opptjeningstid = opptjeningstid as Vurdering.Avklart<Opptjeningstid, Opptjeningsgrunnlag>,
-                                sykepengegrunnlag = sykepengegrunnlag as Vurdering.Avklart<Sykepengegrunnlag, Beregningsperiode>,
-                                sykepengeliste = fakta.faktagrunnlag.sykepengeliste,
-                                maksdato = maksdato as Vurdering.Avklart<LocalDate, Any>
-                        )
-                ))
-            }
-        }
+    } else {
+        Either.Right(AvklarteFakta(
+                originalSøknad = fakta.originalSøknad,
+                faktagrunnlag = fakta.faktagrunnlag,
+                avklarteVerdier = AvklarteVerdier(
+                        medlemsskap = medlemsskap as Vurdering.Avklart<Boolean, Medlemsskapgrunnlag>,
+                        alder = alder as Vurdering.Avklart<Alder, Aldersgrunnlag>,
+                        arbeidsforhold = arbeidsforhold as Vurdering.Avklart<Boolean, List<Arbeidsforhold>>,
+                        opptjeningstid = opptjeningstid as Vurdering.Avklart<Opptjeningstid, Opptjeningsgrunnlag>,
+                        sykepengegrunnlag = sykepengegrunnlag as Vurdering.Avklart<Sykepengegrunnlag, Beregningsperiode>,
+                        sykepengeliste = fakta.faktagrunnlag.sykepengeliste,
+                        maksdato = maksdato as Vurdering.Avklart<LocalDate, Any>
+                )
+        ))
+    }
+}

@@ -2,23 +2,21 @@ package no.nav.helse.behandling
 
 import no.nav.helse.Behandlingsfeil
 import no.nav.helse.Either
-import no.nav.helse.flatMap
 import no.nav.helse.sykepenger.beregning.Beregningsgrunnlag
 import no.nav.helse.sykepenger.beregning.beregn
 
-fun sykepengeBeregning(eitherVilkårsprøving: Either<Behandlingsfeil, Vilkårsprøving>): Either<Behandlingsfeil, Sykepengeberegning> = eitherVilkårsprøving.flatMap { vilkårsprøving ->
-    try {
-        val beregningsresultat= beregn(lagBeregninggrunnlag(vilkårsprøving))
-        Either.Right(Sykepengeberegning(
-                originalSøknad = vilkårsprøving.originalSøknad,
-                faktagrunnlag = vilkårsprøving.faktagrunnlag,
-                avklarteVerdier = vilkårsprøving.avklarteVerdier,
-                vilkårsprøving = vilkårsprøving.vilkårsprøving,
-                beregning = beregningsresultat))
-    } catch(e: Exception) {
-        Either.Left(Behandlingsfeil.from(vilkårsprøving, e))
-    }
-}
+fun sykepengeBeregning(vilkårsprøving: Vilkårsprøving): Either<Behandlingsfeil, Sykepengeberegning> =
+        try {
+            val beregningsresultat = beregn(lagBeregninggrunnlag(vilkårsprøving))
+            Either.Right(Sykepengeberegning(
+                    originalSøknad = vilkårsprøving.originalSøknad,
+                    faktagrunnlag = vilkårsprøving.faktagrunnlag,
+                    avklarteVerdier = vilkårsprøving.avklarteVerdier,
+                    vilkårsprøving = vilkårsprøving.vilkårsprøving,
+                    beregning = beregningsresultat))
+        } catch (e: Exception) {
+            Either.Left(Behandlingsfeil.from(vilkårsprøving, e))
+        }
 
 internal fun grunnbeløp() = 96883L // TODO: lookup?
 

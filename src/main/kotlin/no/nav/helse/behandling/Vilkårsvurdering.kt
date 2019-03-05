@@ -6,15 +6,16 @@ import no.nav.helse.sykepenger.vilkar.sykepengevilkår
 import no.nav.nare.core.evaluations.Evaluering
 import no.nav.nare.core.evaluations.Resultat
 
-fun vilkårsprøving(eitherAvklarteFakta: Either<Behandlingsfeil, AvklarteFakta>): Either<Behandlingsfeil, Vilkårsprøving> = eitherAvklarteFakta.flatMap { avklarteFakta ->
-    val vilkårsprøving = Vilkårsprøving(
+fun vilkårsprøving(avklarteFakta: AvklarteFakta): Either<Behandlingsfeil, Vilkårsprøving> {
+    val vilkår = Vilkårsprøving(
             originalSøknad = avklarteFakta.originalSøknad,
             faktagrunnlag = avklarteFakta.faktagrunnlag,
             avklarteVerdier = avklarteFakta.avklarteVerdier,
             vilkårsprøving = gjennomførVilkårsvurdering(avklarteFakta))
-    when(vilkårsprøving.vilkårsprøving.resultat) {
-        Resultat.JA -> Either.Right(vilkårsprøving)
-        else -> Either.Left(Behandlingsfeil.from(vilkårsprøving))
+
+    return when(vilkår.vilkårsprøving.resultat) {
+        Resultat.JA -> Either.Right(vilkår)
+        else -> Either.Left(Behandlingsfeil.from(vilkår))
     }
 }
 
