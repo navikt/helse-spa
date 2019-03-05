@@ -35,10 +35,14 @@ class SaksbehandlingStream(val env: Environment) {
             .labelNames("state")
             .help("Antall meldinger SaksbehandlingsStream i SPA har godtatt og forsøkt behandlet")
             .register()
-    private val uavklartCounter: Counter = Counter.build()
-            .name("spa_uavklarte_fakta_counter")
-            .labelNames("fakta")
-            .help("Antall ganger et faktum har gått uavklart")
+    private val vedtakCounter: Counter = Counter.build()
+            .name("spa_vedtak_stream_counter")
+            .help("Antall vedtak fattet av SPA")
+            .register()
+    private val behandlingsfeilCounter: Counter = Counter.build()
+            .name("spa_behandlingsfeil_counter")
+            .labelNames("deserialisering", "avklaring", "vilkarsproving", "beregning")
+            .help("Antall ganger en søknad er forsøkt behandlet uten at vi kommer til et vedtak")
             .register()
 
     private val appId = "spa-behandling"
@@ -93,9 +97,17 @@ class SaksbehandlingStream(val env: Environment) {
         return builder.build()
     }
 
-    // TODO : implement
-    private fun logAndCountFail(behandlingsfeil: Behandlingsfeil) {}
-    private fun logAndCountVedtak(vedtak: SykepengeVedtak) {}
+    private fun logAndCountFail(behandlingsfeil: Behandlingsfeil) {
+        when(behandlingsfeil) {
+            is Behandlingsfeil.Deserialiseringsfeil -> behandlingsfeilCounter.labels("deserialisering").inc()
+            is Behandlingsfeil.Avklaringsfeil -> behandlingsfeilCounter.labels("avklaring").inc()
+            is Behandlingsfeil.Vilkårsprøvingsfeil -> behandlingsfeilCounter.labels("vilkarsproving").inc()
+            is Behandlingsfeil.Beregningsfeil -> behandlingsfeilCounter.labels("beregning").inc()
+        }
+    }
+    private fun logAndCountVedtak(vedtak: SykepengeVedtak) {
+        vedtakCounter.inc()
+    }
 
     private fun deserializeSykepengesøknad(soknad: JsonNode): Either<Behandlingsfeil, Sykepengesøknad> =
         try {
