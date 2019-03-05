@@ -1,7 +1,7 @@
 package no.nav.helse.domain
 
-import com.fasterxml.jackson.annotation.*
-import java.time.*
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import java.time.LocalDate
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class Arbeidsgiver(val navn: String, val orgnummer: String)

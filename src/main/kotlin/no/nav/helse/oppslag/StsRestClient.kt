@@ -3,7 +3,7 @@ package no.nav.helse.oppslag
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.github.kittinunf.fuel.httpGet
-import no.nav.helse.serde.defaultObjectMapper
+import no.nav.helse.streams.defaultObjectMapper
 import java.time.LocalDateTime
 
 /**

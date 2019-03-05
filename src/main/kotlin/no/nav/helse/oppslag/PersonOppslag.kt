@@ -1,10 +1,11 @@
 package no.nav.helse.oppslag
 
 import com.github.kittinunf.fuel.httpGet
-import no.nav.helse.behandling.*
-import no.nav.helse.serde.defaultObjectMapper
+import no.nav.helse.behandling.Sykepengesøknad
+import no.nav.helse.behandling.Tpsfakta
 import org.slf4j.LoggerFactory
 import java.time.LocalDate
+import no.nav.helse.streams.defaultObjectMapper
 
 class PersonOppslag(val sparkelUrl: String, val stsRestClient: StsRestClient) {
     private val log = LoggerFactory.getLogger(PersonOppslag::class.java.name)

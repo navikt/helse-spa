@@ -1,10 +1,11 @@
 package no.nav.helse.fastsetting
 
-import no.nav.helse.domain.*
-import org.junit.jupiter.api.Assertions.*
+import no.nav.helse.domain.Arbeidsforhold
+import no.nav.helse.domain.Arbeidsgiver
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.fail
 import org.junit.jupiter.api.Test
-import java.time.*
+import java.time.LocalDate
 
 class OpptjeningstidTest {
 

@@ -1,7 +1,8 @@
 package no.nav.helse
 
-import no.nav.helse.behandling.*
-import no.nav.helse.serde.JacksonDeserializer
+import com.fasterxml.jackson.module.kotlin.readValue
+import no.nav.helse.behandling.Sykepengesøknad
+import no.nav.helse.streams.defaultObjectMapper
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
 import org.slf4j.LoggerFactory
@@ -12,8 +13,7 @@ class SykepengesoknadTest {
 
     @Test
     fun jsonTester() {
-        val sykepengesøknad: Sykepengesøknad = JacksonDeserializer(Sykepengesøknad::class.java)
-                .deserialize(null, SykepengesoknadTest::class.java.classLoader.getResourceAsStream("enkel_soknad.json").readBytes())!!
+        val sykepengesøknad: Sykepengesøknad = defaultObjectMapper.readValue(SykepengesoknadTest::class.java.classLoader.getResourceAsStream("enkel_soknad.json"))
         LOG.info(sykepengesøknad.aktorId)
         assertNotNull(sykepengesøknad.fom.toString())
     }

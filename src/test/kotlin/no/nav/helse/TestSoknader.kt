@@ -1,8 +1,13 @@
 package no.nav.helse
 
-import no.nav.helse.behandling.*
-import no.nav.helse.domain.*
-import java.time.*
+import no.nav.helse.behandling.Faktagrunnlag
+import no.nav.helse.behandling.FaktagrunnlagResultat
+import no.nav.helse.behandling.Sykepengesøknad
+import no.nav.helse.behandling.Tpsfakta
+import no.nav.helse.domain.Arbeidsforhold
+import no.nav.helse.domain.Arbeidsgiver
+import java.time.LocalDate
+import java.time.LocalDateTime
 
 val tpsFaktaUtenVerdi = Tpsfakta(
         fodselsdato = LocalDate.now(),

@@ -4,13 +4,13 @@ val slf4jVersion = "1.7.25"
 val ktorVersion = "1.1.2"
 val prometheusVersion = "0.5.0"
 val gsonVersion = "2.7"
-val navStreamsVersion = "aa320bb"
+val navStreamsVersion = "1a24b7e"
 val fuelVersion = "1.15.1"
 
 val junitJupiterVersion = "5.3.1"
 val assertJVersion = "3.11.1"
 val mainClass = "no.nav.helse.AppKt"
-val jacksonVersion = "2.9.7"
+val jacksonVersion = "2.9.8"
 val wireMockVersion = "2.19.0"
 
 plugins {

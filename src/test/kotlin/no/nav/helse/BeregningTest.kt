@@ -1,15 +1,17 @@
 package no.nav.helse
 
 import no.nav.helse.behandling.*
-import no.nav.helse.domain.*
+import no.nav.helse.domain.Arbeidsgiver
 import no.nav.helse.fastsetting.*
-import no.nav.helse.fastsetting.Sykepengegrunnlag
-import no.nav.helse.sykepenger.beregning.*
-import no.nav.nare.core.evaluations.*
-import org.junit.jupiter.api.*
-import org.junit.jupiter.api.Assertions.*
-import java.math.*
-import java.time.*
+import no.nav.nare.core.evaluations.Evaluering
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Test
+import java.math.BigDecimal
+import java.math.RoundingMode
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.LocalTime
+import java.time.ZoneOffset
 
 class BeregningTest {
 

@@ -1,7 +1,7 @@
 package no.nav.helse.fastsetting
 
-import no.nav.helse.domain.*
-import java.time.*
+import no.nav.helse.domain.Arbeidsforhold
+import java.time.LocalDate
 
 typealias Opptjeningstid = Long
 

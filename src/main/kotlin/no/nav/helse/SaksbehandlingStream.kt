@@ -8,16 +8,18 @@ import no.nav.NarePrometheus
 import no.nav.helse.behandling.*
 import no.nav.helse.fastsetting.vurderFakta
 import no.nav.helse.oppslag.*
-import no.nav.helse.serde.defaultObjectMapper
-import no.nav.helse.serde.jsonNodeSerde
 import no.nav.helse.streams.StreamConsumer
 import no.nav.helse.streams.Topic
 import no.nav.helse.streams.Topics
 import no.nav.helse.streams.consumeTopic
 import no.nav.helse.streams.streamConfig
 import no.nav.helse.streams.toTopic
+import no.nav.helse.oppslag.StsRestClient
+import no.nav.helse.streams.*
+import no.nav.helse.streams.Topics.SYKEPENGEBEHANDLINGSFEIL
+import no.nav.helse.streams.Topics.SYKEPENGESØKNADER_INN
+import no.nav.helse.streams.Topics.VEDTAK_SYKEPENGER
 import org.apache.kafka.clients.consumer.ConsumerConfig
-import org.apache.kafka.common.serialization.Serdes
 import org.apache.kafka.streams.KafkaStreams
 import org.apache.kafka.streams.StreamsBuilder
 import org.apache.kafka.streams.StreamsConfig
@@ -67,7 +69,7 @@ class SaksbehandlingStream(val env: Environment) {
     private fun topology(): Topology {
         val builder = StreamsBuilder()
 
-        val streams = builder.consumeTopic(sykepengesoknadTopic)
+        val streams = builder.consumeTopic(SYKEPENGESØKNADER_INN)
                 .peek { _, _ -> acceptCounter.labels("accepted").inc() }
                 .filter { _, value -> value.has("status") && value.get("status").asText() == "SENDT" }
                 .mapValues { _, jsonNode -> deserializeSykepengesøknad(jsonNode) }
@@ -86,13 +88,13 @@ class SaksbehandlingStream(val env: Environment) {
                 .mapValues { _, behandlingsfeil -> (behandlingsfeil as Either.Left).left }
                 .peek { _, behandlingsfeil -> logAndCountFail(behandlingsfeil) }
                 .mapValues { _, behandlingsfeil -> serialize(behandlingsfeil) }
-                .toTopic(uavklartFaktaTopic) // TODO : should be a generic failure-topic
+                .toTopic(SYKEPENGEBEHANDLINGSFEIL) // TODO : should be a generic failure-topic
 
         streams[1]
                 .mapValues { _, vedtak -> (vedtak as Either.Right).right }
                 .peek { _, vedtak -> logAndCountVedtak(vedtak) }
                 .mapValues { _, vedtak -> serialize(vedtak) }
-                .toTopic(sykepengevedtakTopic)
+                .toTopic(VEDTAK_SYKEPENGER)
 
         return builder.build()
     }
@@ -138,22 +140,5 @@ class SaksbehandlingStream(val env: Environment) {
     fun serialize(feil: Behandlingsfeil): JsonNode = defaultObjectMapper.readTree(defaultObjectMapper.writeValueAsString(feil))
 }
 
-val sykepengesoknadTopic = Topic(
-        name = Topics.SYKEPENGESØKNADER_INN.name,
-        keySerde = Serdes.String(),
-        valueSerde = jsonNodeSerde
-)
-
-val sykepengevedtakTopic = Topic(
-        name = Topics.VEDTAK_SYKEPENGER.name,
-        keySerde = Serdes.String(),
-        valueSerde = jsonNodeSerde
-)
-
-val uavklartFaktaTopic= Topic(
-        name = "privat-helse-sykepenger-uavklart",
-        keySerde = Serdes.String(),
-        valueSerde = jsonNodeSerde
-)
 
 val narePrometheus = NarePrometheus(CollectorRegistry.defaultRegistry)

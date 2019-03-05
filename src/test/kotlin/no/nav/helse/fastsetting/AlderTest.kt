@@ -1,7 +1,10 @@
 package no.nav.helse.fastsetting
 
-import no.nav.helse.*
-import no.nav.helse.behandling.*
+import no.nav.helse.behandling.FaktagrunnlagResultat
+import no.nav.helse.faktagrunnlagUtenVerdi
+import no.nav.helse.originalSoknad
+import no.nav.helse.soknadUtenVerdi
+import no.nav.helse.tpsFaktaUtenVerdi
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail

@@ -1,27 +1,42 @@
 package no.nav.helse
 
-import com.fasterxml.jackson.databind.*
-import com.github.tomakehurst.wiremock.*
+import com.fasterxml.jackson.databind.JsonNode
+import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock.any
 import com.github.tomakehurst.wiremock.client.WireMock.configureFor
 import com.github.tomakehurst.wiremock.client.WireMock.okJson
 import com.github.tomakehurst.wiremock.client.WireMock.stubFor
 import com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo
-import com.github.tomakehurst.wiremock.core.*
-import no.nav.common.*
-import no.nav.helse.behandling.*
-import no.nav.helse.domain.*
-import no.nav.helse.serde.*
-import no.nav.helse.streams.*
-import org.apache.kafka.clients.*
-import org.apache.kafka.clients.consumer.*
-import org.apache.kafka.clients.producer.*
-import org.apache.kafka.common.config.*
-import org.junit.jupiter.api.*
+import com.github.tomakehurst.wiremock.core.WireMockConfiguration
+import no.nav.common.JAASCredential
+import no.nav.common.KafkaEnvironment
+import no.nav.helse.behandling.Soknadsperiode
+import no.nav.helse.behandling.Sykepengesøknad
+import no.nav.helse.domain.Arbeidsgiver
+import no.nav.helse.streams.JsonDeserializer
+import no.nav.helse.streams.JsonSerializer
+
+import no.nav.helse.streams.Topics
+import no.nav.helse.streams.Topics.SYKEPENGESØKNADER_INN
+import no.nav.helse.streams.Topics.VEDTAK_SYKEPENGER
+import no.nav.helse.streams.defaultObjectMapper
+import org.apache.kafka.clients.CommonClientConfigs
+import org.apache.kafka.clients.consumer.ConsumerConfig
+import org.apache.kafka.clients.consumer.KafkaConsumer
+import org.apache.kafka.clients.producer.KafkaProducer
+import org.apache.kafka.clients.producer.ProducerConfig
+import org.apache.kafka.clients.producer.ProducerRecord
+import org.apache.kafka.common.config.SaslConfigs
+import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import java.math.BigDecimal
 import java.math.RoundingMode
-import java.time.*
+import java.time.DayOfWeek
+import java.time.Duration
+import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 import java.util.*
 
@@ -36,7 +51,7 @@ class EndToEndTest {
                 autoStart = false,
                 withSchemaRegistry = false,
                 withSecurity = true,
-                topics = listOf(sykepengesoknadTopic.name, Topics.VEDTAK_SYKEPENGER.name)
+                topics = listOf(SYKEPENGESØKNADER_INN.name, Topics.VEDTAK_SYKEPENGER.name)
         )
 
         val server: WireMockServer = WireMockServer(WireMockConfiguration.options().dynamicPort())
@@ -137,13 +152,13 @@ class EndToEndTest {
                 ),
                 harVurdertInntekt = false
         )
-        produceOneMessage(søknad)
+        produceOneMessage(defaultObjectMapper.valueToTree(søknad))
         return søknad
     }
 
     private fun ventPåVedtak(): JsonNode? {
         val resultConsumer = KafkaConsumer<String, JsonNode>(consumerProperties())
-        resultConsumer.subscribe(listOf(sykepengevedtakTopic.name))
+        resultConsumer.subscribe(listOf(VEDTAK_SYKEPENGER.name))
 
         val end = System.currentTimeMillis() + 60 * 1000
 
@@ -154,7 +169,7 @@ class EndToEndTest {
             if (!records.isEmpty) {
                 assertEquals(1, records.count())
 
-                return records.records(sykepengevedtakTopic.name).map {
+                return records.records(VEDTAK_SYKEPENGER.name).map {
                     it.value()
                 }.first()
             }
@@ -168,7 +183,7 @@ class EndToEndTest {
             put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, embeddedEnvironment.brokersURL)
 
             put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer")
-            put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JacksonNodeDeserializer::class.java)
+            put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer::class.java)
             put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, "SASL_PLAINTEXT")
             put(SaslConfigs.SASL_MECHANISM, "PLAIN")
             put(SaslConfigs.SASL_JAAS_CONFIG, "org.apache.kafka.common.security.plain.PlainLoginModule required username=\"$username\" password=\"$password\";")
@@ -176,9 +191,9 @@ class EndToEndTest {
         }
     }
 
-    private fun produceOneMessage(message: Sykepengesøknad) {
-        val producer = KafkaProducer<String, Sykepengesøknad>(producerProperties())
-        producer.send(ProducerRecord(sykepengesoknadTopic.name, message))
+    private fun produceOneMessage(message: JsonNode) {
+        val producer = KafkaProducer<String, JsonNode>(producerProperties())
+        producer.send(ProducerRecord(SYKEPENGESØKNADER_INN.name, message))
         producer.flush()
     }
 
@@ -186,7 +201,7 @@ class EndToEndTest {
         return Properties().apply {
             put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, embeddedEnvironment.brokersURL)
             put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer")
-            put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JacksonSerializer::class.java)
+            put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer::class.java)
             put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, "SASL_PLAINTEXT")
             put(SaslConfigs.SASL_MECHANISM, "PLAIN")
             put(SaslConfigs.SASL_JAAS_CONFIG, "org.apache.kafka.common.security.plain.PlainLoginModule required username=\"$username\" password=\"$password\";")

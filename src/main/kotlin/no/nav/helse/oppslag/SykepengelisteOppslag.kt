@@ -1,10 +1,10 @@
 package no.nav.helse.oppslag
 
+import com.fasterxml.jackson.module.kotlin.readValue
 import com.github.kittinunf.fuel.httpGet
-import no.nav.helse.serde.defaultObjectMapper
+import no.nav.helse.streams.defaultObjectMapper
 import java.math.BigDecimal
 import java.time.LocalDate
-import com.fasterxml.jackson.module.kotlin.*
 
 class SykepengelisteOppslag(val sparkelUrl: String, val stsRestClient: StsRestClient) {
     fun hentSykepengeliste(aktorId: String, fom: LocalDate): Collection<SykepengerVedtak> {

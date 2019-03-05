@@ -1,13 +1,14 @@
 package no.nav.helse.oppslag
 
 import com.fasterxml.jackson.module.kotlin.readValue
-import com.github.kittinunf.fuel.*
-import no.nav.helse.behandling.*
-import no.nav.helse.domain.*
-import no.nav.helse.serde.*
-import org.slf4j.*
-import java.time.*
-import java.time.temporal.*
+import com.github.kittinunf.fuel.httpGet
+import no.nav.helse.behandling.Sykepengesøknad
+import no.nav.helse.domain.Arbeidsforhold
+import no.nav.helse.domain.ArbeidsforholdWrapper
+import org.slf4j.LoggerFactory
+import java.time.LocalDate
+import java.time.temporal.ChronoUnit
+import no.nav.helse.streams.defaultObjectMapper
 
 class ArbeidsforholdOppslag(val sparkelUrl: String, val stsRestClient: StsRestClient) {
     private val log = LoggerFactory.getLogger(ArbeidsforholdOppslag::class.java.name)

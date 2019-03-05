@@ -2,7 +2,6 @@ package no.nav.helse.fastsetting
 
 import no.nav.helse.behandling.FaktagrunnlagResultat
 import no.nav.helse.behandling.Tpsfakta
-import no.nav.nare.core.evaluations.Evaluering
 import java.time.LocalDate
 import java.time.Period
 

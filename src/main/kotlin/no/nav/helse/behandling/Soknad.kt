@@ -1,11 +1,11 @@
 package no.nav.helse.behandling
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-import no.nav.helse.domain.*
+import no.nav.helse.domain.Arbeidsforhold
+import no.nav.helse.domain.Arbeidsgiver
 import no.nav.helse.fastsetting.*
-import no.nav.helse.fastsetting.Opptjeningsgrunnlag
-import no.nav.helse.fastsetting.Opptjeningstid
-import no.nav.helse.oppslag.*
+import no.nav.helse.oppslag.Inntekt
+import no.nav.helse.oppslag.SykepengerVedtak
 import no.nav.helse.sykepenger.beregning.Beregningsresultat
 import no.nav.nare.core.evaluations.Evaluering
 import java.time.LocalDate

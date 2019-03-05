@@ -1,11 +1,15 @@
 package no.nav.helse.fastsetting
 
-import no.nav.helse.domain.*
-import no.nav.helse.oppslag.*
-import org.junit.jupiter.api.*
-import org.junit.jupiter.api.Assertions.*
-import java.math.*
-import java.time.*
+import no.nav.helse.domain.Arbeidsgiver
+import no.nav.helse.oppslag.Inntekt
+import no.nav.helse.oppslag.Inntektsarbeidsgiver
+import no.nav.helse.oppslag.Opptjeningsperiode
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.fail
+import java.math.BigDecimal
+import java.time.LocalDate
 
 class InntektsFastsettingTest {
 

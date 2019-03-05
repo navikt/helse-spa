@@ -1,8 +1,9 @@
 package no.nav.helse.fastsetting
 
-import no.nav.helse.behandling.*
-import no.nav.helse.domain.*
-import no.nav.nare.core.evaluations.*
+import no.nav.helse.behandling.FaktagrunnlagResultat
+import no.nav.helse.domain.Arbeidsforhold
+import no.nav.nare.core.evaluations.Evaluering
+import no.nav.nare.core.evaluations.Resultat
 
 fun vurderArbeidsforhold(fakta : FaktagrunnlagResultat) : Vurdering<Boolean, List<Arbeidsforhold>> {
 

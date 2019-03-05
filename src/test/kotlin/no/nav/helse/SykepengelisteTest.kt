@@ -1,12 +1,12 @@
 package no.nav.helse
 
 import com.fasterxml.jackson.module.kotlin.readValue
-import no.nav.helse.oppslag.*
-import no.nav.helse.serde.defaultObjectMapper
+import no.nav.helse.oppslag.SykepengerVedtak
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.math.BigDecimal
 import java.time.LocalDate
+import no.nav.helse.streams.defaultObjectMapper
 
 class SykepengelisteTest {
 

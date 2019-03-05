@@ -1,17 +1,21 @@
 package no.nav.helse.fastsetting
 
-import com.fasterxml.jackson.module.kotlin.*
-import no.nav.helse.*
-import no.nav.helse.behandling.*
-import no.nav.helse.domain.*
-import no.nav.helse.serde.*
-import org.assertj.core.api.Assertions.*
+import com.fasterxml.jackson.module.kotlin.readValue
+import no.nav.helse.behandling.Faktagrunnlag
+import no.nav.helse.behandling.FaktagrunnlagResultat
+import no.nav.helse.domain.Arbeidsforhold
+import no.nav.helse.domain.ArbeidsforholdWrapper
+import no.nav.helse.domain.Arbeidsgiver
+import no.nav.helse.originalSoknad
+import no.nav.helse.tpsFaktaUtenVerdi
+import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.fail
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
-import org.slf4j.*
-import java.time.*
-
+import org.slf4j.LoggerFactory
+import java.time.LocalDate
+import no.nav.helse.streams.defaultObjectMapper
 class ArbeidsforholdTest {
 
     private val log = LoggerFactory.getLogger(ArbeidsforholdTest::class.java)

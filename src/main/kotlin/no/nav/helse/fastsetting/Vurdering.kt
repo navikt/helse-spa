@@ -1,8 +1,11 @@
 package no.nav.helse.fastsetting
 
-import no.nav.helse.*
+import no.nav.helse.Behandlingsfeil
+import no.nav.helse.Either
+import no.nav.helse.Yrkesstatus
 import no.nav.helse.behandling.*
-import no.nav.helse.domain.*
+import no.nav.helse.domain.Arbeidsforhold
+import no.nav.helse.flatMap
 import java.time.LocalDate
 import java.time.LocalDateTime
 
