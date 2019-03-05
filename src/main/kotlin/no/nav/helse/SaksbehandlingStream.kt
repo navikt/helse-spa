@@ -135,7 +135,7 @@ class SaksbehandlingStream(val env: Environment) {
     private fun fattVedtak(beregning: Sykepengeberegning): Either<Behandlingsfeil, SykepengeVedtak> = vedtak(beregning)
 }
 
-fun serialize(vedtak: SykepengeVedtak): JsonNode = defaultObjectMapper.readTree(defaultObjectMapper.writeValueAsString(vedtak))
-fun serializeBehandlingsfeil(feil: Behandlingsfeil): JsonNode = defaultObjectMapper.readTree(defaultObjectMapper.writeValueAsString(feil))
+fun serialize(vedtak: SykepengeVedtak): JsonNode = defaultObjectMapper.valueToTree(vedtak)
+fun serializeBehandlingsfeil(feil: Behandlingsfeil): JsonNode = defaultObjectMapper.valueToTree(feil)
 
 val narePrometheus = NarePrometheus(CollectorRegistry.defaultRegistry)
