@@ -15,7 +15,7 @@ fun vilkårsprøving(avklarteFakta: AvklarteFakta): Either<Behandlingsfeil, Vilk
 
     return when(vilkår.vilkårsprøving.resultat) {
         Resultat.JA -> Either.Right(vilkår)
-        else -> Either.Left(Behandlingsfeil.from(vilkår))
+        else -> Either.Left(Behandlingsfeil.vilkårErIkkeOppfylt(vilkår))
     }
 }
 

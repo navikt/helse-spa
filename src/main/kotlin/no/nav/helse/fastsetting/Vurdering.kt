@@ -50,7 +50,7 @@ fun vurderFakta(fakta: FaktagrunnlagResultat): Either<Behandlingsfeil, AvklarteF
             fakta.faktagrunnlag.sykepengeliste)
 
     return if (listOf(medlemsskap, alder, arbeidsforhold, opptjeningstid, sykepengegrunnlag, maksdato).filter { it is Vurdering.Uavklart<*, *> }.isNotEmpty()) {
-        Either.Left(Behandlingsfeil.from(UavklarteFakta(
+        Either.Left(Behandlingsfeil.avklaringsfeil(UavklarteFakta(
                 originalSøknad = fakta.originalSøknad,
                 faktagrunnlag = fakta.faktagrunnlag,
                 uavklarteVerdier = UavklarteVerdier(

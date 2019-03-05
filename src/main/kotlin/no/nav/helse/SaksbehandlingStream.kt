@@ -102,10 +102,10 @@ class SaksbehandlingStream(val env: Environment) {
             Either.Right(defaultObjectMapper.treeToValue(soknad, Sykepengesøknad::class.java))
         } catch(e: MissingKotlinParameterException) {
             log.error("Failed to deserialize søknad due to missing non-nullable parameter: ${e.parameter.name} of type ${e.parameter.type}")
-            Either.Left(Behandlingsfeil.from(soknad, e))
+            Either.Left(Behandlingsfeil.manglendeFeilDeserialiseringsfeil(soknad, e))
         } catch (e: Exception) {
             log.error("Failed to deserialize søknad", e)
-            Either.Left(Behandlingsfeil.from(soknad, e))
+            Either.Left(Behandlingsfeil.ukjentDeserialiseringsfeil(soknad, e))
         }
 
     fun start() {

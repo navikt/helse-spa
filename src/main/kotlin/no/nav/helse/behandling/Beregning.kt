@@ -15,7 +15,7 @@ fun sykepengeBeregning(vilkårsprøving: Vilkårsprøving): Either<Behandlingsfe
                     vilkårsprøving = vilkårsprøving.vilkårsprøving,
                     beregning = beregningsresultat))
         } catch (e: Exception) {
-            Either.Left(Behandlingsfeil.from(vilkårsprøving, e))
+            Either.Left(Behandlingsfeil.beregningsfeil(vilkårsprøving, e))
         }
 
 internal fun grunnbeløp() = 96883L // TODO: lookup?
