@@ -2,15 +2,23 @@ package no.nav.helse
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException
+import io.prometheus.client.Counter
 import no.nav.helse.behandling.UavklarteFakta
 import no.nav.helse.behandling.Vilkårsprøving
+import no.nav.helse.fastsetting.Vurdering
 
 sealed class Behandlingsfeil {
     data class Deserialiseringsfeil(val json: JsonNode, val feilmelding: String): Behandlingsfeil()
 
     data class RegisterFeil(val feilmelding: String): Behandlingsfeil()
 
-    data class Avklaringsfeil(val uavklarteFakta: UavklarteFakta, val feilmelding: String): Behandlingsfeil()
+    data class Avklaringsfeil(val uavklarteFakta: UavklarteFakta, val feilmelding: String): Behandlingsfeil() {
+        fun tellUavklarte(avklaringsfeilCounter: Counter) {
+            uavklarteFakta.uavklarteVerdier.asNamedList().forEach { (name, fakta) ->
+                if (fakta is Vurdering.Uavklart) avklaringsfeilCounter.labels(name).inc()
+            }
+        }
+    }
 
     data class Vilkårsprøvingsfeil(val vilkårsprøving: Vilkårsprøving, val feilmelding: String): Behandlingsfeil()
 

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException
 import io.prometheus.client.CollectorRegistry
 import io.prometheus.client.Counter
 import no.nav.NarePrometheus
+import no.nav.helse.Behandlingsfeil.*
 import no.nav.helse.behandling.*
 import no.nav.helse.fastsetting.vurderFakta
 import no.nav.helse.streams.StreamConsumer
@@ -42,6 +43,11 @@ class SaksbehandlingStream(val env: Environment) {
             .name("spa_behandlingsfeil_counter")
             .labelNames("steg")
             .help("Antall ganger en søknad er forsøkt behandlet uten at vi kommer til et vedtak")
+            .register()
+    private val avklaringsfeilCounter: Counter = Counter.build()
+            .name("spa_avklaringsfeil_counter")
+            .labelNames("faktum")
+            .help("Hvilke faktum klarer vi ikke fastsette")
             .register()
 
     private val appId = "spa-behandling"
@@ -98,12 +104,15 @@ class SaksbehandlingStream(val env: Environment) {
 
     private fun logAndCountFail(behandlingsfeil: Behandlingsfeil) {
         when(behandlingsfeil) {
-            is Behandlingsfeil.Deserialiseringsfeil -> behandlingsfeilCounter.labels("deserialisering").inc()
-            is Behandlingsfeil.RegisterFeil -> behandlingsfeilCounter.labels("register").inc()
-            is Behandlingsfeil.Avklaringsfeil -> behandlingsfeilCounter.labels("avklaring").inc()
-            is Behandlingsfeil.Vilkårsprøvingsfeil -> behandlingsfeilCounter.labels("vilkarsproving").inc()
-            is Behandlingsfeil.Beregningsfeil -> behandlingsfeilCounter.labels("beregning").inc()
+            is Deserialiseringsfeil -> behandlingsfeilCounter.labels("deserialisering").inc()
+            is RegisterFeil -> behandlingsfeilCounter.labels("register").inc()
+            is Avklaringsfeil -> behandlingsfeilCounter.labels("avklaring").inc()
+            is Vilkårsprøvingsfeil -> behandlingsfeilCounter.labels("vilkarsproving").inc()
+            is Beregningsfeil -> behandlingsfeilCounter.labels("beregning").inc()
         }
+    }
+    private fun logAndCountAvklaringsfeil(feil: Avklaringsfeil) {
+        feil.tellUavklarte(avklaringsfeilCounter)
     }
     private fun logAndCountVedtak(vedtak: SykepengeVedtak) {
         vedtakCounter.inc()
