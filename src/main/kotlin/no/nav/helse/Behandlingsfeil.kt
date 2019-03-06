@@ -14,7 +14,7 @@ sealed class Behandlingsfeil {
 
     data class Vilkårsprøvingsfeil(val vilkårsprøving: Vilkårsprøving, val feilmelding: String): Behandlingsfeil()
 
-    data class Beregningsfeil(val vilkårsprøving: Vilkårsprøving, val exception: java.lang.Exception, val feilmelding: String): Behandlingsfeil()
+    data class Beregningsfeil(val vilkårsprøving: Vilkårsprøving, val feilmelding: String): Behandlingsfeil()
 
 
     companion object {
@@ -32,7 +32,7 @@ sealed class Behandlingsfeil {
         fun vilkårErIkkeOppfylt(vilkårsprøving: Vilkårsprøving) = Vilkårsprøvingsfeil(vilkårsprøving, "Vilkår er ikke oppfylt.")
 
         // her feilet noe under _beregning, men vi har ikke del-resultat, bare exception
-        fun beregningsfeil(vilkårsprøving: Vilkårsprøving, e: Exception) = Beregningsfeil(vilkårsprøving, e, "Beregning feilet.")
+        fun beregningsfeil(vilkårsprøving: Vilkårsprøving, exception: Exception) = Beregningsfeil(vilkårsprøving, "Beregning feilet: ${exception.javaClass.simpleName}: ${exception.message}.")
 
         fun registerFeil(exception: Exception):RegisterFeil = RegisterFeil("Feil i opphenting av register-data: ${exception.javaClass.simpleName} : ${exception.message}\"")
 
