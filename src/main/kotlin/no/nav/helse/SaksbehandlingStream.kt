@@ -106,7 +106,10 @@ class SaksbehandlingStream(val env: Environment) {
         when(behandlingsfeil) {
             is Deserialiseringsfeil -> behandlingsfeilCounter.labels("deserialisering").inc()
             is RegisterFeil -> behandlingsfeilCounter.labels("register").inc()
-            is Avklaringsfeil -> behandlingsfeilCounter.labels("avklaring").inc()
+            is Avklaringsfeil -> {
+                behandlingsfeilCounter.labels("avklaring").inc()
+                logAndCountAvklaringsfeil(behandlingsfeil)
+            }
             is Vilkårsprøvingsfeil -> behandlingsfeilCounter.labels("vilkarsproving").inc()
             is Beregningsfeil -> behandlingsfeilCounter.labels("beregning").inc()
         }
