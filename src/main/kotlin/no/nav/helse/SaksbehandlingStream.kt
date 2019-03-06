@@ -85,7 +85,7 @@ class SaksbehandlingStream(val env: Environment) {
                 .mapValues { _, behandlingsfeil -> (behandlingsfeil as Either.Left).left }
                 .peek { _, behandlingsfeil -> logAndCountFail(behandlingsfeil) }
                 .mapValues { _, behandlingsfeil -> serializeBehandlingsfeil(behandlingsfeil) }
-                .toTopic(SYKEPENGEBEHANDLINGSFEIL) // TODO : should be a generic failure-topic
+                .toTopic(SYKEPENGEBEHANDLINGSFEIL)
 
         streams[1]
                 .mapValues { _, vedtak -> (vedtak as Either.Right).right }
