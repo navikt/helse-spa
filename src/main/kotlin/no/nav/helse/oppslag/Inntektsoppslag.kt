@@ -35,7 +35,7 @@ class Inntektsoppslag(val sparkelUrl: String, val stsRestClient: StsRestClient) 
 data class InntektsoppslagResultat(val inntekter : List<Inntekt>)
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-data class Opptjeningsperiode(val fom: LocalDate, val tom: LocalDate)
+data class Opptjeningsperiode(val fom: LocalDate, val tom: LocalDate, val antattPeriode: Boolean = true)
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class Inntektsarbeidsgiver(val orgnr: String)
