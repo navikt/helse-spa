@@ -5,18 +5,36 @@ import com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException
 import io.prometheus.client.CollectorRegistry
 import io.prometheus.client.Counter
 import no.nav.NarePrometheus
-import no.nav.helse.Behandlingsfeil.*
-import no.nav.helse.behandling.*
+import no.nav.helse.Behandlingsfeil.Avklaringsfeil
+import no.nav.helse.Behandlingsfeil.Beregningsfeil
+import no.nav.helse.Behandlingsfeil.Deserialiseringsfeil
+import no.nav.helse.Behandlingsfeil.RegisterFeil
+import no.nav.helse.Behandlingsfeil.Vilkårsprøvingsfeil
+import no.nav.helse.behandling.AvklarteFakta
+import no.nav.helse.behandling.FaktagrunnlagResultat
+import no.nav.helse.behandling.LegacySøknad
+import no.nav.helse.behandling.Oppslag
+import no.nav.helse.behandling.SykepengeVedtak
+import no.nav.helse.behandling.Sykepengeberegning
+import no.nav.helse.behandling.Sykepengesøknad
+import no.nav.helse.behandling.Vilkårsprøving
+import no.nav.helse.behandling.asNewPeriode
+import no.nav.helse.behandling.sykepengeBeregning
+import no.nav.helse.behandling.vedtak
+import no.nav.helse.behandling.vilkårsprøving
 import no.nav.helse.domain.Arbeidsgiver
 import no.nav.helse.fastsetting.vurderFakta
-import no.nav.helse.streams.StreamConsumer
-import no.nav.helse.streams.consumeTopic
-import no.nav.helse.streams.streamConfig
-import no.nav.helse.streams.toTopic
 import no.nav.helse.oppslag.StsRestClient
-import no.nav.helse.streams.*
+import no.nav.helse.streams.JsonDeserializer
+import no.nav.helse.streams.JsonSerializer
+import no.nav.helse.streams.StreamConsumer
+import no.nav.helse.streams.Topic
 import no.nav.helse.streams.Topics.SYKEPENGEBEHANDLINGSFEIL
 import no.nav.helse.streams.Topics.VEDTAK_SYKEPENGER
+import no.nav.helse.streams.consumeTopic
+import no.nav.helse.streams.defaultObjectMapper
+import no.nav.helse.streams.streamConfig
+import no.nav.helse.streams.toTopic
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.common.serialization.Serdes
 import org.apache.kafka.streams.KafkaStreams
@@ -52,7 +70,7 @@ class SaksbehandlingStream(val env: Environment) {
             .help("Hvilke faktum klarer vi ikke fastsette")
             .register()
 
-    private val appId = "spa-behandling"
+    private val appId = "spa-behandling-1"
 
     private val consumer: StreamConsumer
 
