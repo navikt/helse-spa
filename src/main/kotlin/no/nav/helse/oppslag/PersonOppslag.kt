@@ -20,7 +20,6 @@ class PersonOppslag(val sparkelUrl: String, val stsRestClient: StsRestClient) {
 
     private fun hentPerson(aktørId: AktørId): Either<Exception, Person> {
         val bearer = stsRestClient.token()
-        log.info("got token")
         val (_, _, result) = "$sparkelUrl/api/person/${aktørId.aktor}".httpGet()
                 .header(mapOf(
                         "Authorization" to "Bearer $bearer",
