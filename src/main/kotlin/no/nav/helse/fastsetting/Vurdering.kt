@@ -1,13 +1,23 @@
 package no.nav.helse.fastsetting
 
+import io.prometheus.client.Counter
 import no.nav.helse.Behandlingsfeil
 import no.nav.helse.Either
 import no.nav.helse.Yrkesstatus
-import no.nav.helse.behandling.*
+import no.nav.helse.behandling.AvklarteFakta
+import no.nav.helse.behandling.AvklarteVerdier
+import no.nav.helse.behandling.FaktagrunnlagResultat
+import no.nav.helse.behandling.UavklarteFakta
+import no.nav.helse.behandling.UavklarteVerdier
 import no.nav.helse.domain.Arbeidsforhold
-import no.nav.helse.flatMap
 import java.time.LocalDate
 import java.time.LocalDateTime
+
+private val vurderingerCounter = Counter.build()
+        .name("vurderinger_totals")
+        .labelNames("hva", "resultat")
+        .help("antall vurderinger gjort, fordelt på uavklart eller avklart")
+        .register()
 
 sealed class Vurdering<out V, out G>(val begrunnelse: String, val grunnlag: G, val vurderingstidspunkt: LocalDateTime = LocalDateTime.now()) {
     class Avklart<V, G>(val fastsattVerdi: V,
@@ -41,16 +51,52 @@ sealed class Vurdering<out V, out G>(val begrunnelse: String, val grunnlag: G, v
 
 
 fun vurderFakta(fakta: FaktagrunnlagResultat): Either<Behandlingsfeil, AvklarteFakta> {
-    val medlemsskap = vurderMedlemskap(fakta)
-    val alder = vurderAlderPåSisteDagISøknadsPeriode(fakta)
-    val arbeidsforhold = vurderArbeidsforhold(fakta)
-    val opptjeningstid = vurderOpptjeningstid(Opptjeningsgrunnlag(fakta.originalSøknad.startSyketilfelle, fakta.faktagrunnlag.arbeidsforhold))
-    val sykepengegrunnlag = fastsettingAvSykepengegrunnlaget(fakta.originalSøknad.startSyketilfelle, fakta.originalSøknad.arbeidsgiver, fakta.faktagrunnlag.beregningsperiode, fakta.faktagrunnlag.sammenligningsperiode)
+    val medlemsskap = vurderMedlemskap(fakta).also {
+        if (it is Vurdering.Uavklart) {
+            vurderingerCounter.labels("medlemsskap", "uavklart").inc()
+        } else {
+            vurderingerCounter.labels("medlemsskap", "avklart").inc()
+        }
+    }
+    val alder = vurderAlderPåSisteDagISøknadsPeriode(fakta).also {
+        if (it is Vurdering.Uavklart) {
+            vurderingerCounter.labels("alder", "uavklart").inc()
+        } else {
+            vurderingerCounter.labels("alder", "avklart").inc()
+        }
+    }
+    val arbeidsforhold = vurderArbeidsforhold(fakta).also {
+        if (it is Vurdering.Uavklart) {
+            vurderingerCounter.labels("arbeidsforhold", "uavklart").inc()
+        } else {
+            vurderingerCounter.labels("arbeidsforhold", "avklart").inc()
+        }
+    }
+    val opptjeningstid = vurderOpptjeningstid(Opptjeningsgrunnlag(fakta.originalSøknad.startSyketilfelle, fakta.faktagrunnlag.arbeidsforhold)).also {
+        if (it is Vurdering.Uavklart) {
+            vurderingerCounter.labels("opptjeningstid", "uavklart").inc()
+        } else {
+            vurderingerCounter.labels("opptjeningstid", "avklart").inc()
+        }
+    }
+    val sykepengegrunnlag = fastsettingAvSykepengegrunnlaget(fakta.originalSøknad.startSyketilfelle, fakta.originalSøknad.arbeidsgiver, fakta.faktagrunnlag.beregningsperiode, fakta.faktagrunnlag.sammenligningsperiode).also {
+        if (it is Vurdering.Uavklart) {
+            vurderingerCounter.labels("sykepengegrunnlag", "uavklart").inc()
+        } else {
+            vurderingerCounter.labels("sykepengegrunnlag", "avklart").inc()
+        }
+    }
     val maksdato = vurderMaksdato(alder,
             fakta.originalSøknad.startSyketilfelle,
             fakta.originalSøknad.fom,
             Yrkesstatus.ARBEIDSTAKER,
-            fakta.faktagrunnlag.sykepengeliste)
+            fakta.faktagrunnlag.sykepengeliste).also {
+        if (it is Vurdering.Uavklart) {
+            vurderingerCounter.labels("maksdato", "uavklart").inc()
+        } else {
+            vurderingerCounter.labels("maksdato", "avklart").inc()
+        }
+    }
 
     return if (listOf(medlemsskap, alder, arbeidsforhold, opptjeningstid, sykepengegrunnlag, maksdato).filter { it is Vurdering.Uavklart<*, *> }.isNotEmpty()) {
         Either.Left(Behandlingsfeil.avklaringsfeil(UavklarteFakta(
