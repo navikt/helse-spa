@@ -45,6 +45,7 @@ import org.apache.kafka.streams.errors.LogAndFailExceptionHandler
 import org.apache.kafka.streams.kstream.Predicate
 import org.slf4j.LoggerFactory
 import java.time.LocalDate
+import java.time.YearMonth
 import java.util.*
 
 class SaksbehandlingStream(val env: Environment) {
@@ -186,8 +187,8 @@ fun deserializeSykepengesøknadLegacy(soknad: JsonNode): Either<Behandlingsfeil,
             val asNotLegacy = Sykepengesøknad(
                     aktorId = legacy.aktorId,
                     arbeidsgiver = Arbeidsgiver(navn = legacy.arbeidsgiver?: "TOM ASA", orgnummer = "00000000000"),
-                    fom = legacy.fom,
-                    tom = legacy.tom,
+                    fom = legacy.fom ?: YearMonth.now().atDay(1),
+                    tom = legacy.tom ?: YearMonth.now().atEndOfMonth(),
                     startSyketilfelle = legacy.startSykeforlop?: LocalDate.now(),
                     soktUtenlandsopphold = false,
                     soknadsperioder = legacy.soknadPerioder.map { asNewPeriode(it) },

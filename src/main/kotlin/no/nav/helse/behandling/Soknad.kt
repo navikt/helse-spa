@@ -122,8 +122,8 @@ data class LegacySøknad(
         val aktorId: String,
         val status: String,
         val arbeidsgiver: String?,
-        val fom: LocalDate,
-        val tom: LocalDate,
+        val fom: LocalDate?,
+        val tom: LocalDate?,
         val startSykeforlop: LocalDate?,
         val innsendtDato: LocalDate?,
         val soknadPerioder: List<LegacySoknadsperiode>
