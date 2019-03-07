@@ -2,14 +2,18 @@ package no.nav.helse.oppslag
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.github.kittinunf.fuel.httpGet
+import no.nav.helse.Either
 import no.nav.helse.streams.defaultObjectMapper
+import org.slf4j.LoggerFactory
 
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 class Inntektsoppslag(val sparkelUrl: String, val stsRestClient: StsRestClient) {
-    private fun hentInntekter(aktorId: String, fom: LocalDate, tom: LocalDate, type: String): List<Inntekt> {
+    private val log = LoggerFactory.getLogger(Inntektsoppslag::class.java.name)
+
+    private fun hentInntekter(aktorId: String, fom: LocalDate, tom: LocalDate, type: String): Either<Exception, List<Inntekt>> {
         val bearer = stsRestClient.token()
 
         val dyFom = fom.format(DateTimeFormatter.ofPattern("yyyy-MM"));
@@ -23,8 +27,16 @@ class Inntektsoppslag(val sparkelUrl: String, val stsRestClient: StsRestClient) 
                         "Nav-Consumer-Id" to "spa"
                 ))
                 .responseString()
+        val (_, error) = result
 
-        return defaultObjectMapper.readValue(result.component1(), InntektsoppslagResultat::class.java).inntekter
+        return error?.exception?.let {
+            log.error("Error in inntekt lookup", it)
+            Either.Left(it)
+        } ?: try {
+            Either.Right(defaultObjectMapper.readValue(result.component1(), InntektsoppslagResultat::class.java).inntekter)
+        } catch (err: Exception) {
+            Either.Left(err)
+        }
     }
 
     fun hentBeregningsgrunnlag(aktorId: String, fom: LocalDate, tom: LocalDate) = hentInntekter(aktorId, fom, tom, "beregningsgrunnlag")
