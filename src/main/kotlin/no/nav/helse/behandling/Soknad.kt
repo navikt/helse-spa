@@ -110,3 +110,28 @@ data class Faktagrunnlag(val tps: Tpsfakta,
                          val arbeidsforhold: List<Arbeidsforhold>)
 
 data class Tpsfakta(val fodselsdato: LocalDate, val bostedland: String)
+
+fun asNewPeriode(it: LegacySoknadsperiode): Soknadsperiode = Soknadsperiode(
+        fom = it.fom,
+        tom = it.tom,
+        sykmeldingsgrad = it.grad
+)
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class LegacySøknad(
+        val aktorId: String,
+        val status: String,
+        val arbeidsgiver: String?,
+        val fom: LocalDate,
+        val tom: LocalDate,
+        val startSykeforlop: LocalDate?,
+        val innsendtDato: LocalDate?,
+        val soknadPerioder: List<LegacySoknadsperiode>
+)
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class LegacySoknadsperiode(
+        val fom: LocalDate,
+        val tom: LocalDate,
+        val grad: Int
+)

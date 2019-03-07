@@ -7,6 +7,7 @@ import io.prometheus.client.Counter
 import no.nav.NarePrometheus
 import no.nav.helse.Behandlingsfeil.*
 import no.nav.helse.behandling.*
+import no.nav.helse.domain.Arbeidsgiver
 import no.nav.helse.fastsetting.vurderFakta
 import no.nav.helse.streams.StreamConsumer
 import no.nav.helse.streams.consumeTopic
@@ -15,9 +16,9 @@ import no.nav.helse.streams.toTopic
 import no.nav.helse.oppslag.StsRestClient
 import no.nav.helse.streams.*
 import no.nav.helse.streams.Topics.SYKEPENGEBEHANDLINGSFEIL
-import no.nav.helse.streams.Topics.SYKEPENGESØKNADER_INN
 import no.nav.helse.streams.Topics.VEDTAK_SYKEPENGER
 import org.apache.kafka.clients.consumer.ConsumerConfig
+import org.apache.kafka.common.serialization.Serdes
 import org.apache.kafka.streams.KafkaStreams
 import org.apache.kafka.streams.StreamsBuilder
 import org.apache.kafka.streams.StreamsConfig
@@ -25,6 +26,7 @@ import org.apache.kafka.streams.Topology
 import org.apache.kafka.streams.errors.LogAndFailExceptionHandler
 import org.apache.kafka.streams.kstream.Predicate
 import org.slf4j.LoggerFactory
+import java.time.LocalDate
 import java.util.*
 
 class SaksbehandlingStream(val env: Environment) {
@@ -72,10 +74,16 @@ class SaksbehandlingStream(val env: Environment) {
     private fun topology(): Topology {
         val builder = StreamsBuilder()
 
-        val streams = builder.consumeTopic(SYKEPENGESØKNADER_INN)
+        val SYKEPENGESØKNADER_INN_LEGACY = Topic(
+                name = "syfo-soknad-v1",
+                keySerde = Serdes.String(),
+                valueSerde = Serdes.serdeFrom(JsonSerializer(), JsonDeserializer())
+        )
+
+        val streams = builder.consumeTopic(SYKEPENGESØKNADER_INN_LEGACY)
                 .peek { _, _ -> acceptCounter.labels("accepted").inc() }
                 .filter { _, value -> value.has("status") && value.get("status").asText() == "SENDT" }
-                .mapValues { _, jsonNode -> deserializeSykepengesøknad(jsonNode) }
+                .mapValues { _, jsonNode -> deserializeSykepengesøknadLegacy(jsonNode) }
                 .mapValues { _, søknad -> søknad.flatMap { hentRegisterData(it) } }
                 .mapValues { _, faktagrunnlag -> faktagrunnlag.flatMap { fastsettFakta(it) } }
                 .mapValues { _, avklarteFakta -> avklarteFakta.flatMap { prøvVilkår(it) } }
@@ -151,3 +159,26 @@ fun serialize(vedtak: SykepengeVedtak): JsonNode = defaultObjectMapper.valueToTr
 fun serializeBehandlingsfeil(feil: Behandlingsfeil): JsonNode = defaultObjectMapper.valueToTree(feil)
 
 val narePrometheus = NarePrometheus(CollectorRegistry.defaultRegistry)
+
+// while we do that thing with old topic
+fun deserializeSykepengesøknadLegacy(soknad: JsonNode): Either<Behandlingsfeil, Sykepengesøknad> =
+        try {
+            val legacy: LegacySøknad = defaultObjectMapper.treeToValue(soknad, LegacySøknad::class.java)
+            val asNotLegacy = Sykepengesøknad(
+                    aktorId = legacy.aktorId,
+                    arbeidsgiver = Arbeidsgiver(navn = legacy.arbeidsgiver?: "TOM ASA", orgnummer = "00000000000"),
+                    fom = legacy.fom,
+                    tom = legacy.tom,
+                    startSyketilfelle = legacy.startSykeforlop?: LocalDate.now(),
+                    soktUtenlandsopphold = false,
+                    soknadsperioder = legacy.soknadPerioder.map { asNewPeriode(it) },
+                    sendtNav = legacy.innsendtDato?.atStartOfDay(),
+                    harVurdertInntekt = false,
+                    status = legacy.status
+            )
+            Either.Right(asNotLegacy)
+        } catch (e: MissingKotlinParameterException) {
+            Either.Left(Behandlingsfeil.manglendeFeilDeserialiseringsfeil(soknad, e))
+        } catch (e: Exception) {
+            Either.Left(Behandlingsfeil.ukjentDeserialiseringsfeil(soknad, e))
+        }
