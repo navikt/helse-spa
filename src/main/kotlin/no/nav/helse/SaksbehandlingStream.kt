@@ -111,6 +111,7 @@ class SaksbehandlingStream(val env: Environment) {
     }
 
     private fun logAndCountFail(behandlingsfeil: Behandlingsfeil) {
+        log.info(behandlingsfeil.feilmelding)
         when(behandlingsfeil) {
             is Deserialiseringsfeil -> behandlingsfeilCounter.labels("deserialisering").inc()
             is RegisterFeil -> behandlingsfeilCounter.labels("register").inc()

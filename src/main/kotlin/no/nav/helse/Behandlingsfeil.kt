@@ -7,12 +7,14 @@ import no.nav.helse.behandling.UavklarteFakta
 import no.nav.helse.behandling.Vilkårsprøving
 import no.nav.helse.fastsetting.Vurdering
 
-sealed class Behandlingsfeil {
-    data class Deserialiseringsfeil(val json: JsonNode, val feilmelding: String): Behandlingsfeil()
+interface Behandlingsfeil {
+    val feilmelding: String
 
-    data class RegisterFeil(val feilmelding: String): Behandlingsfeil()
+    data class Deserialiseringsfeil(val json: JsonNode, override val feilmelding: String): Behandlingsfeil
 
-    data class Avklaringsfeil(val uavklarteFakta: UavklarteFakta, val feilmelding: String): Behandlingsfeil() {
+    data class RegisterFeil(override val feilmelding: String): Behandlingsfeil
+
+    data class Avklaringsfeil(val uavklarteFakta: UavklarteFakta, override val feilmelding: String): Behandlingsfeil {
         fun tellUavklarte(avklaringsfeilCounter: Counter) {
             uavklarteFakta.uavklarteVerdier.asNamedList().forEach { (name, fakta) ->
                 if (fakta is Vurdering.Uavklart) avklaringsfeilCounter.labels(name).inc()
@@ -20,9 +22,9 @@ sealed class Behandlingsfeil {
         }
     }
 
-    data class Vilkårsprøvingsfeil(val vilkårsprøving: Vilkårsprøving, val feilmelding: String): Behandlingsfeil()
+    data class Vilkårsprøvingsfeil(val vilkårsprøving: Vilkårsprøving, override val feilmelding: String): Behandlingsfeil
 
-    data class Beregningsfeil(val vilkårsprøving: Vilkårsprøving, val feilmelding: String): Behandlingsfeil()
+    data class Beregningsfeil(val vilkårsprøving: Vilkårsprøving, override val feilmelding: String): Behandlingsfeil
 
 
     companion object {
