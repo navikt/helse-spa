@@ -30,7 +30,6 @@ import no.nav.helse.streams.JsonSerializer
 import no.nav.helse.streams.StreamConsumer
 import no.nav.helse.streams.Topic
 import no.nav.helse.streams.Topics.SYKEPENGEBEHANDLINGSFEIL
-import no.nav.helse.streams.Topics.SYKEPENGESØKNADER_INN
 import no.nav.helse.streams.Topics.VEDTAK_SYKEPENGER
 import no.nav.helse.streams.consumeTopic
 import no.nav.helse.streams.defaultObjectMapper
@@ -72,22 +71,15 @@ class SaksbehandlingStream(val env: Environment) {
             .help("Hvilke faktum klarer vi ikke fastsette")
             .register()
 
-    val SYKEPENGESØKNADER_INN_LEGACY = Topic(
-            name = "syfo-soknad-v1",
-            keySerde = Serdes.String(),
-            valueSerde = Serdes.serdeFrom(JsonSerializer(), JsonDeserializer())
-    )
     private val appId = "spa-behandling-1"
 
-    private val legacyConsumer: StreamConsumer
-    private val v2Consumer: StreamConsumer
+    private val consumer: StreamConsumer
 
     init {
         val streamConfig = if ("true" == env.plainTextKafka) streamConfigPlainTextKafka() else streamConfig(appId, env.bootstrapServersUrl,
                 env.kafkaUsername to env.kafkaPassword,
                 env.navTruststorePath to env.navTruststorePassword)
-        legacyConsumer = StreamConsumer(appId, KafkaStreams(topology(this.SYKEPENGESØKNADER_INN_LEGACY, this::deserializeSykepengesøknadLegacy), streamConfig))
-        v2Consumer = StreamConsumer(appId, KafkaStreams(topology(SYKEPENGESØKNADER_INN, this::deserializeSykepengesøknad), streamConfig))
+        consumer = StreamConsumer(appId, KafkaStreams(topology(), streamConfig))
     }
 
     private fun streamConfigPlainTextKafka(): Properties = Properties().apply {
@@ -98,13 +90,19 @@ class SaksbehandlingStream(val env: Environment) {
         put(StreamsConfig.DEFAULT_DESERIALIZATION_EXCEPTION_HANDLER_CLASS_CONFIG, LogAndFailExceptionHandler::class.java)
     }
 
-    private fun topology(topic: Topic<String, JsonNode>, deserializer: (JsonNode) -> Either<Behandlingsfeil, Sykepengesøknad>): Topology {
+    private fun topology(): Topology {
         val builder = StreamsBuilder()
 
-        val streams = builder.consumeTopic(topic)
+        val SYKEPENGESØKNADER_INN_LEGACY = Topic(
+                name = "syfo-soknad-v1",
+                keySerde = Serdes.String(),
+                valueSerde = Serdes.serdeFrom(JsonSerializer(), JsonDeserializer())
+        )
+
+        val streams = builder.consumeTopic(SYKEPENGESØKNADER_INN_LEGACY)
                 .peek { _, _ -> acceptCounter.labels("accepted").inc() }
                 .filter { _, value -> value.has("status") && value.get("status").asText() == "SENDT" }
-                .mapValues { _, jsonNode -> deserializer(jsonNode) }
+                .mapValues { _, jsonNode -> deserializeSykepengesøknadLegacy(jsonNode) }
                 .mapValues { _, søknad -> søknad.flatMap { hentRegisterData(it) } }
                 .mapValues { _, faktagrunnlag -> faktagrunnlag.flatMap { fastsettFakta(it) } }
                 .mapValues { _, avklarteFakta -> avklarteFakta.flatMap { prøvVilkår(it) } }
@@ -162,37 +160,12 @@ class SaksbehandlingStream(val env: Environment) {
             Either.Left(Behandlingsfeil.ukjentDeserialiseringsfeil(soknad, e))
         }
 
-    // while we do that thing with old topic
-    fun deserializeSykepengesøknadLegacy(soknad: JsonNode): Either<Behandlingsfeil, Sykepengesøknad> =
-            try {
-                val legacy: LegacySøknad = defaultObjectMapper.treeToValue(soknad, LegacySøknad::class.java)
-                val asNotLegacy = Sykepengesøknad(
-                        aktorId = legacy.aktorId,
-                        arbeidsgiver = Arbeidsgiver(navn = legacy.arbeidsgiver?: "TOM ASA", orgnummer = "00000000000"),
-                        fom = legacy.fom ?: YearMonth.now().atDay(1),
-                        tom = legacy.tom ?: YearMonth.now().atEndOfMonth(),
-                        startSyketilfelle = legacy.startSykeforlop?: LocalDate.now(),
-                        soktUtenlandsopphold = false,
-                        soknadsperioder = legacy.soknadPerioder.map { asNewPeriode(it) },
-                        sendtNav = legacy.innsendtDato?.atStartOfDay(),
-                        harVurdertInntekt = false,
-                        status = legacy.status
-                )
-                Either.Right(asNotLegacy)
-            } catch (e: MissingKotlinParameterException) {
-                Either.Left(Behandlingsfeil.manglendeFeilDeserialiseringsfeil(soknad, e))
-            } catch (e: Exception) {
-                Either.Left(Behandlingsfeil.ukjentDeserialiseringsfeil(soknad, e))
-            }
-
     fun start() {
-        legacyConsumer.start()
-        v2Consumer.start()
+        consumer.start()
     }
 
     fun stop() {
-        legacyConsumer.stop()
-        v2Consumer.stop()
+        consumer.stop()
     }
 
     private fun hentRegisterData(søknad: Sykepengesøknad): Either<Behandlingsfeil, FaktagrunnlagResultat> = Oppslag(env.sparkelBaseUrl, stsClient).hentRegisterData(søknad)
@@ -207,3 +180,25 @@ fun serializeBehandlingsfeil(feil: Behandlingsfeil): JsonNode = defaultObjectMap
 
 val narePrometheus = NarePrometheus(CollectorRegistry.defaultRegistry)
 
+// while we do that thing with old topic
+fun deserializeSykepengesøknadLegacy(soknad: JsonNode): Either<Behandlingsfeil, Sykepengesøknad> =
+        try {
+            val legacy: LegacySøknad = defaultObjectMapper.treeToValue(soknad, LegacySøknad::class.java)
+            val asNotLegacy = Sykepengesøknad(
+                    aktorId = legacy.aktorId,
+                    arbeidsgiver = Arbeidsgiver(navn = legacy.arbeidsgiver?: "TOM ASA", orgnummer = "00000000000"),
+                    fom = legacy.fom ?: YearMonth.now().atDay(1),
+                    tom = legacy.tom ?: YearMonth.now().atEndOfMonth(),
+                    startSyketilfelle = legacy.startSykeforlop?: LocalDate.now(),
+                    soktUtenlandsopphold = false,
+                    soknadsperioder = legacy.soknadPerioder.map { asNewPeriode(it) },
+                    sendtNav = legacy.innsendtDato?.atStartOfDay(),
+                    harVurdertInntekt = false,
+                    status = legacy.status
+            )
+            Either.Right(asNotLegacy)
+        } catch (e: MissingKotlinParameterException) {
+            Either.Left(Behandlingsfeil.manglendeFeilDeserialiseringsfeil(soknad, e))
+        } catch (e: Exception) {
+            Either.Left(Behandlingsfeil.ukjentDeserialiseringsfeil(soknad, e))
+        }
