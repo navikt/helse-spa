@@ -143,16 +143,15 @@ class SaksbehandlingStream(val env: Environment) {
             is RegisterFeil -> behandlingsfeilCounter.labels("register").inc()
             is Avklaringsfeil -> {
                 behandlingsfeilCounter.labels("avklaring").inc()
-                logAndCountAvklaringsfeil(behandlingsfeil)
+                behandlingsfeil.tellUavklarte(avklaringsfeilCounter)
             }
             is Vilkårsprøvingsfeil -> behandlingsfeilCounter.labels("vilkarsproving").inc()
             is Beregningsfeil -> behandlingsfeilCounter.labels("beregning").inc()
         }
     }
-    private fun logAndCountAvklaringsfeil(feil: Avklaringsfeil) {
-        feil.tellUavklarte(avklaringsfeilCounter)
-    }
+
     private fun logAndCountVedtak(vedtak: SykepengeVedtak) {
+        log.info("Søknad for aktør ${vedtak.originalSøknad.aktorId} behandlet OK.")
         vedtakCounter.inc()
     }
 
