@@ -29,6 +29,7 @@ import no.nav.helse.streams.JsonDeserializer
 import no.nav.helse.streams.JsonSerializer
 import no.nav.helse.streams.StreamConsumer
 import no.nav.helse.streams.Topic
+import no.nav.helse.streams.Topics
 import no.nav.helse.streams.Topics.SYKEPENGEBEHANDLINGSFEIL
 import no.nav.helse.streams.Topics.VEDTAK_SYKEPENGER
 import no.nav.helse.streams.consumeTopic
@@ -99,10 +100,16 @@ class SaksbehandlingStream(val env: Environment) {
                 valueSerde = Serdes.serdeFrom(JsonSerializer(), JsonDeserializer())
         )
 
-        val streams = builder.consumeTopic(SYKEPENGESØKNADER_INN_LEGACY)
+        val v1Stream = builder.consumeTopic(SYKEPENGESØKNADER_INN_LEGACY)
                 .peek { _, _ -> acceptCounter.labels("accepted").inc() }
                 .filter { _, value -> value.has("status") && value.get("status").asText() == "SENDT" }
                 .mapValues { _, jsonNode -> deserializeSykepengesøknadLegacy(jsonNode) }
+
+        val v2Stream = builder.consumeTopic(Topics.SYKEPENGESØKNADER_INN)
+                .filter { _, value -> value.has("status") && value.get("status").asText() == "SENDT" }
+                .mapValues { _, jsonNode -> deserializeSykepengesøknad(jsonNode) }
+
+        val streams = v1Stream.merge(v2Stream)
                 .mapValues { _, søknad -> søknad.flatMap { hentRegisterData(it) } }
                 .mapValues { _, faktagrunnlag -> faktagrunnlag.flatMap { fastsettFakta(it) } }
                 .mapValues { _, avklarteFakta -> avklarteFakta.flatMap { prøvVilkår(it) } }
