@@ -1,5 +1,7 @@
 package no.nav.helse.fastsetting
 
+import com.fasterxml.jackson.annotation.JsonSubTypes
+import com.fasterxml.jackson.annotation.JsonTypeInfo
 import io.prometheus.client.Counter
 import no.nav.helse.Behandlingsfeil
 import no.nav.helse.Either
@@ -19,6 +21,13 @@ private val vurderingerCounter = Counter.build()
         .help("antall vurderinger gjort, fordelt på uavklart eller avklart")
         .register()
 
+@JsonTypeInfo(
+        use = JsonTypeInfo.Id.NAME,
+        include = JsonTypeInfo.As.PROPERTY,
+        property = "type")
+@JsonSubTypes(
+        JsonSubTypes.Type(value = Vurdering.Uavklart::class, name = "Uavklart"),
+        JsonSubTypes.Type(value = Vurdering.Avklart::class, name = "Avklart"))
 sealed class Vurdering<out V, out G>(val begrunnelse: String, val grunnlag: G, val vurderingstidspunkt: LocalDateTime = LocalDateTime.now()) {
     class Avklart<V, G>(val fastsattVerdi: V,
                         begrunnelse: String,
@@ -107,7 +116,7 @@ fun vurderFakta(fakta: FaktagrunnlagResultat): Either<Behandlingsfeil, AvklarteF
                         alder = alder,
                         arbeidsforhold = arbeidsforhold,
                         opptjeningstid = opptjeningstid,
-                        sykepengegrunnlag = sykepengegrunnlag as Vurdering<Long, Beregningsperiode>,
+                        sykepengegrunnlag = sykepengegrunnlag,
                         sykepengeliste = fakta.faktagrunnlag.sykepengeliste,
                         maksdato = maksdato
                 )
