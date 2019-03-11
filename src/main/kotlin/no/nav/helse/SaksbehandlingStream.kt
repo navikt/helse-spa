@@ -144,8 +144,12 @@ class SaksbehandlingStream(val env: Environment) {
             is Avklaringsfeil -> {
                 behandlingsfeilCounter.labels("avklaring").inc()
                 behandlingsfeil.tellUavklarte(avklaringsfeilCounter)
+                log.info("Søknad for aktør ${behandlingsfeil.uavklarteFakta.originalSøknad.aktorId} er uavklart")
             }
-            is Vilkårsprøvingsfeil -> behandlingsfeilCounter.labels("vilkarsproving").inc()
+            is Vilkårsprøvingsfeil -> {
+                behandlingsfeilCounter.labels("vilkarsproving").inc()
+                log.info("Søknad for aktør ${behandlingsfeil.vilkårsprøving.originalSøknad.aktorId} oppfyller ikke vilkårene")
+            }
             is Beregningsfeil -> behandlingsfeilCounter.labels("beregning").inc()
         }
     }
