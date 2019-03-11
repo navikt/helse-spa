@@ -24,11 +24,11 @@ class SensuClient(private val hostname: String, private val port: Int) {
 
     fun sendEvent(event: SensuEvent) {
         writeToSocket(hostname, port, event.asJson())
-        log.debug("Sent event({}) via sensu-client", event)
+        log.debug("Sent event({}) via sensu-client", event.asJson())
     }
 
     companion object {
-        private val log = LoggerFactory.getLogger("SensuClient")
+        private val log = LoggerFactory.getLogger(SensuClient::class.java)
 
         private fun writeToSocket(hostname: String, port: Int, data: String) {
             thread {

@@ -4,6 +4,8 @@
       <encoder class="net.logstash.logback.encoder.LogstashEncoder" />
    </appender>
 
+   <logger name="no.nav.helse.sensu" level="DEBUG" />
+
    <root level="INFO">
       <appender-ref ref="STDOUT_JSON"/>
    </root>
