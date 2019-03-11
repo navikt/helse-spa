@@ -33,7 +33,6 @@ val originalSoknad = Sykepengesøknad(
         sendtNav = LocalDateTime.now(),
         tom = LocalDate.now(),
         fom = LocalDate.now(),
-        harVurdertInntekt = false,
         status = "SENDT"
 )
 

@@ -12,13 +12,15 @@ import no.nav.helse.Behandlingsfeil.RegisterFeil
 import no.nav.helse.Behandlingsfeil.Vilkårsprøvingsfeil
 import no.nav.helse.behandling.AvklarteFakta
 import no.nav.helse.behandling.FaktagrunnlagResultat
-import no.nav.helse.behandling.LegacySøknad
 import no.nav.helse.behandling.Oppslag
 import no.nav.helse.behandling.SykepengeVedtak
 import no.nav.helse.behandling.Sykepengeberegning
 import no.nav.helse.behandling.Sykepengesøknad
+import no.nav.helse.behandling.SykepengesøknadV1DTO
+import no.nav.helse.behandling.SykepengesøknadV2DTO
 import no.nav.helse.behandling.Vilkårsprøving
 import no.nav.helse.behandling.asNewPeriode
+import no.nav.helse.behandling.mapToSykepengesøknad
 import no.nav.helse.behandling.sykepengeBeregning
 import no.nav.helse.behandling.vedtak
 import no.nav.helse.behandling.vilkårsprøving
@@ -112,13 +114,15 @@ class SaksbehandlingStream(val env: Environment) {
         val v1Stream = builder.consumeTopic(SYKEPENGESØKNADER_INN_LEGACY)
                 .peek { _, _ -> acceptCounter.labels("accepted").inc() }
                 .filter { _, value -> value.has("status") && value.get("status").asText() == "SENDT" }
-                .mapValues { _, jsonNode -> deserializeSykepengesøknadLegacy(jsonNode) }
+                .mapValues { _, jsonNode -> deserializeSykepengesøknadV1(jsonNode) }
+                .mapValues { _, either -> either.map(::mapSykepengesøknadV1ToSykepengesøknadV2) }
 
         val v2Stream = builder.consumeTopic(Topics.SYKEPENGESØKNADER_INN)
                 .filter { _, value -> value.has("status") && value.get("status").asText() == "SENDT" }
-                .mapValues { _, jsonNode -> deserializeSykepengesøknad(jsonNode) }
+                .mapValues { _, jsonNode -> deserializeSykepengesøknadV2(jsonNode) }
 
         val streams = v1Stream.merge(v2Stream)
+                .mapValues { either -> either.flatMap(::mapToSykepengesøknad) }
                 .mapValues { _, søknad -> søknad.flatMap { hentRegisterData(it) } }
                 .mapValues { _, faktagrunnlag -> faktagrunnlag.flatMap { fastsettFakta(it) } }
                 .mapValues { _, avklarteFakta -> avklarteFakta.flatMap { prøvVilkår(it) } }
@@ -177,9 +181,9 @@ class SaksbehandlingStream(val env: Environment) {
         vedtakCounter.inc()
     }
 
-    private fun deserializeSykepengesøknad(soknad: JsonNode): Either<Behandlingsfeil, Sykepengesøknad> =
+    private fun deserializeSykepengesøknadV2(soknad: JsonNode): Either<Behandlingsfeil, SykepengesøknadV2DTO> =
         try {
-            Either.Right(defaultObjectMapper.treeToValue(soknad, Sykepengesøknad::class.java))
+            Either.Right(defaultObjectMapper.treeToValue(soknad, SykepengesøknadV2DTO::class.java))
         } catch(e: MissingKotlinParameterException) {
             log.error("Failed to deserialize søknad due to missing non-nullable parameter: ${e.parameter.name} of type ${e.parameter.type}")
             Either.Left(Behandlingsfeil.manglendeFeilDeserialiseringsfeil(soknad, e))
@@ -209,10 +213,17 @@ fun serializeBehandlingsfeil(feil: Behandlingsfeil): JsonNode = defaultObjectMap
 val narePrometheus = NarePrometheus(CollectorRegistry.defaultRegistry)
 
 // while we do that thing with old topic
-fun deserializeSykepengesøknadLegacy(soknad: JsonNode): Either<Behandlingsfeil, Sykepengesøknad> =
+fun deserializeSykepengesøknadV1(soknad: JsonNode): Either<Behandlingsfeil, SykepengesøknadV1DTO> =
         try {
-            val legacy: LegacySøknad = defaultObjectMapper.treeToValue(soknad, LegacySøknad::class.java)
-            val asNotLegacy = Sykepengesøknad(
+            Either.Right(defaultObjectMapper.treeToValue(soknad, SykepengesøknadV1DTO::class.java))
+        } catch (e: MissingKotlinParameterException) {
+            Either.Left(Behandlingsfeil.manglendeFeilDeserialiseringsfeil(soknad, e))
+        } catch (e: Exception) {
+            Either.Left(Behandlingsfeil.ukjentDeserialiseringsfeil(soknad, e))
+        }
+
+fun mapSykepengesøknadV1ToSykepengesøknadV2(legacy: SykepengesøknadV1DTO): SykepengesøknadV2DTO =
+        SykepengesøknadV2DTO(
                     aktorId = legacy.aktorId,
                     arbeidsgiver = Arbeidsgiver(navn = legacy.arbeidsgiver?: "TOM ASA", orgnummer = "00000000000"),
                     fom = legacy.fom ?: YearMonth.now().atDay(1),
@@ -221,12 +232,5 @@ fun deserializeSykepengesøknadLegacy(soknad: JsonNode): Either<Behandlingsfeil,
                     soktUtenlandsopphold = false,
                     soknadsperioder = legacy.soknadPerioder.map { asNewPeriode(it) },
                     sendtNav = legacy.innsendtDato?.atStartOfDay(),
-                    harVurdertInntekt = false,
                     status = legacy.status
             )
-            Either.Right(asNotLegacy)
-        } catch (e: MissingKotlinParameterException) {
-            Either.Left(Behandlingsfeil.manglendeFeilDeserialiseringsfeil(soknad, e))
-        } catch (e: Exception) {
-            Either.Left(Behandlingsfeil.ukjentDeserialiseringsfeil(soknad, e))
-        }

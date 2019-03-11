@@ -1,18 +1,28 @@
 package no.nav.helse.behandling
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import no.nav.helse.Behandlingsfeil
+import no.nav.helse.Either
 import no.nav.helse.domain.Arbeidsforhold
 import no.nav.helse.domain.Arbeidsgiver
-import no.nav.helse.fastsetting.*
+import no.nav.helse.fastsetting.Alder
+import no.nav.helse.fastsetting.Aldersgrunnlag
+import no.nav.helse.fastsetting.Beregningsperiode
+import no.nav.helse.fastsetting.Medlemsskapgrunnlag
+import no.nav.helse.fastsetting.Opptjeningsgrunnlag
+import no.nav.helse.fastsetting.Opptjeningstid
+import no.nav.helse.fastsetting.Sykepengegrunnlag
+import no.nav.helse.fastsetting.Vurdering
 import no.nav.helse.oppslag.Inntekt
 import no.nav.helse.oppslag.SykepengerVedtak
+import no.nav.helse.streams.defaultObjectMapper
 import no.nav.helse.sykepenger.beregning.Beregningsresultat
 import no.nav.nare.core.evaluations.Evaluering
 import java.time.LocalDate
 import java.time.LocalDateTime
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-data class Sykepengesøknad(
+data class SykepengesøknadV2DTO(
         val aktorId: String,
         val status: String,
         val arbeidsgiver: Arbeidsgiver,
@@ -21,8 +31,37 @@ data class Sykepengesøknad(
         val tom: LocalDate,
         val startSyketilfelle: LocalDate,
         val sendtNav: LocalDateTime?,
-        val soknadsperioder: List<Soknadsperiode>,
-        val harVurdertInntekt: Boolean
+        val soknadsperioder: List<Soknadsperiode>
+)
+
+fun mapToSykepengesøknad(dto: SykepengesøknadV2DTO): Either<Behandlingsfeil, Sykepengesøknad> {
+    return if (dto.sendtNav == null) {
+        Either.Left(Behandlingsfeil.ukjentDeserialiseringsfeil(defaultObjectMapper.valueToTree(dto), Exception("sendtNav er null")))
+    } else {
+        Either.Right(Sykepengesøknad(
+                aktorId = dto.aktorId,
+                status = dto.status,
+                arbeidsgiver = dto.arbeidsgiver,
+                soktUtenlandsopphold = dto.soktUtenlandsopphold,
+                fom = dto.fom,
+                tom = dto.tom,
+                startSyketilfelle = dto.startSyketilfelle,
+                sendtNav = dto.sendtNav,
+                soknadsperioder = dto.soknadsperioder
+        ))
+    }
+}
+
+data class Sykepengesøknad(
+        val aktorId: String,
+        val status: String,
+        val arbeidsgiver: Arbeidsgiver,
+        val soktUtenlandsopphold: Boolean,
+        val fom: LocalDate,
+        val tom: LocalDate,
+        val startSyketilfelle: LocalDate,
+        val sendtNav: LocalDateTime,
+        val soknadsperioder: List<Soknadsperiode>
 )
 
 data class FaktagrunnlagResultat(
@@ -111,14 +150,14 @@ data class Faktagrunnlag(val tps: Tpsfakta,
 
 data class Tpsfakta(val fodselsdato: LocalDate, val bostedland: String)
 
-fun asNewPeriode(it: LegacySoknadsperiode): Soknadsperiode = Soknadsperiode(
+fun asNewPeriode(it: SykepengesøknadV1Periode): Soknadsperiode = Soknadsperiode(
         fom = it.fom,
         tom = it.tom,
         sykmeldingsgrad = it.grad
 )
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-data class LegacySøknad(
+data class SykepengesøknadV1DTO(
         val aktorId: String,
         val status: String,
         val arbeidsgiver: String?,
@@ -126,11 +165,11 @@ data class LegacySøknad(
         val tom: LocalDate?,
         val startSykeforlop: LocalDate?,
         val innsendtDato: LocalDate?,
-        val soknadPerioder: List<LegacySoknadsperiode>
+        val soknadPerioder: List<SykepengesøknadV1Periode>
 )
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-data class LegacySoknadsperiode(
+data class SykepengesøknadV1Periode(
         val fom: LocalDate,
         val tom: LocalDate,
         val grad: Int

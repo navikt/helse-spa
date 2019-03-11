@@ -1,6 +1,7 @@
 package no.nav.helse
 
 import no.nav.helse.behandling.Sykepengesøknad
+import no.nav.helse.behandling.SykepengesøknadV1DTO
 import no.nav.helse.streams.defaultObjectMapper
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
@@ -10,7 +11,7 @@ class LegacyTopicParseTest {
 
     @Test
     fun `try to parse legacy-format`() {
-        val maybeSøknad: Either<Behandlingsfeil, Sykepengesøknad> = deserializeSykepengesøknadLegacy(defaultObjectMapper.readTree(json))
+        val maybeSøknad: Either<Behandlingsfeil, SykepengesøknadV1DTO> = deserializeSykepengesøknadV1(defaultObjectMapper.readTree(json))
 
         when (maybeSøknad) {
             is Either.Left -> fail("should parse well")

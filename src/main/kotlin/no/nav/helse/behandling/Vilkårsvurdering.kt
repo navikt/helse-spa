@@ -2,7 +2,6 @@ package no.nav.helse.behandling
 
 import no.nav.helse.Behandlingsfeil
 import no.nav.helse.Either
-import no.nav.helse.flatMap
 import no.nav.helse.narePrometheus
 import no.nav.helse.sykepenger.vilkar.Vilkårsgrunnlag
 import no.nav.helse.sykepenger.vilkar.sykepengevilkår
@@ -28,7 +27,7 @@ private fun gjennomførVilkårsvurdering(avklarteFakta: AvklarteFakta): Evalueri
             alder = avklarteFakta.avklarteVerdier.alder.fastsattVerdi,
             erMedlem = avklarteFakta.avklarteVerdier.medlemsskap.fastsattVerdi,
             ytelser = emptyList(),
-            søknadSendt = avklarteFakta.originalSøknad.sendtNav!!.toLocalDate(),
+            søknadSendt = avklarteFakta.originalSøknad.sendtNav.toLocalDate(),
             førsteDagSøknadGjelderFor = avklarteFakta.originalSøknad.fom,
             fastsattÅrsinntekt = avklarteFakta.avklarteVerdier.sykepengegrunnlag.fastsattVerdi.sykepengegrunnlagNårTrygdenYter.fastsattVerdi,
             grunnbeløp = 96883
