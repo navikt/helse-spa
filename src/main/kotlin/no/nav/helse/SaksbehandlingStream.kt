@@ -25,6 +25,8 @@ import no.nav.helse.behandling.vilkårsprøving
 import no.nav.helse.domain.Arbeidsgiver
 import no.nav.helse.fastsetting.vurderFakta
 import no.nav.helse.oppslag.StsRestClient
+import no.nav.helse.sensu.InfluxMetricReporter
+import no.nav.helse.sensu.SensuClient
 import no.nav.helse.streams.JsonDeserializer
 import no.nav.helse.streams.JsonSerializer
 import no.nav.helse.streams.StreamConsumer
@@ -75,6 +77,13 @@ class SaksbehandlingStream(val env: Environment) {
     private val appId = "spa-behandling-1"
 
     private val consumer: StreamConsumer
+
+    private val sensuClient = SensuClient(env.sensuHostname, env.sensuPort)
+    private val influxMetricReporter = InfluxMetricReporter(sensuClient, mapOf(
+            "application" to (System.getenv("NAIS_APP_NAME") ?: "spa"),
+            "cluster" to (System.getenv("NAIS_CLUSTER_NAME") ?: "dev-fss"),
+            "namespace" to (System.getenv("NAIS_NAMESPACE") ?: "default")
+    ))
 
     init {
         val streamConfig = if ("true" == env.plainTextKafka) streamConfigPlainTextKafka() else streamConfig(appId, env.bootstrapServersUrl,
@@ -139,22 +148,31 @@ class SaksbehandlingStream(val env: Environment) {
     private fun logAndCountFail(behandlingsfeil: Behandlingsfeil) {
         log.info(behandlingsfeil.feilmelding)
         when(behandlingsfeil) {
-            is Deserialiseringsfeil -> behandlingsfeilCounter.labels("deserialisering").inc()
+            is Deserialiseringsfeil -> {
+                behandlingsfeilCounter.labels("deserialisering").inc()
+                influxMetricReporter.sendDataPoint("behandlingsfeil.event", mapOf("steg" to "deserialisering"))
+            }
             is RegisterFeil -> behandlingsfeilCounter.labels("register").inc()
             is Avklaringsfeil -> {
                 behandlingsfeilCounter.labels("avklaring").inc()
                 behandlingsfeil.tellUavklarte(avklaringsfeilCounter)
+                influxMetricReporter.sendDataPoint("behandlingsfeil.event", mapOf("steg" to "avklaring", "aktorId" to behandlingsfeil.uavklarteFakta.originalSøknad.aktorId))
                 log.info("Søknad for aktør ${behandlingsfeil.uavklarteFakta.originalSøknad.aktorId} er uavklart")
             }
             is Vilkårsprøvingsfeil -> {
                 behandlingsfeilCounter.labels("vilkarsproving").inc()
+                influxMetricReporter.sendDataPoint("behandlingsfeil.event", mapOf("steg" to "vilkarsproving", "aktorId" to behandlingsfeil.vilkårsprøving.originalSøknad.aktorId))
                 log.info("Søknad for aktør ${behandlingsfeil.vilkårsprøving.originalSøknad.aktorId} oppfyller ikke vilkårene")
             }
-            is Beregningsfeil -> behandlingsfeilCounter.labels("beregning").inc()
+            is Beregningsfeil -> {
+                behandlingsfeilCounter.labels("beregning").inc()
+                influxMetricReporter.sendDataPoint("behandlingsfeil.event", mapOf("steg" to "beregning", "aktorId" to behandlingsfeil.vilkårsprøving.originalSøknad.aktorId))
+            }
         }
     }
 
     private fun logAndCountVedtak(vedtak: SykepengeVedtak) {
+        influxMetricReporter.sendDataPoint("vedtak.event", mapOf("aktorId" to vedtak.originalSøknad.aktorId))
         log.info("Søknad for aktør ${vedtak.originalSøknad.aktorId} behandlet OK.")
         vedtakCounter.inc()
     }
