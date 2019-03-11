@@ -107,7 +107,7 @@ fun vurderFakta(fakta: FaktagrunnlagResultat): Either<Behandlingsfeil, AvklarteF
                         alder = alder,
                         arbeidsforhold = arbeidsforhold,
                         opptjeningstid = opptjeningstid,
-                        sykepengegrunnlag = sykepengegrunnlag as Vurdering<Long, Beregningsperiode>,
+                        sykepengegrunnlag = sykepengegrunnlag,
                         sykepengeliste = fakta.faktagrunnlag.sykepengeliste,
                         maksdato = maksdato
                 )
