@@ -1,5 +1,7 @@
 package no.nav.helse.sensu
 
+import org.json.JSONArray
+import org.json.JSONObject
 import org.slf4j.LoggerFactory
 import java.io.IOException
 import java.io.OutputStreamWriter
@@ -9,16 +11,13 @@ import kotlin.concurrent.thread
 
 data class SensuEvent(val name: String, val type: String, val handler: String, val output: String, val status: Int = 0) {
 
-    fun asJson() = """{
-    "name": "$name",
-    "type": "$type",
-    "handlers": ["$handler"],
-    "output": "${escapeQuote(output)}",
-    "status": $status
-}""".trimIndent()
-
-    private fun escapeQuote(str: String) =
-            str.replace("\"", "\\\"")
+    fun asJson() = with(JSONObject()) {
+        put("name", name)
+        put("type", type)
+        put("handlers", JSONArray(listOf(handler)))
+        put("output", output)
+        put("status", status)
+    }.toString()
 }
 
 class SensuClient(private val hostname: String, private val port: Int) {
@@ -39,6 +38,7 @@ class SensuClient(private val hostname: String, private val port: Int) {
                             OutputStreamWriter(socket.getOutputStream(), "UTF-8").use { osw ->
                                 osw.write(data, 0, data.length)
                                 osw.flush()
+                                log.debug("wrote {} bytes of data", data.length)
                             }
                         } catch (err: IOException) {
                             log.error("Unable to write data {} to socket", data, err)
