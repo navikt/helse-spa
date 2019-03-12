@@ -39,7 +39,7 @@ data class DataPoint(val name: String, val fields: Map<String, Any>, val tags: M
             str.replace("\"", "\\\"")
 }
 
-class InfluxMetricReporter(private val sensuClient: SensuClient, private val defaultTags: Map<String, String> = emptyMap()) {
+class InfluxMetricReporter(private val sensuClient: SensuClient, private val sensuCheckName: String, private val defaultTags: Map<String, String> = emptyMap()) {
 
     fun sendDataPoint(measurement: String, fields: Map<String, Any> = emptyMap(), tags: Map<String, String> = emptyMap()) =
             DataPoint(name = measurement, fields = fields, tags = addDefaultTags(tags)).also {
@@ -48,7 +48,7 @@ class InfluxMetricReporter(private val sensuClient: SensuClient, private val def
 
     fun sendDataPoint(dataPoint: DataPoint) =
             dataPoint.copy(tags = addDefaultTags(dataPoint.tags)).let {
-                createSensuEvent(it.name, it.toLineProtocol()).also { event ->
+                createSensuEvent(sensuCheckName, it.toLineProtocol()).also { event ->
                     sensuClient.sendEvent(event)
                 }
             }

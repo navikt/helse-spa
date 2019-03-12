@@ -18,11 +18,12 @@ class InfluxDBTest {
 
         every {
             sensuClient.sendEvent(match { event ->
-                event.output == expected.toLineProtocol()
+                event.name == "check-app"
+                        && event.output == expected.toLineProtocol()
             })
         } answers(ConstantAnswer(Unit))
 
-        InfluxMetricReporter(sensuClient, defaultTags).sendDataPoint(dataPoint)
+        InfluxMetricReporter(sensuClient, "check-app", defaultTags).sendDataPoint(dataPoint)
 
         verify(exactly = 1) {
             sensuClient.sendEvent(any())
@@ -39,13 +40,14 @@ class InfluxDBTest {
             sensuClient.sendEvent(any())
         } answers(ConstantAnswer(Unit))
 
-        val actual = InfluxMetricReporter(sensuClient, defaultTags).sendDataPoint("myEvent", mapOf("field" to "val"))
+        val actual = InfluxMetricReporter(sensuClient, "check-app", defaultTags).sendDataPoint("myEvent", mapOf("field" to "val"))
 
         val expected = DataPoint("myEvent", mapOf("field" to "val"), defaultTags, time = actual.time)
 
         verify(exactly = 1) {
             sensuClient.sendEvent(match { event ->
-                event.output == expected.toLineProtocol()
+                event.name == "check-app"
+                        && event.output == expected.toLineProtocol()
             })
         }
     }

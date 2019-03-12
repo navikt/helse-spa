@@ -37,7 +37,7 @@ class SensuClientIntegrationTest {
         val client = SensuClient("localhost", server.localPort)
 
         val dataPoint = DataPoint("myEvent", mapOf("field1" to "val1", "field2" to 1), mapOf("tag1" to "tag2"))
-        val event = InfluxMetricReporter(client).sendDataPoint(dataPoint)
+        val event = InfluxMetricReporter(client, "check-app").sendDataPoint(dataPoint)
 
         client.sendEvent(event)
 
@@ -46,7 +46,7 @@ class SensuClientIntegrationTest {
         val json = JSONObject(jsonString)
 
         val expected = with(JSONObject()) {
-            put("name", "myEvent")
+            put("name", "check-app")
             put("type", "metric")
             put("handlers", JSONArray(listOf("events_nano")))
             put("output", dataPoint.toLineProtocol())

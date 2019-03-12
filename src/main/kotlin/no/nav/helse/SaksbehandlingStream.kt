@@ -81,7 +81,7 @@ class SaksbehandlingStream(val env: Environment) {
     private val consumer: StreamConsumer
 
     private val sensuClient = SensuClient(env.sensuHostname, env.sensuPort)
-    private val influxMetricReporter = InfluxMetricReporter(sensuClient, mapOf(
+    private val influxMetricReporter = InfluxMetricReporter(sensuClient, "spa-events", mapOf(
             "application" to (System.getenv("NAIS_APP_NAME") ?: "spa"),
             "cluster" to (System.getenv("NAIS_CLUSTER_NAME") ?: "dev-fss"),
             "namespace" to (System.getenv("NAIS_NAMESPACE") ?: "default")
