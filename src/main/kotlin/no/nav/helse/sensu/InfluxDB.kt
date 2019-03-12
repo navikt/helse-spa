@@ -1,6 +1,8 @@
 package no.nav.helse.sensu
 
-data class DataPoint(val name: String, val fields: Map<String, Any>, val tags: Map<String, String> = emptyMap(), val time: Long = System.nanoTime()) {
+import java.util.concurrent.TimeUnit
+
+data class DataPoint(val name: String, val fields: Map<String, Any>, val tags: Map<String, String> = emptyMap(), val timeInMilliseconds: Long = System.currentTimeMillis()) {
 
     init {
         if (fields.isEmpty()) {
@@ -9,7 +11,7 @@ data class DataPoint(val name: String, val fields: Map<String, Any>, val tags: M
     }
 
     fun toLineProtocol() =
-            String.format("%s%s%s %d", escapeMeasurement(name), if (tags.isNotEmpty()) "," + tags.toCSV() else "", if (fields.isNotEmpty()) " " + transformFields(fields) else "", time)
+            String.format("%s%s%s %d", escapeMeasurement(name), if (tags.isNotEmpty()) "," + tags.toCSV() else "", if (fields.isNotEmpty()) " " + transformFields(fields) else "", TimeUnit.MILLISECONDS.toNanos(timeInMilliseconds))
 
     private fun transformFields(fields: Map<String, Any>) =
             fields.map { entry ->

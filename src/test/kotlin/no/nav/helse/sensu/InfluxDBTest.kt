@@ -42,7 +42,7 @@ class InfluxDBTest {
 
         val actual = InfluxMetricReporter(sensuClient, "check-app", defaultTags).sendDataPoint("myEvent", mapOf("field" to "val"))
 
-        val expected = DataPoint("myEvent", mapOf("field" to "val"), defaultTags, time = actual.time)
+        val expected = DataPoint("myEvent", mapOf("field" to "val"), defaultTags, timeInMilliseconds = actual.timeInMilliseconds)
 
         verify(exactly = 1) {
             sensuClient.sendEvent(match { event ->
