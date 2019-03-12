@@ -16,7 +16,8 @@ class SensuClientTest {
     "name": "myEvent",
     "type": "metric",
     "handlers": ["events_nano"],
-    "output": "this is an output"
+    "output": "this is an output",
+    "status": 0
 }""".trimMargin())
 
         assertJsonEquals(expected, json)

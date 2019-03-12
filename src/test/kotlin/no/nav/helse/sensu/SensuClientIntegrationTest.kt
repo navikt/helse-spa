@@ -50,6 +50,7 @@ class SensuClientIntegrationTest {
             put("type", "metric")
             put("handlers", JSONArray(listOf("events_nano")))
             put("output", dataPoint.toLineProtocol())
+            put("status", 0)
         }
 
         assertJsonEquals(expected, json)

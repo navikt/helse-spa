@@ -7,13 +7,14 @@ import java.net.ConnectException
 import java.net.Socket
 import kotlin.concurrent.thread
 
-data class SensuEvent(val name: String, val type: String, val handler: String, val output: String) {
+data class SensuEvent(val name: String, val type: String, val handler: String, val output: String, val status: Int = 0) {
 
     fun asJson() = """{
     "name": "$name",
     "type": "$type",
     "handlers": ["$handler"],
-    "output": "${escapeQuote(output)}"
+    "output": "${escapeQuote(output)}",
+    "status": $status
 }""".trimIndent()
 
     private fun escapeQuote(str: String) =
