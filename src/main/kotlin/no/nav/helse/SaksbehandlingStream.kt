@@ -54,27 +54,33 @@ import java.time.YearMonth
 import java.util.*
 
 class SaksbehandlingStream(val env: Environment) {
-    private val log = LoggerFactory.getLogger(SaksbehandlingStream::class.java)
+
     private val stsClient = StsRestClient(baseUrl = env.stsRestUrl, username = env.username, password = env.password)
-    private val acceptCounter: Counter = Counter.build()
-            .name("spa_behandling_stream_counter")
-            .labelNames("state")
-            .help("Antall meldinger SaksbehandlingsStream i SPA har godtatt og forsøkt behandlet")
-            .register()
-    private val vedtakCounter: Counter = Counter.build()
-            .name("spa_vedtak_stream_counter")
-            .help("Antall vedtak fattet av SPA")
-            .register()
-    private val behandlingsfeilCounter: Counter = Counter.build()
-            .name("spa_behandlingsfeil_counter")
-            .labelNames("steg")
-            .help("Antall ganger en søknad er forsøkt behandlet uten at vi kommer til et vedtak")
-            .register()
-    private val avklaringsfeilCounter: Counter = Counter.build()
-            .name("spa_avklaringsfeil_counter")
-            .labelNames("faktum")
-            .help("Hvilke faktum klarer vi ikke fastsette")
-            .register()
+
+    companion object {
+        private val log = LoggerFactory.getLogger(SaksbehandlingStream::class.java)
+
+        private val mottattCounter = Counter.build()
+                .name("soknader_mottatt_total")
+                .labelNames("status", "version")
+                .help("Antall søknader mottatt fordelt på status og versjon (v1/v2)")
+                .register()
+        private val behandlingsCounter = Counter.build()
+                .name("soknader_behandlet_total")
+                .labelNames("outcome")
+                .help("Antall søknader behandlet, fordelt på utfall (ok/feil)")
+                .register()
+        private val behandlingsfeilCounter = Counter.build()
+                .name("behandlingsfeil_total")
+                .labelNames("steg")
+                .help("Antall ganger en søknad er forsøkt behandlet uten at vi kommer til et vedtak")
+                .register()
+        private val avklaringsfeilCounter = Counter.build()
+                .name("avklaringsfeil_total")
+                .labelNames("faktum")
+                .help("Hvilke faktum klarer vi ikke fastsette")
+                .register()
+    }
 
     private val appId = "spa-behandling-1"
 
@@ -112,13 +118,16 @@ class SaksbehandlingStream(val env: Environment) {
         )
 
         val v1Stream = builder.consumeTopic(SYKEPENGESØKNADER_INN_LEGACY)
-                .peek { _, _ -> acceptCounter.labels("accepted").inc() }
-                .filter { _, value -> value.has("status") && value.get("status").asText() == "SENDT" }
+                .filter { _, value -> value.has("status") }
+                .peek { _, value -> mottattCounter.labels(value.get("status").asText(), "v1").inc() }
+                .filter { _, value -> value.get("status").asText() == "SENDT" }
                 .mapValues { _, jsonNode -> deserializeSykepengesøknadV1(jsonNode) }
                 .mapValues { _, either -> either.map(::mapSykepengesøknadV1ToSykepengesøknadV2) }
 
         val v2Stream = builder.consumeTopic(Topics.SYKEPENGESØKNADER_INN)
-                .filter { _, value -> value.has("status") && value.get("status").asText() == "SENDT" }
+                .filter { _, value -> value.has("status")}
+                .peek { _, value -> mottattCounter.labels(value.get("status").asText(), "v2").inc() }
+                .filter { _, value -> value.get("status").asText() == "SENDT" }
                 .mapValues { _, jsonNode -> deserializeSykepengesøknadV2(jsonNode) }
 
         val streams = v1Stream.merge(v2Stream)
@@ -128,19 +137,20 @@ class SaksbehandlingStream(val env: Environment) {
                 .mapValues { _, avklarteFakta -> avklarteFakta.flatMap { prøvVilkår(it) } }
                 .mapValues { _, vilkårsprøving -> vilkårsprøving.flatMap { beregnSykepenger(it) } }
                 .mapValues { _, sykepengeberegning -> sykepengeberegning.flatMap { fattVedtak(it) } }
-                .peek { _, _ -> acceptCounter.labels("processed").inc() }
                 .branch(
                         Predicate { _, søknad -> søknad is Either.Left },
                         Predicate { _, søknad -> søknad is Either.Right }
                 )
 
         streams[0]
+                .peek { _, _ -> behandlingsCounter.labels("feil").inc() }
                 .mapValues { _, behandlingsfeil -> (behandlingsfeil as Either.Left).left }
                 .peek { _, behandlingsfeil -> logAndCountFail(behandlingsfeil) }
                 .mapValues { _, behandlingsfeil -> serializeBehandlingsfeil(behandlingsfeil) }
                 .toTopic(SYKEPENGEBEHANDLINGSFEIL)
 
         streams[1]
+                .peek { _, _ -> behandlingsCounter.labels("ok").inc() }
                 .mapValues { _, vedtak -> (vedtak as Either.Right).right }
                 .peek { _, vedtak -> logAndCountVedtak(vedtak) }
                 .mapValues { _, vedtak -> serialize(vedtak) }
@@ -178,7 +188,6 @@ class SaksbehandlingStream(val env: Environment) {
     private fun logAndCountVedtak(vedtak: SykepengeVedtak) {
         influxMetricReporter.sendDataPoint("vedtak.event", mapOf("aktorId" to vedtak.originalSøknad.aktorId))
         log.info("Søknad for aktør ${vedtak.originalSøknad.aktorId} behandlet OK.")
-        vedtakCounter.inc()
     }
 
     private fun deserializeSykepengesøknadV2(soknad: JsonNode): Either<Behandlingsfeil, SykepengesøknadV2DTO> =
