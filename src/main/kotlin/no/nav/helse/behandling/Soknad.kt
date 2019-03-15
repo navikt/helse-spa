@@ -14,7 +14,7 @@ import no.nav.helse.fastsetting.Opptjeningstid
 import no.nav.helse.fastsetting.Sykepengegrunnlag
 import no.nav.helse.fastsetting.Vurdering
 import no.nav.helse.oppslag.Inntekt
-import no.nav.helse.oppslag.SykepengerVedtak
+import no.nav.helse.oppslag.SykepengerPeriode
 import no.nav.helse.streams.defaultObjectMapper
 import no.nav.helse.sykepenger.beregning.Beregningsresultat
 import no.nav.nare.core.evaluations.Evaluering
@@ -81,7 +81,7 @@ data class AvklarteVerdier(
         val medlemsskap: Vurdering.Avklart<Boolean, Medlemsskapgrunnlag>,
         val alder: Vurdering.Avklart<Alder, Aldersgrunnlag>,
         val maksdato: Vurdering.Avklart<LocalDate, Any>,
-        val sykepengeliste: Collection<SykepengerVedtak>,
+        val sykepengeliste: Collection<SykepengerPeriode>,
         val arbeidsforhold: Vurdering.Avklart<Boolean, List<Arbeidsforhold>>,
         val opptjeningstid: Vurdering.Avklart<Opptjeningstid, Opptjeningsgrunnlag>,
         val sykepengegrunnlag: Vurdering.Avklart<Sykepengegrunnlag, Beregningsperiode>
@@ -97,7 +97,7 @@ data class UavklarteVerdier(
         val medlemsskap: Vurdering<Boolean, Medlemsskapgrunnlag>,
         val alder: Vurdering<Alder, Aldersgrunnlag>,
         val maksdato: Vurdering<LocalDate, Any>,
-        val sykepengeliste: Collection<SykepengerVedtak>,
+        val sykepengeliste: Collection<SykepengerPeriode>,
         val arbeidsforhold: Vurdering<Boolean, List<Arbeidsforhold>>,
         val opptjeningstid: Vurdering<Opptjeningstid, Opptjeningsgrunnlag>,
         val sykepengegrunnlag: Vurdering<*, *>
@@ -145,7 +145,7 @@ data class Soknadsperiode(val fom: LocalDate,
 data class Faktagrunnlag(val tps: Tpsfakta,
                          val beregningsperiode: List<Inntekt>,
                          val sammenligningsperiode: List<Inntekt>,
-                         val sykepengeliste: Collection<SykepengerVedtak>,
+                         val sykepengeliste: Collection<SykepengerPeriode>,
                          val arbeidsforhold: List<Arbeidsforhold>)
 
 data class Tpsfakta(val fodselsdato: LocalDate, val bostedland: String)
