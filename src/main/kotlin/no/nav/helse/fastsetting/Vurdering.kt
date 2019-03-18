@@ -6,6 +6,7 @@ import io.prometheus.client.Counter
 import no.nav.helse.Behandlingsfeil
 import no.nav.helse.Either
 import no.nav.helse.Yrkesstatus
+import no.nav.helse.Grunnlagsdata
 import no.nav.helse.behandling.AvklarteFakta
 import no.nav.helse.behandling.AvklarteVerdier
 import no.nav.helse.behandling.FaktagrunnlagResultat
@@ -133,7 +134,7 @@ fun vurderFakta(fakta: FaktagrunnlagResultat): Either<Behandlingsfeil, AvklarteF
                         opptjeningstid = opptjeningstid as Vurdering.Avklart<Opptjeningstid, Opptjeningsgrunnlag>,
                         sykepengegrunnlag = sykepengegrunnlag as Vurdering.Avklart<Sykepengegrunnlag, Beregningsperiode>,
                         sykepengeliste = fakta.faktagrunnlag.sykepengeliste,
-                        maksdato = maksdato as Vurdering.Avklart<LocalDate, Any>
+                        maksdato = maksdato as Vurdering.Avklart<LocalDate, Grunnlagsdata>
                 )
         ))
     }

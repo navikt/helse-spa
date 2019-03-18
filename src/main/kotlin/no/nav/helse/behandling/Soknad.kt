@@ -3,6 +3,7 @@ package no.nav.helse.behandling
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import no.nav.helse.Behandlingsfeil
 import no.nav.helse.Either
+import no.nav.helse.Grunnlagsdata
 import no.nav.helse.domain.Arbeidsforhold
 import no.nav.helse.domain.Arbeidsgiver
 import no.nav.helse.fastsetting.Alder
@@ -80,7 +81,7 @@ data class AvklarteFakta(
 data class AvklarteVerdier(
         val medlemsskap: Vurdering.Avklart<Boolean, Medlemsskapgrunnlag>,
         val alder: Vurdering.Avklart<Alder, Aldersgrunnlag>,
-        val maksdato: Vurdering.Avklart<LocalDate, Any>,
+        val maksdato: Vurdering.Avklart<LocalDate, Grunnlagsdata>,
         val sykepengeliste: Collection<SykepengerPeriode>,
         val arbeidsforhold: Vurdering.Avklart<Boolean, List<Arbeidsforhold>>,
         val opptjeningstid: Vurdering.Avklart<Opptjeningstid, Opptjeningsgrunnlag>,
@@ -96,7 +97,7 @@ data class UavklarteFakta(
 data class UavklarteVerdier(
         val medlemsskap: Vurdering<Boolean, Medlemsskapgrunnlag>,
         val alder: Vurdering<Alder, Aldersgrunnlag>,
-        val maksdato: Vurdering<LocalDate, Any>,
+        val maksdato: Vurdering<LocalDate, Grunnlagsdata?>,
         val sykepengeliste: Collection<SykepengerPeriode>,
         val arbeidsforhold: Vurdering<Boolean, List<Arbeidsforhold>>,
         val opptjeningstid: Vurdering<Opptjeningstid, Opptjeningsgrunnlag>,

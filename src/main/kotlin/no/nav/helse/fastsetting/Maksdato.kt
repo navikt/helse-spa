@@ -7,17 +7,15 @@ import no.nav.helse.maksdato
 import no.nav.helse.oppslag.SykepengerPeriode
 import java.time.LocalDate
 
-data class TomtMaksdatoGrunnlag(val aarsak: String = "Venter på neste steg i fastsetting av fakta")
-
 fun vurderMaksdato(
         alder: Vurdering<Int, Aldersgrunnlag>,
         startSyketilfelle: LocalDate,
         førsteSykepengedag: LocalDate,
         yrkesstatus: Yrkesstatus,
         sykepengeliste: Collection<SykepengerPeriode>
-): Vurdering<LocalDate, Any> {
+): Vurdering<LocalDate, Grunnlagsdata?> {
     return when (alder) {
-        is Vurdering.Uavklart -> Vurdering.Uavklart(årsak = Vurdering.Uavklart.Årsak.MANGELFULL_DATAGRUNNLAG, begrunnelse = "Kan ikke fastsette maksdato for bruker med uavklart alder", grunnlag = TomtMaksdatoGrunnlag(aarsak = "Alder ikke avklart"))
+        is Vurdering.Uavklart -> Vurdering.Uavklart(årsak = Vurdering.Uavklart.Årsak.MANGELFULL_DATAGRUNNLAG, begrunnelse = "Kan ikke fastsette maksdato for bruker med uavklart alder", grunnlag = null)
         is Vurdering.Avklart -> {
             val grunnlag = Grunnlagsdata(
                     førsteFraværsdag = startSyketilfelle,

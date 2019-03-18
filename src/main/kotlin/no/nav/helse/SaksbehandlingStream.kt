@@ -53,6 +53,12 @@ import java.time.LocalDate
 import java.time.YearMonth
 import java.util.*
 
+val SYKEPENGESØKNADER_INN_LEGACY = Topic(
+        name = "syfo-soknad-v1",
+        keySerde = Serdes.String(),
+        valueSerde = Serdes.serdeFrom(JsonSerializer(), JsonDeserializer())
+)
+
 class SaksbehandlingStream(val env: Environment) {
 
     private val stsClient = StsRestClient(baseUrl = env.stsRestUrl, username = env.username, password = env.password)
@@ -110,12 +116,6 @@ class SaksbehandlingStream(val env: Environment) {
 
     private fun topology(): Topology {
         val builder = StreamsBuilder()
-
-        val SYKEPENGESØKNADER_INN_LEGACY = Topic(
-                name = "syfo-soknad-v1",
-                keySerde = Serdes.String(),
-                valueSerde = Serdes.serdeFrom(JsonSerializer(), JsonDeserializer())
-        )
 
         val v1Stream = builder.consumeTopic(SYKEPENGESØKNADER_INN_LEGACY)
                 .filter { _, value -> value.has("status") }

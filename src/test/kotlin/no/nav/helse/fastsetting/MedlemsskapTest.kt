@@ -1,10 +1,12 @@
 package no.nav.helse.fastsetting
 
+import assertk.assert
+import assertk.assertions.contains
+import assertk.assertions.isTrue
 import no.nav.helse.behandling.FaktagrunnlagResultat
 import no.nav.helse.faktagrunnlagUtenVerdi
 import no.nav.helse.soknadUtenVerdi
 import no.nav.helse.tpsFaktaUtenVerdi
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
 
@@ -18,7 +20,10 @@ class MedlemsskapTest {
 
         when (vurdering) {
             is Vurdering.Uavklart -> fail("Norsk søknad skal være avklart")
-            is Vurdering.Avklart -> assertThat(vurdering.fastsattVerdi).isTrue()
+            is Vurdering.Avklart -> {
+                assert(vurdering.fastsattVerdi).isTrue()
+                assert(vurdering.begrunnelse).contains(søkerErBosattINorge)
+            }
         }
     }
 

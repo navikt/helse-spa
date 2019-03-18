@@ -19,12 +19,17 @@ internal val harOppfyltMedlemskap = (boddeINorgeISykdomsperioden eller toBeDecid
         identitet = "Kapittel 2. Medlemskap"
 )
 
-fun søkerBorINorge(bostedland: String) =
-        if (bostedland == "NOR") {
-            Evaluering.ja("Søker er bosatt i Norge.")
-        } else {
-            Evaluering.nei("Søker er ikke bostatt i Norge.")
-        }
+val landskodeNORGE = "NOR"
+val søkerErBosattINorge = "Søker er bosatt i Norge."
+val søkerIkkeBosattINorge = "Søker er ikke bostatt i Norge."
+
+fun søkerBorINorge(bostedland: String): Evaluering {
+    return if (bostedland == landskodeNORGE) {
+        Evaluering.ja(søkerErBosattINorge)
+    } else {
+        Evaluering.nei(søkerIkkeBosattINorge)
+    }
+}
 
 data class Medlemsskapgrunnlag(val bostedsland: String)
 
