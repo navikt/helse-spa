@@ -144,14 +144,23 @@ class EndToEndTest {
     }
 
     private fun checkAvklarteVerdier(innsendtSøknad: SykepengesøknadV2DTO, faktagrunnlag: Faktagrunnlag, avklarteVerdier: AvklarteVerdier) {
-        // TODO checkAlder(avklarteVerdier.alder)
+        checkAlder(avklarteVerdier.alder)
         checkMaksdato(innsendtSøknad, avklarteVerdier.alder.fastsattVerdi, faktagrunnlag.sykepengeliste, avklarteVerdier.maksdato)
         checkMedlemsskap(avklarteVerdier.medlemsskap)
-        checkSykepengegrunnlag(avklarteVerdier.sykepengegrunnlag)
-        // TODO checkArbeidsforhold(avklarteVerdier.arbeidsforhold)
+        checkSykepengegrunnlag(avklarteVerdier.sykepengegrunnlag, innsendtSøknad.startSyketilfelle)
+        checkArbeidsforhold(avklarteVerdier.arbeidsforhold)
         // TODO checkOpptjeningstid(avklarteVerdier.opptjeningstid)
         // TODO checkSykepengeliste(avklarteVerdier.sykepengeliste)
         // TODO checkOpptjeningstid(avklarteVerdier.opptjeningstid)
+    }
+
+    private fun checkAlder(aldersVurdering: Vurdering.Avklart<Alder, Aldersgrunnlag>) {
+        assert(aldersVurdering.fastsattVerdi).isEqualTo(48)
+        assert(aldersVurdering.begrunnelse).isEqualTo(begrunnelse_p_8_51)
+        assert(aldersVurdering.vurderingstidspunkt).isBetween(LocalDateTime.now().minusHours(1), LocalDateTime.now().plusHours(1))
+        assert(aldersVurdering.fastsattAv).isEqualTo("SPA")
+
+        assert(aldersVurdering.grunnlag.fodselsdato).isEqualTo(stubbet_person.fdato)
     }
 
     private fun checkMaksdato(innsendtSøknad: SykepengesøknadV2DTO, alder: Alder, sykepengeListe: Collection<SykepengerPeriode>, maksdato: Vurdering.Avklart<LocalDate, Grunnlagsdata>) {
@@ -171,23 +180,55 @@ class EndToEndTest {
     }
 
     private fun checkMedlemsskap(medlemsskap: Vurdering.Avklart<Boolean, Medlemsskapgrunnlag>) {
-        assert(medlemsskap.grunnlag.bostedsland).isEqualTo(landskodeNORGE)
-
         assert(medlemsskap.fastsattVerdi).isTrue()
         assert(medlemsskap.begrunnelse).contains(søkerErBosattINorge)
         assert(medlemsskap.vurderingstidspunkt).isBetween(LocalDateTime.now().minusHours(1), LocalDateTime.now().plusHours(1))
         assert(medlemsskap.fastsattAv).isEqualTo("SPA")
+
+        assert(medlemsskap.grunnlag.bostedsland).isEqualTo(landskodeNORGE)
     }
 
-    private fun checkSykepengegrunnlag(sykepengegrunnlag: Vurdering.Avklart<Sykepengegrunnlag, Beregningsperiode>) {
-        checkBeregningsperiode(sykepengegrunnlag.grunnlag)
+    private fun checkSykepengegrunnlag(sykepengegrunnlagVurdering: Vurdering.Avklart<Sykepengegrunnlag, Beregningsperiode>, startSyketilfelle: LocalDate) {
+        checkSykepengegrunnlagNårTrygdenYter(sykepengegrunnlagVurdering.fastsattVerdi.sykepengegrunnlagNårTrygdenYter, startSyketilfelle)
+        checkSykepengegrunnlagIArbeidsgiverperioden(sykepengegrunnlagVurdering.fastsattVerdi.sykepengegrunnlagIArbeidsgiverperioden, startSyketilfelle)
+        assert(sykepengegrunnlagVurdering.begrunnelse).isEqualTo("")
+        assert(sykepengegrunnlagVurdering.vurderingstidspunkt).isBetween(LocalDateTime.now().minusHours(1), LocalDateTime.now().plusHours(1))
+        assert(sykepengegrunnlagVurdering.fastsattAv).isEqualTo("SPA")
 
-        sykepengegrunnlag.fastsattVerdi.sykepengegrunnlagNårTrygdenYter
-        sykepengegrunnlag.fastsattVerdi.sykepengegrunnlagIArbeidsgiverperioden
-        assert(sykepengegrunnlag.fastsattAv).isEqualTo("SPA")
+        checkBeregningsperiode12mnd(sykepengegrunnlagVurdering.grunnlag)
     }
 
-    private fun checkBeregningsperiode(beregningsperiode: Beregningsperiode) {
+    private fun checkSykepengegrunnlagNårTrygdenYter(sykepengegrunnlagNårTrygdenYterVurdering: Vurdering.Avklart<Long, Beregningsperiode>, førsteSykdomsdag: LocalDate) {
+        assert(sykepengegrunnlagNårTrygdenYterVurdering.fastsattVerdi).isEqualTo(300000L)
+        assert(sykepengegrunnlagNårTrygdenYterVurdering.begrunnelse).contains(paragraf_8_30_første_ledd)
+        assert(sykepengegrunnlagNårTrygdenYterVurdering.vurderingstidspunkt).isBetween(LocalDateTime.now().minusHours(1), LocalDateTime.now().plusHours(1))
+        assert(sykepengegrunnlagNårTrygdenYterVurdering.fastsattAv).isEqualTo("SPA")
+
+        checkBeregningsperiode3mnd(sykepengegrunnlagNårTrygdenYterVurdering.grunnlag, førsteSykdomsdag)
+    }
+
+    private fun checkSykepengegrunnlagIArbeidsgiverperioden(sykepengegrunnlagIArbeidsgiverperiodenVurdering: Vurdering.Avklart<Long, Beregningsperiode>, førsteSykdomsdag: LocalDate) {
+        assert(sykepengegrunnlagIArbeidsgiverperiodenVurdering.fastsattVerdi).isEqualTo(25000L)
+        assert(sykepengegrunnlagIArbeidsgiverperiodenVurdering.begrunnelse).contains(paragraf_8_28_andre_ledd)
+        assert(sykepengegrunnlagIArbeidsgiverperiodenVurdering.vurderingstidspunkt).isBetween(LocalDateTime.now().minusHours(1), LocalDateTime.now().plusHours(1))
+        assert(sykepengegrunnlagIArbeidsgiverperiodenVurdering.fastsattAv).isEqualTo("SPA")
+
+        checkBeregningsperiode3mnd(sykepengegrunnlagIArbeidsgiverperiodenVurdering.grunnlag, førsteSykdomsdag)
+    }
+
+    private fun checkBeregningsperiode3mnd(beregningsperiode: Beregningsperiode, førsteSykdomsdag: LocalDate) {
+        assert(beregningsperiode.begrunnelse).isEqualTo(paragraf_8_28_tredje_ledd_bokstav_a + "(${førsteSykdomsdag}) legges til grunn.")
+        assert(beregningsperiode.inntekter).hasSize(3)
+        assert(beregningsperiode.inntekter).each {
+            val inntekt = it.actual
+            assert(inntekt.arbeidsgiver.orgnr).isEqualTo("97114455")
+            assert(inntekt.beløp.toLong()).isEqualTo(25000L)
+            assert(inntekt.opptjeningsperiode.fom).isBetween(LocalDate.of(2018, 10, 1), LocalDate.of(2018, 12, 1))
+            assert(inntekt.opptjeningsperiode.tom).isBetween(LocalDate.of(2018, 10, 30), LocalDate.of(2018, 12, 31))
+        }
+    }
+
+    private fun checkBeregningsperiode12mnd(beregningsperiode: Beregningsperiode) {
         assert(beregningsperiode.begrunnelse).isNotEmpty()
         assert(beregningsperiode.inntekter).hasSize(12)
         assert(beregningsperiode.inntekter).each {
@@ -199,23 +240,15 @@ class EndToEndTest {
         }
     }
 
-    /**    "arbeidsforhold": {
-    "grunnlag": {
-    "arbeidsgivere": [
-    {
-    "navn": "EQUINOR ASA, AVD STATOIL SOKKELVIRKSOMHET",
-    "organisasjonsnummer": "97114455",
-    "startdato":"2017-01-01"
-    }
-    ]
-    },
-    "begrunnelse": "Søker har en arbeidsgiver med orgnummer 97114455",
-    "fastsattVerdi": true,
-    "vurderingstidspunkt": "BLIR_IKKE_MATCHET",
-    "fastsattAv": "SPA"
-    },*/
-    private fun checkArbeidsforhold(arbeidsforhold: Vurdering.Avklart<Boolean, List<Arbeidsforhold>>) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    private fun checkArbeidsforhold(arbeidsforholdVurdering: Vurdering.Avklart<Boolean, List<Arbeidsforhold>>) {
+        assert(arbeidsforholdVurdering.fastsattVerdi).isTrue()
+        assert(arbeidsforholdVurdering.begrunnelse).isEqualTo(søker_har_arbeidsgiver + stubbet_arbeidsforhold.arbeidsgiver.orgnummer)
+        assert(arbeidsforholdVurdering.vurderingstidspunkt).isBetween(LocalDateTime.now().minusHours(1), LocalDateTime.now().plusHours(1))
+        assert(arbeidsforholdVurdering.fastsattAv).isEqualTo("SPA")
+
+        val arbeidsforhold = arbeidsforholdVurdering.grunnlag
+        assert(arbeidsforhold.size).isEqualTo(1)
+        assert(arbeidsforhold.get(0)).isEqualTo(stubbet_arbeidsforhold)
     }
 
     /**   "opptjeningstid": {
@@ -241,19 +274,6 @@ class EndToEndTest {
     /**  "sykepengeliste": [],
      */
     private fun checkSykepengeliste(sykepengeliste: Collection<SykepengerPeriode>) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    /** "alder": {
-    "grunnlag": {
-    "fodselsdato": "1970-09-01"
-    },
-    "begrunnelse": "§ 8-51",
-    "fastsattVerdi": 48,
-    "vurderingstidspunkt": "BLIR_IKKE_MATCHET",
-    "fastsattAv": "SPA"
-    }*/
-    private fun checkAlder(alder: Vurdering.Avklart<Alder, Aldersgrunnlag>) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
@@ -671,18 +691,18 @@ class EndToEndTest {
 }""")))
     }
 
+    val stubbet_person = Person(
+            id = AktørId("1078277661159"),
+            fdato = parse("1970-09-01"),
+            fornavn = "MAX",
+            etternavn = "SMEKKER",
+            kjønn = Kjønn.MANN,
+            bostedsland = "NOR"
+    )
+
     private fun personStub(aktørId: String) {
         stubFor(any(urlPathEqualTo("/api/person/$aktørId"))
-                .willReturn(okJson("""{
-    "id": {
-        "aktor": "1078277661159"
-    },
-    "fdato": "1970-09-01",
-    "fornavn": "MAX",
-    "etternavn": "SMEKKER",
-    "kjønn": "MANN",
-    "bostedsland": "NOR"
-}""")))
+                .willReturn(okJson(defaultObjectMapper.writeValueAsString(stubbet_person))))
     }
 
     private fun inntektStub(aktørId: String) {
@@ -849,20 +869,21 @@ class EndToEndTest {
 }""")))
     }
 
+    val stubbet_arbeidsforhold = Arbeidsforhold(
+            Arbeidsgiver(
+                    navn = "EQUINOR ASA, AVD STATOIL SOKKELVIRKSOMHET",
+                    orgnummer = "97114455"
+            ),
+            startdato = parse("2017-01-01"),
+            sluttdato = null
+    )
     private fun arbeidsforholdStub(aktørId: String) {
-        val arbeidsforhold = ArbeidsforholdWrapper(
-                arbeidsforhold = arrayOf(
-                        Arbeidsforhold(
-                                Arbeidsgiver(
-                                        navn = "EQUINOR ASA, AVD STATOIL SOKKELVIRKSOMHET",
-                                        orgnummer = "97114455"
-                                ),
-                                startdato = parse("2017-01-01"),
-                                sluttdato = null
-                        )
-                ))
+
+        val arbeidsforholdWrapper = ArbeidsforholdWrapper(
+                arbeidsforhold = arrayOf(stubbet_arbeidsforhold)
+        )
 
         stubFor(any(urlPathEqualTo("/api/arbeidsforhold/$aktørId"))
-                .willReturn((okJson(defaultObjectMapper.writeValueAsString(arbeidsforhold)))))
+                .willReturn((okJson(defaultObjectMapper.writeValueAsString(arbeidsforholdWrapper)))))
     }
 }

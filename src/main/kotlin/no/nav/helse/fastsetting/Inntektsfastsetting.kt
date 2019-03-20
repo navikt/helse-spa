@@ -31,6 +31,8 @@ fun fastsettingAvSykepengegrunnlaget(førsteSykdomsdag: LocalDate, arbeidsgiver:
     return Vurdering.Avklart(Sykepengegrunnlag(sykepengegrunnlagNårTrygdenYter as Vurdering.Avklart, sykepengegrunnlagIArbeidsgiverperioden), "", fastsattSammenligningsgrunnlag.grunnlag , "SPA")
 }
 
+const val paragraf_8_28_tredje_ledd_bokstav_a = "§ 8-28 tredje ledd bokstav a) – De tre siste kalendermånedene før arbeidstakeren ble arbeidsufør"
+const val paragraf_8_28_andre_ledd = "§ 8-28 andre ledd"
 // https://lovdata.no/lov/1997-02-28-19/§8-28
 fun fastsettingAvSykepengegrunnlagetIArbeidsgiverperioden(førsteSykdomsdag: LocalDate, arbeidsgiver: Arbeidsgiver, inntekter: List<Inntekt>): Vurdering<Long, Beregningsperiode> {
     val enMånedFør = førsteSykdomsdag.minusMonths(1)
@@ -42,7 +44,7 @@ fun fastsettingAvSykepengegrunnlagetIArbeidsgiverperioden(førsteSykdomsdag: Loc
         inntekt.opptjeningsperiode.fom in treMånederFør.atDay(1)..enMånedFør.atEndOfMonth()
                 && inntekt.opptjeningsperiode.tom in treMånederFør.atDay(1)..enMånedFør.atEndOfMonth()
     }.let {
-        Beregningsperiode(it, "§ 8-28 tredje ledd bokstav a) – De tre siste kalendermånedene før arbeidstakeren ble arbeidsufør (${førsteSykdomsdag}) legges til grunn.")
+        Beregningsperiode(it, paragraf_8_28_tredje_ledd_bokstav_a + "(${førsteSykdomsdag}) legges til grunn.")
     }
 
     // TODO: sjekke om listen inneholder mer enn tre elementer? (hva om det er rapportert inn to inntekter for en måned?)
@@ -59,7 +61,7 @@ fun fastsettingAvSykepengegrunnlagetIArbeidsgiverperioden(førsteSykdomsdag: Loc
             periode.beløp.toInt()
         } / beregningsperiode.inntekter.size
 
-        Vurdering.Avklart(aktuellMånedsinntekt.toLong(), "§ 8-28 andre ledd", beregningsperiode, "spa")
+        Vurdering.Avklart(aktuellMånedsinntekt.toLong(), paragraf_8_28_andre_ledd, beregningsperiode, "SPA")
     }
 }
 
@@ -79,9 +81,10 @@ fun fastsettSammenligningsgrunnlag(førsteSykdomsdag: LocalDate, sammenligningsg
     return Vurdering.Avklart(beregningsperiode.inntekter
             .map {
                 it.beløp
-            }.reduce(BigDecimal::add).longValueExact(), "§ 8-30 andre ledd", beregningsperiode, "spa")
+            }.reduce(BigDecimal::add).longValueExact(), "§ 8-30 andre ledd", beregningsperiode, "SPA")
 }
 
+val paragraf_8_30_første_ledd = "§ 8-30 første ledd"
 // § 8-30 første ledd
 fun fastsettingAvSykepengegrunnlagetNårTrygdenYterSykepenger(sammenligningsgrunnlag: Vurdering.Avklart<Long, Beregningsperiode>,
                                                              beregnetAktuellMånedsinntekt: Vurdering.Avklart<Long, Beregningsperiode>): Vurdering<Long, Beregningsperiode> {
@@ -96,7 +99,7 @@ fun fastsettingAvSykepengegrunnlagetNårTrygdenYterSykepenger(sammenligningsgrun
                 sammenligningsgrunnlag.grunnlag) // FIXME: hva ønsker vi egentlig som referert grunnlag her ?
     }
 
-    return Vurdering.Avklart(omregnetÅrsinntekt, "§ 8-30 første ledd", beregnetAktuellMånedsinntekt.grunnlag, "spa")
+    return Vurdering.Avklart(omregnetÅrsinntekt, paragraf_8_30_første_ledd, beregnetAktuellMånedsinntekt.grunnlag, "SPA")
 }
 
 data class Beregningsperiode(val inntekter: List<Inntekt>, val begrunnelse: String)
