@@ -58,7 +58,7 @@ class SaksbehandlingStream(val env: Environment) {
 
         private val mottattCounter = Counter.build()
                 .name("soknader_mottatt_total")
-                .labelNames("status", "version")
+                .labelNames("status", "type", "version")
                 .help("Antall søknader mottatt fordelt på status og versjon (v1/v2)")
                 .register()
         private val behandlingsCounter = Counter.build()
@@ -109,9 +109,9 @@ class SaksbehandlingStream(val env: Environment) {
 
         val streams = builder.consumeTopic(Topics.SYKEPENGESØKNADER_INN)
                 .filter { _, value -> value.has("status")}
-                .peek { _, value -> mottattCounter.labels(value.get("status").asText(), "v2").inc() }
+                .peek { _, value -> mottattCounter.labels(value.get("status").asText(), value.get("type").asText(), "v2").inc() }
                 .filter { _, value -> value.get("status").asText() == "SENDT" && !value.get("sendtNav").isNull }
-                .peek { _, _ -> mottattCounter.labels("SENDT_NAV", "v2").inc() }
+                .peek { _, value -> mottattCounter.labels("SENDT_NAV", value.get("type").asText(), "v2").inc() }
                 .mapValues { _, jsonNode -> deserializeSykepengesøknadV2(jsonNode) }
                 .mapValues { either -> either.flatMap(::mapToSykepengesøknad) }
                 .mapValues { _, søknad -> søknad.flatMap { hentRegisterData(it) } }
