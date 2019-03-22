@@ -111,6 +111,7 @@ class SaksbehandlingStream(val env: Environment) {
                 .filter { _, value -> value.has("status")}
                 .peek { _, value -> mottattCounter.labels(value.get("status").asText(), "v2").inc() }
                 .filter { _, value -> value.get("status").asText() == "SENDT" && !value.get("sendtNav").isNull }
+                .peek { _, _ -> mottattCounter.labels("SENDT_NAV", "v2").inc() }
                 .mapValues { _, jsonNode -> deserializeSykepengesøknadV2(jsonNode) }
                 .mapValues { either -> either.flatMap(::mapToSykepengesøknad) }
                 .mapValues { _, søknad -> søknad.flatMap { hentRegisterData(it) } }
