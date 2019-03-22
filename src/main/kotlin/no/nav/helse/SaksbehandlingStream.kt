@@ -103,7 +103,7 @@ class SaksbehandlingStream(val env: Environment) {
     private fun topology(): Topology {
         val builder = StreamsBuilder()
 
-        val søknader = builder.consumeTopic(Topics.SYKEPENGESØKNADER_INN)
+        val (arbeidstakersøknader, frilanssøknader, alleAndreSøknader) = builder.consumeTopic(Topics.SYKEPENGESØKNADER_INN)
                 .filter { _, value -> value.has("status")}
                 .branch(
                         Predicate { _, value -> value.has("type") },
@@ -111,12 +111,10 @@ class SaksbehandlingStream(val env: Environment) {
                         Predicate { _, _ -> true }
                 )
 
-        val (arbeidstakersøknader, frilanssøknader, alleAndreSøknader) = søknader
-
         frilanssøknader.peek { _, value -> mottattCounter.labels(value.get("status").asText(), value.get("soknadstype").asText(), "v2").inc() }
         alleAndreSøknader.peek { _, value -> mottattCounter.labels(value.get("status").asText(), "UKJENT", "v2").inc() }
 
-        val streams = arbeidstakersøknader
+        val (feilendeSøknader, vedtak) = arbeidstakersøknader
                 .peek { _, value -> mottattCounter.labels(value.get("status").asText(), value.get("type").asText(), "v2").inc() }
                 .filter { _, value -> value.get("status").asText() == "SENDT" && value.has("sendtNav") && !value.get("sendtNav").isNull }
                 .peek { _, value -> mottattCounter.labels("SENDT_NAV", value.get("type").asText(), "v2").inc() }
@@ -132,14 +130,14 @@ class SaksbehandlingStream(val env: Environment) {
                         Predicate { _, søknad -> søknad is Either.Right }
                 )
 
-        streams[0]
+        feilendeSøknader
                 .peek { _, _ -> behandlingsCounter.labels("feil").inc() }
                 .mapValues { _, behandlingsfeil -> (behandlingsfeil as Either.Left).left }
                 .peek { _, behandlingsfeil -> logAndCountFail(behandlingsfeil) }
                 .mapValues { _, behandlingsfeil -> serializeBehandlingsfeil(behandlingsfeil) }
                 .toTopic(SYKEPENGEBEHANDLINGSFEIL)
 
-        streams[1]
+        vedtak
                 .peek { _, _ -> behandlingsCounter.labels("ok").inc() }
                 .mapValues { _, vedtak -> (vedtak as Either.Right).right }
                 .peek { _, vedtak -> logAndCountVedtak(vedtak) }
