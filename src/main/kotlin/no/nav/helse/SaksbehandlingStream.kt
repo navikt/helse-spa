@@ -29,10 +29,7 @@ import no.nav.helse.fastsetting.vurderFakta
 import no.nav.helse.oppslag.StsRestClient
 import no.nav.helse.sensu.InfluxMetricReporter
 import no.nav.helse.sensu.SensuClient
-import no.nav.helse.streams.JsonDeserializer
-import no.nav.helse.streams.JsonSerializer
 import no.nav.helse.streams.StreamConsumer
-import no.nav.helse.streams.Topic
 import no.nav.helse.streams.Topics
 import no.nav.helse.streams.Topics.SYKEPENGEBEHANDLINGSFEIL
 import no.nav.helse.streams.Topics.VEDTAK_SYKEPENGER
@@ -41,7 +38,6 @@ import no.nav.helse.streams.defaultObjectMapper
 import no.nav.helse.streams.streamConfig
 import no.nav.helse.streams.toTopic
 import org.apache.kafka.clients.consumer.ConsumerConfig
-import org.apache.kafka.common.serialization.Serdes
 import org.apache.kafka.streams.KafkaStreams
 import org.apache.kafka.streams.StreamsBuilder
 import org.apache.kafka.streams.StreamsConfig
@@ -52,12 +48,6 @@ import org.slf4j.LoggerFactory
 import java.time.LocalDate
 import java.time.YearMonth
 import java.util.*
-
-val SYKEPENGESØKNADER_INN_LEGACY = Topic(
-        name = "syfo-soknad-v1",
-        keySerde = Serdes.String(),
-        valueSerde = Serdes.serdeFrom(JsonSerializer(), JsonDeserializer())
-)
 
 class SaksbehandlingStream(val env: Environment) {
 
@@ -117,20 +107,11 @@ class SaksbehandlingStream(val env: Environment) {
     private fun topology(): Topology {
         val builder = StreamsBuilder()
 
-        val v1Stream = builder.consumeTopic(SYKEPENGESØKNADER_INN_LEGACY)
-                .filter { _, value -> value.has("status") }
-                .peek { _, value -> mottattCounter.labels(value.get("status").asText(), "v1").inc() }
-                .filter { _, value -> value.get("status").asText() == "SENDT" }
-                .mapValues { _, jsonNode -> deserializeSykepengesøknadV1(jsonNode) }
-                .mapValues { _, either -> either.map(::mapSykepengesøknadV1ToSykepengesøknadV2) }
-
-        val v2Stream = builder.consumeTopic(Topics.SYKEPENGESØKNADER_INN)
+        val streams = builder.consumeTopic(Topics.SYKEPENGESØKNADER_INN)
                 .filter { _, value -> value.has("status")}
                 .peek { _, value -> mottattCounter.labels(value.get("status").asText(), "v2").inc() }
-                .filter { _, value -> value.get("status").asText() == "SENDT" }
+                .filter { _, value -> value.get("status").asText() == "SENDT" && !value.get("sendtNav").isNull }
                 .mapValues { _, jsonNode -> deserializeSykepengesøknadV2(jsonNode) }
-
-        val streams = v1Stream.merge(v2Stream)
                 .mapValues { either -> either.flatMap(::mapToSykepengesøknad) }
                 .mapValues { _, søknad -> søknad.flatMap { hentRegisterData(it) } }
                 .mapValues { _, faktagrunnlag -> faktagrunnlag.flatMap { fastsettFakta(it) } }

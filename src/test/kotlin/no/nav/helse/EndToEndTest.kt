@@ -1,20 +1,56 @@
 package no.nav.helse
 
 import assertk.assert
-import assertk.assertions.*
+import assertk.assertions.contains
+import assertk.assertions.each
+import assertk.assertions.hasSize
+import assertk.assertions.isBetween
+import assertk.assertions.isEqualTo
+import assertk.assertions.isNotEmpty
+import assertk.assertions.isTrue
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.github.tomakehurst.wiremock.WireMockServer
-import com.github.tomakehurst.wiremock.client.WireMock.*
+import com.github.tomakehurst.wiremock.client.WireMock.any
+import com.github.tomakehurst.wiremock.client.WireMock.configureFor
+import com.github.tomakehurst.wiremock.client.WireMock.okJson
+import com.github.tomakehurst.wiremock.client.WireMock.stubFor
+import com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import no.nav.common.JAASCredential
 import no.nav.common.KafkaEnvironment
-import no.nav.helse.behandling.*
+import no.nav.helse.behandling.AvklarteVerdier
+import no.nav.helse.behandling.Faktagrunnlag
+import no.nav.helse.behandling.Soknadsperiode
+import no.nav.helse.behandling.SykepengeVedtak
+import no.nav.helse.behandling.Sykepengesøknad
+import no.nav.helse.behandling.SykepengesøknadV2DTO
 import no.nav.helse.domain.Arbeidsforhold
 import no.nav.helse.domain.ArbeidsforholdWrapper
 import no.nav.helse.domain.Arbeidsgiver
-import no.nav.helse.fastsetting.*
-import no.nav.helse.oppslag.*
+import no.nav.helse.fastsetting.Alder
+import no.nav.helse.fastsetting.Aldersgrunnlag
+import no.nav.helse.fastsetting.Beregningsperiode
+import no.nav.helse.fastsetting.Medlemsskapgrunnlag
+import no.nav.helse.fastsetting.Opptjeningsgrunnlag
+import no.nav.helse.fastsetting.Opptjeningstid
+import no.nav.helse.fastsetting.Sykepengegrunnlag
+import no.nav.helse.fastsetting.Vurdering
+import no.nav.helse.fastsetting.begrunnelse_p_8_51
+import no.nav.helse.fastsetting.landskodeNORGE
+import no.nav.helse.fastsetting.paragraf_8_28_andre_ledd
+import no.nav.helse.fastsetting.paragraf_8_28_tredje_ledd_bokstav_a
+import no.nav.helse.fastsetting.paragraf_8_30_første_ledd
+import no.nav.helse.fastsetting.søkerErBosattINorge
+import no.nav.helse.fastsetting.søker_har_arbeidsgiver
+import no.nav.helse.oppslag.AktørId
+import no.nav.helse.oppslag.Inntekt
+import no.nav.helse.oppslag.Inntektsarbeidsgiver
+import no.nav.helse.oppslag.InntektsoppslagResultat
+import no.nav.helse.oppslag.Kjønn
+import no.nav.helse.oppslag.Opptjeningsperiode
+import no.nav.helse.oppslag.Person
+import no.nav.helse.oppslag.SykepengerPeriode
 import no.nav.helse.streams.JsonSerializer
 import no.nav.helse.streams.Topics.SYKEPENGEBEHANDLINGSFEIL
 import no.nav.helse.streams.Topics.SYKEPENGESØKNADER_INN
@@ -28,7 +64,9 @@ import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.apache.kafka.common.config.SaslConfigs
-import org.apache.kafka.common.serialization.*
+import org.apache.kafka.common.serialization.Deserializer
+import org.apache.kafka.common.serialization.StringDeserializer
+import org.apache.kafka.common.serialization.StringSerializer
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeAll
@@ -40,7 +78,6 @@ import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalDate.parse
 import java.time.LocalDateTime
-import kotlin.collections.HashMap
 
 class EndToEndTest {
 
@@ -54,7 +91,6 @@ class EndToEndTest {
                 withSchemaRegistry = false,
                 withSecurity = true,
                 topics = listOf(
-                        SYKEPENGESØKNADER_INN_LEGACY.name,
                         SYKEPENGESØKNADER_INN.name,
                         VEDTAK_SYKEPENGER.name,
                         SYKEPENGEBEHANDLINGSFEIL.name
