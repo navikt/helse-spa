@@ -104,10 +104,10 @@ class SaksbehandlingStream(val env: Environment) {
         val builder = StreamsBuilder()
 
         val streams = builder.consumeTopic(Topics.SYKEPENGESØKNADER_INN)
-                .filter { _, value -> value.has("status")}
-                .peek { _, value -> mottattCounter.labels(value.get("status").asText(), value.get("type").asText(), "v2").inc() }
+                .filter { _, value -> value.has("status") && value.has("soknadstype")}
+                .peek { _, value -> mottattCounter.labels(value.get("status").asText(), value.get("soknadstype").asText(), "v2").inc() }
                 .filter { _, value -> value.get("status").asText() == "SENDT" && value.has("sendtNav") && !value.get("sendtNav").isNull }
-                .peek { _, value -> mottattCounter.labels("SENDT_NAV", value.get("type").asText(), "v2").inc() }
+                .peek { _, value -> mottattCounter.labels("SENDT_NAV", value.get("soknadstype").asText(), "v2").inc() }
                 .mapValues { _, jsonNode -> deserializeSykepengesøknadV2(jsonNode) }
                 .mapValues { either -> either.flatMap(::mapToSykepengesøknad) }
                 .mapValues { _, søknad -> søknad.flatMap { hentRegisterData(it) } }

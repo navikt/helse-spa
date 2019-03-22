@@ -629,7 +629,7 @@ class EndToEndTest {
     private fun produserSykepengesøknadV2(aktørId: String): SykepengesøknadV2DTO {
         val søknad = SykepengesøknadV2DTO(
                 aktorId = aktørId,
-                type = "ARBEIDSTAKERE",
+                soknadstype = "ARBEIDSTAKERE",
                 status = "SENDT",
                 arbeidsgiver = Arbeidsgiver(
                         navn = "EQUINOR ASA, AVD STATOIL SOKKELVIRKSOMHET",

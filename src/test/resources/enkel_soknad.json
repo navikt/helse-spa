@@ -1,6 +1,6 @@
 {
   "id": "8320c034-595c-4202-8874-903890c38147",
-  "type": "ARBEIDSTAKERE",
+  "soknadstype": "ARBEIDSTAKERE",
   "status": "NY",
   "aktorId": "1733483394485",
   "sykmeldingId": "62020322-1b72-4f0f-bda1-4b4af90c8467",
