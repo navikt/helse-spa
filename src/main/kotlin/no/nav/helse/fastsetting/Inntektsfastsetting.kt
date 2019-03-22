@@ -2,7 +2,9 @@ package no.nav.helse.fastsetting
 
 import no.nav.helse.domain.Arbeidsgiver
 import no.nav.helse.oppslag.Inntekt
+import no.nav.helse.sykepenger.beregning.longValueExact
 import java.math.BigDecimal
+import java.math.RoundingMode
 import java.time.LocalDate
 import java.time.YearMonth
 
@@ -81,7 +83,7 @@ fun fastsettSammenligningsgrunnlag(førsteSykdomsdag: LocalDate, sammenligningsg
     return Vurdering.Avklart(beregningsperiode.inntekter
             .map {
                 it.beløp
-            }.reduce(BigDecimal::add).longValueExact(), "§ 8-30 andre ledd", beregningsperiode, "SPA")
+            }.reduce(BigDecimal::add).longValueExact(RoundingMode.HALF_UP), "§ 8-30 andre ledd", beregningsperiode, "SPA")
 }
 
 val paragraf_8_30_første_ledd = "§ 8-30 første ledd"
