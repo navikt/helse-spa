@@ -19,12 +19,10 @@ import no.nav.helse.behandling.Sykepengesøknad
 import no.nav.helse.behandling.SykepengesøknadV1DTO
 import no.nav.helse.behandling.SykepengesøknadV2DTO
 import no.nav.helse.behandling.Vilkårsprøving
-import no.nav.helse.behandling.asNewPeriode
 import no.nav.helse.behandling.mapToSykepengesøknad
 import no.nav.helse.behandling.sykepengeBeregning
 import no.nav.helse.behandling.vedtak
 import no.nav.helse.behandling.vilkårsprøving
-import no.nav.helse.domain.Arbeidsgiver
 import no.nav.helse.fastsetting.vurderFakta
 import no.nav.helse.oppslag.StsRestClient
 import no.nav.helse.sensu.InfluxMetricReporter
@@ -45,8 +43,6 @@ import org.apache.kafka.streams.Topology
 import org.apache.kafka.streams.errors.LogAndFailExceptionHandler
 import org.apache.kafka.streams.kstream.Predicate
 import org.slf4j.LoggerFactory
-import java.time.LocalDate
-import java.time.YearMonth
 import java.util.*
 
 class SaksbehandlingStream(val env: Environment) {
@@ -212,16 +208,3 @@ fun deserializeSykepengesøknadV1(soknad: JsonNode): Either<Behandlingsfeil, Syk
         } catch (e: Exception) {
             Either.Left(Behandlingsfeil.ukjentDeserialiseringsfeil(soknad, e))
         }
-
-fun mapSykepengesøknadV1ToSykepengesøknadV2(legacy: SykepengesøknadV1DTO): SykepengesøknadV2DTO =
-        SykepengesøknadV2DTO(
-                    aktorId = legacy.aktorId,
-                    arbeidsgiver = Arbeidsgiver(navn = legacy.arbeidsgiver?: "TOM ASA", orgnummer = "00000000000"),
-                    fom = legacy.fom ?: YearMonth.now().atDay(1),
-                    tom = legacy.tom ?: YearMonth.now().atEndOfMonth(),
-                    startSyketilfelle = legacy.startSykeforlop?: LocalDate.now(),
-                    soktUtenlandsopphold = false,
-                    soknadsperioder = legacy.soknadPerioder.map { asNewPeriode(it) },
-                    sendtNav = legacy.innsendtDato?.atStartOfDay(),
-                    status = legacy.status
-            )
