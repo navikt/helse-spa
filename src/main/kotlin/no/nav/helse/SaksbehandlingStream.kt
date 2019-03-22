@@ -103,11 +103,23 @@ class SaksbehandlingStream(val env: Environment) {
     private fun topology(): Topology {
         val builder = StreamsBuilder()
 
-        val streams = builder.consumeTopic(Topics.SYKEPENGESØKNADER_INN)
-                .filter { _, value -> value.has("status") && value.has("soknadstype")}
-                .peek { _, value -> mottattCounter.labels(value.get("status").asText(), value.get("soknadstype").asText(), "v2").inc() }
+        val søknader = builder.consumeTopic(Topics.SYKEPENGESØKNADER_INN)
+                .filter { _, value -> value.has("status")}
+                .branch(
+                        Predicate { _, value -> value.has("type") },
+                        Predicate { _, value -> value.has("soknadstype") },
+                        Predicate { _, _ -> true }
+                )
+
+        val (arbeidstakersøknader, frilanssøknader, alleAndreSøknader) = søknader
+
+        frilanssøknader.peek { _, value -> mottattCounter.labels(value.get("status").asText(), value.get("soknadstype").asText(), "v2").inc() }
+        alleAndreSøknader.peek { _, value -> mottattCounter.labels(value.get("status").asText(), "UKJENT", "v2").inc() }
+
+        val streams = arbeidstakersøknader
+                .peek { _, value -> mottattCounter.labels(value.get("status").asText(), value.get("type").asText(), "v2").inc() }
                 .filter { _, value -> value.get("status").asText() == "SENDT" && value.has("sendtNav") && !value.get("sendtNav").isNull }
-                .peek { _, value -> mottattCounter.labels("SENDT_NAV", value.get("soknadstype").asText(), "v2").inc() }
+                .peek { _, value -> mottattCounter.labels("SENDT_NAV", value.get("type").asText(), "v2").inc() }
                 .mapValues { _, jsonNode -> deserializeSykepengesøknadV2(jsonNode) }
                 .mapValues { either -> either.flatMap(::mapToSykepengesøknad) }
                 .mapValues { _, søknad -> søknad.flatMap { hentRegisterData(it) } }

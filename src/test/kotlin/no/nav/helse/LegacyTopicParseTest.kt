@@ -38,7 +38,7 @@ val json = """
       "tom": "2018-12-05"
     }
   ],
-  "soknadstype": "ARBEIDSTAKERE",
+  "type": "ARBEIDSTAKERE",
   "sporsmal": [
     {
       "id": "35206",

@@ -25,7 +25,7 @@ import java.time.LocalDateTime
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class SykepengesøknadV2DTO(
         val aktorId: String,
-        val soknadstype: String,
+        val type: String,
         val status: String,
         val arbeidsgiver: Arbeidsgiver,
         val soktUtenlandsopphold: Boolean,
