@@ -41,6 +41,7 @@ import org.apache.kafka.streams.StreamsBuilder
 import org.apache.kafka.streams.StreamsConfig
 import org.apache.kafka.streams.Topology
 import org.apache.kafka.streams.errors.LogAndFailExceptionHandler
+import org.apache.kafka.streams.kstream.KStream
 import org.apache.kafka.streams.kstream.Predicate
 import org.slf4j.LoggerFactory
 import java.util.*
@@ -103,18 +104,39 @@ class SaksbehandlingStream(val env: Environment) {
     private fun topology(): Topology {
         val builder = StreamsBuilder()
 
-        val (arbeidstakersøknader, frilanssøknader, alleAndreSøknader) = builder.consumeTopic(Topics.SYKEPENGESØKNADER_INN)
-                .filter { _, value -> value.has("status")}
-                .branch(
-                        Predicate { _, value -> value.has("type") },
-                        Predicate { _, value -> value.has("soknadstype") },
-                        Predicate { _, _ -> true }
-                )
+        val (arbeidstakersøknader, frilanssøknader, alleAndreSøknader) = splittPåType(builder)
 
         frilanssøknader.peek { _, value -> mottattCounter.labels(value.get("status").asText(), value.get("soknadstype").asText(), "v2").inc() }
         alleAndreSøknader.peek { _, value -> mottattCounter.labels(value.get("status").asText(), "UKJENT", "v2").inc() }
 
-        val (feilendeSøknader, vedtak) = arbeidstakersøknader
+        val (feilendeSøknader, vedtak) = prøvArbeidstaker(arbeidstakersøknader)
+
+        sendTilFeilkø(feilendeSøknader)
+        sendTilVedtakskø(vedtak)
+
+        return builder.build()
+    }
+
+    private fun sendTilVedtakskø(vedtak: KStream<String, Either<Behandlingsfeil, SykepengeVedtak>>) {
+        vedtak
+                .peek { _, _ -> behandlingsCounter.labels("ok").inc() }
+                .mapValues { _, sykepengevedtak -> (sykepengevedtak as Either.Right).right }
+                .peek { _, sykepengevedtak -> logAndCountVedtak(sykepengevedtak) }
+                .mapValues { _, sykepengevedtak -> serialize(sykepengevedtak) }
+                .toTopic(VEDTAK_SYKEPENGER)
+    }
+
+    private fun sendTilFeilkø(feilendeSøknader: KStream<String, Either<Behandlingsfeil, SykepengeVedtak>>) {
+        feilendeSøknader
+                .peek { _, _ -> behandlingsCounter.labels("feil").inc() }
+                .mapValues { _, behandlingsfeil -> (behandlingsfeil as Either.Left).left }
+                .peek { _, behandlingsfeil -> logAndCountFail(behandlingsfeil) }
+                .mapValues { _, behandlingsfeil -> serializeBehandlingsfeil(behandlingsfeil) }
+                .toTopic(SYKEPENGEBEHANDLINGSFEIL)
+    }
+
+    private fun prøvArbeidstaker(arbeidstakersøknader: KStream<String, JsonNode>): VedtakEllerFeil {
+        val (feil, vedtak) = arbeidstakersøknader
                 .peek { _, value -> mottattCounter.labels(value.get("status").asText(), value.get("type").asText(), "v2").inc() }
                 .filter { _, value -> value.get("status").asText() == "SENDT" && value.has("sendtNav") && !value.get("sendtNav").isNull }
                 .peek { _, value -> mottattCounter.labels("SENDT_NAV", value.get("type").asText(), "v2").inc() }
@@ -129,22 +151,18 @@ class SaksbehandlingStream(val env: Environment) {
                         Predicate { _, søknad -> søknad is Either.Left },
                         Predicate { _, søknad -> søknad is Either.Right }
                 )
+        return VedtakEllerFeil(feil, vedtak)
+    }
 
-        feilendeSøknader
-                .peek { _, _ -> behandlingsCounter.labels("feil").inc() }
-                .mapValues { _, behandlingsfeil -> (behandlingsfeil as Either.Left).left }
-                .peek { _, behandlingsfeil -> logAndCountFail(behandlingsfeil) }
-                .mapValues { _, behandlingsfeil -> serializeBehandlingsfeil(behandlingsfeil) }
-                .toTopic(SYKEPENGEBEHANDLINGSFEIL)
-
-        vedtak
-                .peek { _, _ -> behandlingsCounter.labels("ok").inc() }
-                .mapValues { _, vedtak -> (vedtak as Either.Right).right }
-                .peek { _, vedtak -> logAndCountVedtak(vedtak) }
-                .mapValues { _, vedtak -> serialize(vedtak) }
-                .toTopic(VEDTAK_SYKEPENGER)
-
-        return builder.build()
+    private fun splittPåType(builder: StreamsBuilder): SplitByType {
+        val (arbeidstakersøknader, frilanssøknader, alleAndreSøknader) = builder.consumeTopic(Topics.SYKEPENGESØKNADER_INN)
+                .filter { _, value -> value.has("status") }
+                .branch(
+                        Predicate { _, value -> value.has("type") },
+                        Predicate { _, value -> value.has("soknadstype") },
+                        Predicate { _, _ -> true }
+                )
+        return SplitByType(arbeidstakersøknader = arbeidstakersøknader, frilanssøknader = frilanssøknader, alleAndreSøknader = alleAndreSøknader)
     }
 
     private fun logAndCountFail(behandlingsfeil: Behandlingsfeil) {
@@ -218,3 +236,14 @@ fun deserializeSykepengesøknadV1(soknad: JsonNode): Either<Behandlingsfeil, Syk
         } catch (e: Exception) {
             Either.Left(Behandlingsfeil.ukjentDeserialiseringsfeil(soknad, e))
         }
+
+private data class SplitByType(
+        val arbeidstakersøknader: KStream<String, JsonNode>,
+        val frilanssøknader: KStream<String, JsonNode>,
+        val alleAndreSøknader: KStream<String, JsonNode>
+)
+
+private data class VedtakEllerFeil(
+        val behandlingsFeil: KStream<String, Either<Behandlingsfeil, SykepengeVedtak>>,
+        val vedtak: KStream<String, Either<Behandlingsfeil, SykepengeVedtak>>
+)
