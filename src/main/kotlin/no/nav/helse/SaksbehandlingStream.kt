@@ -110,7 +110,7 @@ class SaksbehandlingStream(val env: Environment) {
         val streams = builder.consumeTopic(Topics.SYKEPENGESØKNADER_INN)
                 .filter { _, value -> value.has("status")}
                 .peek { _, value -> mottattCounter.labels(value.get("status").asText(), value.get("type").asText(), "v2").inc() }
-                .filter { _, value -> value.get("status").asText() == "SENDT" && !value.get("sendtNav").isNull }
+                .filter { _, value -> value.get("status").asText() == "SENDT" && value.has("sendtNav") && !value.get("sendtNav").isNull }
                 .peek { _, value -> mottattCounter.labels("SENDT_NAV", value.get("type").asText(), "v2").inc() }
                 .mapValues { _, jsonNode -> deserializeSykepengesøknadV2(jsonNode) }
                 .mapValues { either -> either.flatMap(::mapToSykepengesøknad) }
