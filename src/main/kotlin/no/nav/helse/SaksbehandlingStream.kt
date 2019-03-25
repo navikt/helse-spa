@@ -211,7 +211,9 @@ class SaksbehandlingStream(val env: Environment) {
     }
 
     private fun logAndCountVedtak(vedtak: SykepengeVedtak) {
-        influxMetricReporter.sendDataPoint("vedtak.event", mapOf("aktorId" to vedtak.originalSøknad.aktorId))
+        influxMetricReporter.sendDataPoint("behandling.event", mapOf("aktorId" to vedtak.originalSøknad.aktorId), mapOf(
+                "type" to vedtak.originalSøknad.type
+        ))
         log.info("Søknad for aktør ${vedtak.originalSøknad.aktorId} behandlet OK.")
     }
 
