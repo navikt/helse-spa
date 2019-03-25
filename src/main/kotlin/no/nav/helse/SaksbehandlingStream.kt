@@ -170,23 +170,42 @@ class SaksbehandlingStream(val env: Environment) {
         when(behandlingsfeil) {
             is Deserialiseringsfeil -> {
                 behandlingsfeilCounter.labels("deserialisering").inc()
-                influxMetricReporter.sendDataPoint("behandlingsfeil.event", mapOf("feilmelding" to behandlingsfeil.feilmelding), mapOf("steg" to "deserialisering"))
+                influxMetricReporter.sendDataPoint("behandlingsfeil.event", mapOf("feilmelding" to behandlingsfeil.feilmelding), mapOf(
+                        "steg" to "deserialisering",
+                        "type" to behandlingsfeil.json.get("type").asText()
+
+                ))
             }
-            is RegisterFeil -> behandlingsfeilCounter.labels("register").inc()
+            is RegisterFeil -> {
+                behandlingsfeilCounter.labels("register").inc()
+                influxMetricReporter.sendDataPoint("behandlingsfeil.event", mapOf("aktorId" to behandlingsfeil.søknad.aktorId), mapOf(
+                        "steg" to "register",
+                        "type" to behandlingsfeil.søknad.type
+                ))
+            }
             is Avklaringsfeil -> {
                 behandlingsfeilCounter.labels("avklaring").inc()
                 behandlingsfeil.tellUavklarte(avklaringsfeilCounter)
-                influxMetricReporter.sendDataPoint("behandlingsfeil.event", mapOf("aktorId" to behandlingsfeil.uavklarteFakta.originalSøknad.aktorId), mapOf("steg" to "avklaring"))
+                influxMetricReporter.sendDataPoint("behandlingsfeil.event", mapOf("aktorId" to behandlingsfeil.uavklarteFakta.originalSøknad.aktorId), mapOf(
+                        "steg" to "avklaring",
+                        "type" to behandlingsfeil.uavklarteFakta.originalSøknad.type
+                ))
                 log.info("Søknad for aktør ${behandlingsfeil.uavklarteFakta.originalSøknad.aktorId} er uavklart")
             }
             is Vilkårsprøvingsfeil -> {
                 behandlingsfeilCounter.labels("vilkarsproving").inc()
-                influxMetricReporter.sendDataPoint("behandlingsfeil.event", mapOf("aktorId" to behandlingsfeil.vilkårsprøving.originalSøknad.aktorId), mapOf("steg" to "vilkarsproving"))
+                influxMetricReporter.sendDataPoint("behandlingsfeil.event", mapOf("aktorId" to behandlingsfeil.vilkårsprøving.originalSøknad.aktorId), mapOf(
+                        "steg" to "vilkarsproving",
+                        "type" to behandlingsfeil.vilkårsprøving.originalSøknad.type
+                ))
                 log.info("Søknad for aktør ${behandlingsfeil.vilkårsprøving.originalSøknad.aktorId} oppfyller ikke vilkårene")
             }
             is Beregningsfeil -> {
                 behandlingsfeilCounter.labels("beregning").inc()
-                influxMetricReporter.sendDataPoint("behandlingsfeil.event", mapOf("aktorId" to behandlingsfeil.vilkårsprøving.originalSøknad.aktorId), mapOf("steg" to "beregning"))
+                influxMetricReporter.sendDataPoint("behandlingsfeil.event", mapOf("aktorId" to behandlingsfeil.vilkårsprøving.originalSøknad.aktorId), mapOf(
+                        "steg" to "beregning",
+                        "type" to behandlingsfeil.vilkårsprøving.originalSøknad.type
+                ))
             }
         }
     }

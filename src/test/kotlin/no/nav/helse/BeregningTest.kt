@@ -1,8 +1,17 @@
 package no.nav.helse
 
-import no.nav.helse.behandling.*
+import no.nav.helse.behandling.AvklarteVerdier
+import no.nav.helse.behandling.Soknadsperiode
+import no.nav.helse.behandling.Sykepengesøknad
+import no.nav.helse.behandling.Vilkårsprøving
+import no.nav.helse.behandling.grunnbeløp
+import no.nav.helse.behandling.sykepengeBeregning
 import no.nav.helse.domain.Arbeidsgiver
-import no.nav.helse.fastsetting.*
+import no.nav.helse.fastsetting.Aldersgrunnlag
+import no.nav.helse.fastsetting.Beregningsperiode
+import no.nav.helse.fastsetting.Medlemsskapgrunnlag
+import no.nav.helse.fastsetting.Opptjeningsgrunnlag
+import no.nav.helse.fastsetting.Sykepengegrunnlag
 import no.nav.helse.fastsetting.Vurdering.Avklart
 import no.nav.nare.core.evaluations.Evaluering
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -50,6 +59,7 @@ class BeregningTest {
             Vilkårsprøving(
                     originalSøknad = Sykepengesøknad(
                             aktorId = "123123",
+                            type = "ARBEIDSTAKERE",
                             fom = fom,
                             tom = tom,
                             arbeidsgiver = Arbeidsgiver("TheWorkplace", "999888777"),

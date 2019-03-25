@@ -42,6 +42,7 @@ fun mapToSykepengesøknad(dto: SykepengesøknadV2DTO): Either<Behandlingsfeil, S
     } else {
         Either.Right(Sykepengesøknad(
                 aktorId = dto.aktorId,
+                type = dto.type,
                 status = dto.status,
                 arbeidsgiver = dto.arbeidsgiver,
                 soktUtenlandsopphold = dto.soktUtenlandsopphold,
@@ -56,6 +57,7 @@ fun mapToSykepengesøknad(dto: SykepengesøknadV2DTO): Either<Behandlingsfeil, S
 
 data class Sykepengesøknad(
         val aktorId: String,
+        val type: String,
         val status: String,
         val arbeidsgiver: Arbeidsgiver,
         val soktUtenlandsopphold: Boolean,

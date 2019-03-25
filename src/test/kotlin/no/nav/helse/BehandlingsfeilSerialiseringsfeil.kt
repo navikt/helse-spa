@@ -23,6 +23,7 @@ val uavklarteJson= """{
   "uavklarteFakta" : {
     "originalSøknad" : {
       "aktorId" : "9903059340882",
+      "type": "ARBEIDSTAKERE",
       "status" : "SENDT",
       "arbeidsgiver" : {
         "navn" : "AS MOCK",

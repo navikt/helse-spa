@@ -3,6 +3,7 @@ package no.nav.helse
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException
 import io.prometheus.client.Counter
+import no.nav.helse.behandling.Sykepengesøknad
 import no.nav.helse.behandling.UavklarteFakta
 import no.nav.helse.behandling.Vilkårsprøving
 import no.nav.helse.fastsetting.Vurdering
@@ -12,7 +13,7 @@ interface Behandlingsfeil {
 
     data class Deserialiseringsfeil(val json: JsonNode, override val feilmelding: String): Behandlingsfeil
 
-    data class RegisterFeil(override val feilmelding: String): Behandlingsfeil
+    data class RegisterFeil(override val feilmelding: String, val søknad: Sykepengesøknad): Behandlingsfeil
 
     data class Avklaringsfeil(val uavklarteFakta: UavklarteFakta, override val feilmelding: String): Behandlingsfeil {
         fun tellUavklarte(avklaringsfeilCounter: Counter) {
@@ -44,7 +45,7 @@ interface Behandlingsfeil {
         // her feilet noe under _beregning, men vi har ikke del-resultat, bare exception
         fun beregningsfeil(vilkårsprøving: Vilkårsprøving, exception: Exception) = Beregningsfeil(vilkårsprøving, "Beregning feilet: ${exception.javaClass.simpleName}: ${exception.message}.")
 
-        fun registerFeil(exception: Exception):RegisterFeil = RegisterFeil("Feil i opphenting av register-data: ${exception.javaClass.simpleName} : ${exception.message}\"")
+        fun registerFeil(exception: Exception, søknad: Sykepengesøknad):RegisterFeil = RegisterFeil("Feil i opphenting av register-data: ${exception.javaClass.simpleName} : ${exception.message}\"", søknad)
 
     }
 }

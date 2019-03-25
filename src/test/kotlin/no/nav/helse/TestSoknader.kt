@@ -26,6 +26,7 @@ val faktagrunnlagUtenVerdi = Faktagrunnlag(
 
 val originalSoknad = Sykepengesøknad(
         aktorId = "1",
+        type = "ARBEIDSTAKERE",
         arbeidsgiver = Arbeidsgiver("Test 1", "1111"),
         startSyketilfelle = LocalDate.now(),
         soktUtenlandsopphold = true,
