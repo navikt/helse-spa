@@ -24,6 +24,7 @@ import java.time.LocalDateTime
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class SykepengesøknadV2DTO(
+        val id: String,
         val aktorId: String,
         val type: String,
         val status: String,
@@ -41,6 +42,7 @@ fun mapToSykepengesøknad(dto: SykepengesøknadV2DTO): Either<Behandlingsfeil, S
         Either.Left(Behandlingsfeil.ukjentDeserialiseringsfeil(defaultObjectMapper.valueToTree(dto), Exception("sendtNav er null")))
     } else {
         Either.Right(Sykepengesøknad(
+                id = dto.id,
                 aktorId = dto.aktorId,
                 type = dto.type,
                 status = dto.status,
@@ -56,6 +58,7 @@ fun mapToSykepengesøknad(dto: SykepengesøknadV2DTO): Either<Behandlingsfeil, S
 }
 
 data class Sykepengesøknad(
+        val id: String,
         val aktorId: String,
         val type: String,
         val status: String,

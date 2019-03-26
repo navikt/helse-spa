@@ -170,7 +170,9 @@ class SaksbehandlingStream(val env: Environment) {
         when(behandlingsfeil) {
             is Deserialiseringsfeil -> {
                 behandlingsfeilCounter.labels("deserialisering").inc()
-                influxMetricReporter.sendDataPoint("behandlingsfeil.event", mapOf("feilmelding" to behandlingsfeil.feilmelding), mapOf(
+                influxMetricReporter.sendDataPoint("behandlingsfeil.event", mapOf(
+                        "feilmelding" to behandlingsfeil.feilmelding
+                ), mapOf(
                         "steg" to "deserialisering",
                         "type" to behandlingsfeil.json.get("type").asText()
 
@@ -178,7 +180,9 @@ class SaksbehandlingStream(val env: Environment) {
             }
             is RegisterFeil -> {
                 behandlingsfeilCounter.labels("register").inc()
-                influxMetricReporter.sendDataPoint("behandlingsfeil.event", mapOf("aktorId" to behandlingsfeil.søknad.aktorId), mapOf(
+                influxMetricReporter.sendDataPoint("behandlingsfeil.event", mapOf(
+                        "soknadId" to behandlingsfeil.søknad.id
+                ), mapOf(
                         "steg" to "register",
                         "type" to behandlingsfeil.søknad.type
                 ))
@@ -186,23 +190,29 @@ class SaksbehandlingStream(val env: Environment) {
             is Avklaringsfeil -> {
                 behandlingsfeilCounter.labels("avklaring").inc()
                 behandlingsfeil.tellUavklarte(avklaringsfeilCounter)
-                influxMetricReporter.sendDataPoint("behandlingsfeil.event", mapOf("aktorId" to behandlingsfeil.uavklarteFakta.originalSøknad.aktorId), mapOf(
+                influxMetricReporter.sendDataPoint("behandlingsfeil.event", mapOf(
+                        "soknadId" to behandlingsfeil.uavklarteFakta.originalSøknad.id
+                ), mapOf(
                         "steg" to "avklaring",
                         "type" to behandlingsfeil.uavklarteFakta.originalSøknad.type
                 ))
-                log.info("Søknad for aktør ${behandlingsfeil.uavklarteFakta.originalSøknad.aktorId} er uavklart")
+                log.info("Søknad for aktør ${behandlingsfeil.uavklarteFakta.originalSøknad.aktorId} med id ${behandlingsfeil.uavklarteFakta.originalSøknad.id} er uavklart")
             }
             is Vilkårsprøvingsfeil -> {
                 behandlingsfeilCounter.labels("vilkarsproving").inc()
-                influxMetricReporter.sendDataPoint("behandlingsfeil.event", mapOf("aktorId" to behandlingsfeil.vilkårsprøving.originalSøknad.aktorId), mapOf(
+                influxMetricReporter.sendDataPoint("behandlingsfeil.event", mapOf(
+                        "soknadId" to behandlingsfeil.vilkårsprøving.originalSøknad.id
+                ), mapOf(
                         "steg" to "vilkarsproving",
                         "type" to behandlingsfeil.vilkårsprøving.originalSøknad.type
                 ))
-                log.info("Søknad for aktør ${behandlingsfeil.vilkårsprøving.originalSøknad.aktorId} oppfyller ikke vilkårene")
+                log.info("Søknad for aktør ${behandlingsfeil.vilkårsprøving.originalSøknad.aktorId} med id ${behandlingsfeil.vilkårsprøving.originalSøknad.id} oppfyller ikke vilkårene")
             }
             is Beregningsfeil -> {
                 behandlingsfeilCounter.labels("beregning").inc()
-                influxMetricReporter.sendDataPoint("behandlingsfeil.event", mapOf("aktorId" to behandlingsfeil.vilkårsprøving.originalSøknad.aktorId), mapOf(
+                influxMetricReporter.sendDataPoint("behandlingsfeil.event", mapOf(
+                        "soknadId" to behandlingsfeil.vilkårsprøving.originalSøknad.id
+                ), mapOf(
                         "steg" to "beregning",
                         "type" to behandlingsfeil.vilkårsprøving.originalSøknad.type
                 ))
@@ -211,10 +221,12 @@ class SaksbehandlingStream(val env: Environment) {
     }
 
     private fun logAndCountVedtak(vedtak: SykepengeVedtak) {
-        influxMetricReporter.sendDataPoint("behandling.event", mapOf("aktorId" to vedtak.originalSøknad.aktorId), mapOf(
+        influxMetricReporter.sendDataPoint("behandling.event", mapOf(
+                "soknadId" to vedtak.originalSøknad.id
+        ), mapOf(
                 "type" to vedtak.originalSøknad.type
         ))
-        log.info("Søknad for aktør ${vedtak.originalSøknad.aktorId} behandlet OK.")
+        log.info("Søknad for aktør ${vedtak.originalSøknad.aktorId} med id ${vedtak.originalSøknad.id} behandlet OK.")
     }
 
     private fun deserializeSykepengesøknadV2(soknad: JsonNode): Either<Behandlingsfeil, SykepengesøknadV2DTO> =

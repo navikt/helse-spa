@@ -22,6 +22,7 @@ class BehandlingsfeilSerialiseringsfeil {
 val uavklarteJson= """{
   "uavklarteFakta" : {
     "originalSøknad" : {
+      "id": "12345",
       "aktorId" : "9903059340882",
       "type": "ARBEIDSTAKERE",
       "status" : "SENDT",

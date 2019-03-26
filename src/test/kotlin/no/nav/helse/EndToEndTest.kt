@@ -1,7 +1,14 @@
 package no.nav.helse
 
 import assertk.assert
-import assertk.assertions.*
+import assertk.assertions.contains
+import assertk.assertions.containsExactly
+import assertk.assertions.each
+import assertk.assertions.hasSize
+import assertk.assertions.isBetween
+import assertk.assertions.isEqualTo
+import assertk.assertions.isNotEmpty
+import assertk.assertions.isTrue
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.github.tomakehurst.wiremock.WireMockServer
@@ -22,7 +29,22 @@ import no.nav.helse.behandling.SykepengesøknadV2DTO
 import no.nav.helse.domain.Arbeidsforhold
 import no.nav.helse.domain.ArbeidsforholdWrapper
 import no.nav.helse.domain.Arbeidsgiver
-import no.nav.helse.fastsetting.*
+import no.nav.helse.fastsetting.Alder
+import no.nav.helse.fastsetting.Aldersgrunnlag
+import no.nav.helse.fastsetting.Beregningsperiode
+import no.nav.helse.fastsetting.Medlemsskapgrunnlag
+import no.nav.helse.fastsetting.Opptjeningsgrunnlag
+import no.nav.helse.fastsetting.Opptjeningstid
+import no.nav.helse.fastsetting.Sykepengegrunnlag
+import no.nav.helse.fastsetting.Vurdering
+import no.nav.helse.fastsetting.begrunnelse_p_8_51
+import no.nav.helse.fastsetting.begrunnelse_søker_i_aktivt_arbeidsforhold
+import no.nav.helse.fastsetting.landskodeNORGE
+import no.nav.helse.fastsetting.paragraf_8_28_andre_ledd
+import no.nav.helse.fastsetting.paragraf_8_28_tredje_ledd_bokstav_a
+import no.nav.helse.fastsetting.paragraf_8_30_første_ledd
+import no.nav.helse.fastsetting.søkerErBosattINorge
+import no.nav.helse.fastsetting.søker_har_arbeidsgiver
 import no.nav.helse.oppslag.AktørId
 import no.nav.helse.oppslag.Inntekt
 import no.nav.helse.oppslag.Inntektsarbeidsgiver
@@ -272,7 +294,7 @@ class EndToEndTest {
         assert(opptjeningstidVurdering.begrunnelse).isEqualTo(begrunnelse_søker_i_aktivt_arbeidsforhold)
         assert(opptjeningstidVurdering.vurderingstidspunkt).isBetween(LocalDateTime.now().minusHours(1), LocalDateTime.now().plusHours(1))
         assert(opptjeningstidVurdering.fastsattAv).isEqualTo("SPA")
-        
+
         val opptjeningsgrunnlag = opptjeningstidVurdering.grunnlag
         assert(opptjeningsgrunnlag.førsteSykdomsdag).isEqualTo(første_dag_i_syketilfelle)
         assert(opptjeningsgrunnlag.arbeidsforhold).containsExactly(stubbet_arbeidsforhold)
@@ -598,9 +620,10 @@ class EndToEndTest {
 """.trimIndent()
 
     val første_dag_i_syketilfelle = parse("2019-01-01")
-    
+
     private fun produserSykepengesøknadV2(aktørId: String): SykepengesøknadV2DTO {
         val søknad = SykepengesøknadV2DTO(
+                id = "1",
                 aktorId = aktørId,
                 type = "ARBEIDSTAKERE",
                 status = "SENDT",

@@ -25,6 +25,7 @@ val faktagrunnlagUtenVerdi = Faktagrunnlag(
 )
 
 val originalSoknad = Sykepengesøknad(
+        id = "1",
         aktorId = "1",
         type = "ARBEIDSTAKERE",
         arbeidsgiver = Arbeidsgiver("Test 1", "1111"),
