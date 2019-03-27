@@ -1,14 +1,7 @@
 package no.nav.helse
 
 import assertk.assert
-import assertk.assertions.contains
-import assertk.assertions.containsExactly
-import assertk.assertions.each
-import assertk.assertions.hasSize
-import assertk.assertions.isBetween
-import assertk.assertions.isEqualTo
-import assertk.assertions.isNotEmpty
-import assertk.assertions.isTrue
+import assertk.assertions.*
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.github.tomakehurst.wiremock.WireMockServer
@@ -20,39 +13,12 @@ import com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import no.nav.common.JAASCredential
 import no.nav.common.KafkaEnvironment
-import no.nav.helse.behandling.AvklarteVerdier
-import no.nav.helse.behandling.Faktagrunnlag
-import no.nav.helse.behandling.Soknadsperiode
-import no.nav.helse.behandling.SykepengeVedtak
-import no.nav.helse.behandling.Sykepengesøknad
-import no.nav.helse.behandling.SykepengesøknadV2DTO
+import no.nav.helse.behandling.*
 import no.nav.helse.domain.Arbeidsforhold
 import no.nav.helse.domain.ArbeidsforholdWrapper
 import no.nav.helse.domain.Arbeidsgiver
-import no.nav.helse.fastsetting.Alder
-import no.nav.helse.fastsetting.Aldersgrunnlag
-import no.nav.helse.fastsetting.Beregningsperiode
-import no.nav.helse.fastsetting.Medlemsskapgrunnlag
-import no.nav.helse.fastsetting.Opptjeningsgrunnlag
-import no.nav.helse.fastsetting.Opptjeningstid
-import no.nav.helse.fastsetting.Sykepengegrunnlag
-import no.nav.helse.fastsetting.Vurdering
-import no.nav.helse.fastsetting.begrunnelse_p_8_51
-import no.nav.helse.fastsetting.begrunnelse_søker_i_aktivt_arbeidsforhold
-import no.nav.helse.fastsetting.landskodeNORGE
-import no.nav.helse.fastsetting.paragraf_8_28_andre_ledd
-import no.nav.helse.fastsetting.paragraf_8_28_tredje_ledd_bokstav_a
-import no.nav.helse.fastsetting.paragraf_8_30_første_ledd
-import no.nav.helse.fastsetting.søkerErBosattINorge
-import no.nav.helse.fastsetting.søker_har_arbeidsgiver
-import no.nav.helse.oppslag.AktørId
-import no.nav.helse.oppslag.Inntekt
-import no.nav.helse.oppslag.Inntektsarbeidsgiver
-import no.nav.helse.oppslag.InntektsoppslagResultat
-import no.nav.helse.oppslag.Kjønn
-import no.nav.helse.oppslag.Opptjeningsperiode
-import no.nav.helse.oppslag.Person
-import no.nav.helse.oppslag.SykepengerPeriode
+import no.nav.helse.fastsetting.*
+import no.nav.helse.oppslag.*
 import no.nav.helse.streams.JsonSerializer
 import no.nav.helse.streams.Topics.SYKEPENGEBEHANDLINGSFEIL
 import no.nav.helse.streams.Topics.SYKEPENGESØKNADER_INN
@@ -80,6 +46,9 @@ import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalDate.parse
 import java.time.LocalDateTime
+import java.time.temporal.ChronoUnit
+import java.time.temporal.TemporalAdjusters.firstDayOfMonth
+import java.time.temporal.TemporalAdjusters.lastDayOfMonth
 
 class EndToEndTest {
 
@@ -163,10 +132,11 @@ class EndToEndTest {
         val vedtak: SykepengeVedtak = ventPåVedtak()!!
 
         checkSøknad(innsendtSøknad, vedtak.originalSøknad)
+        checkFaktagrunnlag(vedtak.faktagrunnlag)
         checkAvklarteVerdier(vedtak.faktagrunnlag, vedtak.avklarteVerdier)
-// TODO       checkBeregning(sykepengeberegning.beregning)
-// TODO       checkFaktagrunnlag(sykepengeberegning.faktagrunnlag)
-// TODO       checkVilkårsprøving(sykepengeberegning.vilkårsprøving)
+        // TODO       checkVilkårsprøving(vedtak.vilkårsprøving)
+        // TODO       checkBeregning(vedtak.beregning)
+        // TODO       checkSykepengeVedtak(vedtak.vedtak)
     }
 
     private fun checkSøknad(innsendtSøknad: SykepengesøknadV2DTO, faktiskSøknad: Sykepengesøknad) {
@@ -181,15 +151,27 @@ class EndToEndTest {
         assert(innsendtSøknad.soknadsperioder).isEqualTo(faktiskSøknad.soknadsperioder)
     }
 
+    private fun checkFaktagrunnlag(faktagrunnlag: Faktagrunnlag) {
+        checkTpsFakta(faktagrunnlag.tps)
+        checkInntekt(faktagrunnlag.beregningsperiode, beregningsgrunnlagStart, beregningsgrunnlagStart.plusMonths(2).with(lastDayOfMonth()))
+        checkInntekt(faktagrunnlag.sammenligningsperiode, sammenligningsgrunnlagStart, sammenligningsgrunnlagStart.plusMonths(11).with(lastDayOfMonth()))
+        checkSykepengeliste(faktagrunnlag.sykepengeliste)
+        checkArbeidsforhold(faktagrunnlag.arbeidsforhold)
+    }
+
+    private fun checkTpsFakta(tps: Tpsfakta) {
+        assert(tps.bostedland).isEqualTo(stubbet_person.bostedsland)
+        assert(tps.fodselsdato).isEqualTo(stubbet_person.fdato)
+    }
+
     private fun checkAvklarteVerdier(faktagrunnlag: Faktagrunnlag, avklarteVerdier: AvklarteVerdier) {
         checkAlder(avklarteVerdier.alder)
         checkMaksdato(avklarteVerdier.alder.fastsattVerdi, faktagrunnlag.sykepengeliste, avklarteVerdier.maksdato)
         checkMedlemsskap(avklarteVerdier.medlemsskap)
         checkSykepengegrunnlag(avklarteVerdier.sykepengegrunnlag)
-        checkArbeidsforhold(avklarteVerdier.arbeidsforhold)
+        checkArbeidsforholdVurdering(avklarteVerdier.arbeidsforhold)
         checkOpptjeningstid(avklarteVerdier.opptjeningstid)
-        // TODO checkSykepengeliste(avklarteVerdier.sykepengeliste)
-        // TODO checkOpptjeningstid(avklarteVerdier.opptjeningstid)
+        checkSykepengeliste(avklarteVerdier.sykepengeliste)
     }
 
     private fun checkAlder(aldersVurdering: Vurdering.Avklart<Alder, Aldersgrunnlag>) {
@@ -227,8 +209,8 @@ class EndToEndTest {
     }
 
     private fun checkSykepengegrunnlag(sykepengegrunnlagVurdering: Vurdering.Avklart<Sykepengegrunnlag, Beregningsperiode>) {
-        checkSykepengegrunnlagNårTrygdenYter(sykepengegrunnlagVurdering.fastsattVerdi.sykepengegrunnlagNårTrygdenYter, første_dag_i_syketilfelle)
-        checkSykepengegrunnlagIArbeidsgiverperioden(sykepengegrunnlagVurdering.fastsattVerdi.sykepengegrunnlagIArbeidsgiverperioden, første_dag_i_syketilfelle)
+        checkSykepengegrunnlagNårTrygdenYter(sykepengegrunnlagVurdering.fastsattVerdi.sykepengegrunnlagNårTrygdenYter)
+        checkSykepengegrunnlagIArbeidsgiverperioden(sykepengegrunnlagVurdering.fastsattVerdi.sykepengegrunnlagIArbeidsgiverperioden)
         assert(sykepengegrunnlagVurdering.begrunnelse).isEqualTo("")
         assert(sykepengegrunnlagVurdering.vurderingstidspunkt).isBetween(LocalDateTime.now().minusHours(1), LocalDateTime.now().plusHours(1))
         assert(sykepengegrunnlagVurdering.fastsattAv).isEqualTo("SPA")
@@ -236,57 +218,58 @@ class EndToEndTest {
         checkBeregningsperiode12mnd(sykepengegrunnlagVurdering.grunnlag)
     }
 
-    private fun checkSykepengegrunnlagNårTrygdenYter(sykepengegrunnlagNårTrygdenYterVurdering: Vurdering.Avklart<Long, Beregningsperiode>, førsteSykdomsdag: LocalDate) {
+    private fun checkSykepengegrunnlagNårTrygdenYter(sykepengegrunnlagNårTrygdenYterVurdering: Vurdering.Avklart<Long, Beregningsperiode>) {
         assert(sykepengegrunnlagNårTrygdenYterVurdering.fastsattVerdi).isEqualTo(300000L)
         assert(sykepengegrunnlagNårTrygdenYterVurdering.begrunnelse).contains(paragraf_8_30_første_ledd)
         assert(sykepengegrunnlagNårTrygdenYterVurdering.vurderingstidspunkt).isBetween(LocalDateTime.now().minusHours(1), LocalDateTime.now().plusHours(1))
         assert(sykepengegrunnlagNårTrygdenYterVurdering.fastsattAv).isEqualTo("SPA")
 
-        checkBeregningsperiode3mnd(sykepengegrunnlagNårTrygdenYterVurdering.grunnlag, førsteSykdomsdag)
+        checkBeregningsperiode3mnd(sykepengegrunnlagNårTrygdenYterVurdering.grunnlag)
     }
 
-    private fun checkSykepengegrunnlagIArbeidsgiverperioden(sykepengegrunnlagIArbeidsgiverperiodenVurdering: Vurdering.Avklart<Long, Beregningsperiode>, førsteSykdomsdag: LocalDate) {
+    private fun checkSykepengegrunnlagIArbeidsgiverperioden(sykepengegrunnlagIArbeidsgiverperiodenVurdering: Vurdering.Avklart<Long, Beregningsperiode>) {
         assert(sykepengegrunnlagIArbeidsgiverperiodenVurdering.fastsattVerdi).isEqualTo(25000L)
         assert(sykepengegrunnlagIArbeidsgiverperiodenVurdering.begrunnelse).contains(paragraf_8_28_andre_ledd)
         assert(sykepengegrunnlagIArbeidsgiverperiodenVurdering.vurderingstidspunkt).isBetween(LocalDateTime.now().minusHours(1), LocalDateTime.now().plusHours(1))
         assert(sykepengegrunnlagIArbeidsgiverperiodenVurdering.fastsattAv).isEqualTo("SPA")
 
-        checkBeregningsperiode3mnd(sykepengegrunnlagIArbeidsgiverperiodenVurdering.grunnlag, førsteSykdomsdag)
+        checkBeregningsperiode3mnd(sykepengegrunnlagIArbeidsgiverperiodenVurdering.grunnlag)
     }
 
-    private fun checkBeregningsperiode3mnd(beregningsperiode: Beregningsperiode, førsteSykdomsdag: LocalDate) {
-        assert(beregningsperiode.begrunnelse).isEqualTo(paragraf_8_28_tredje_ledd_bokstav_a + "(${førsteSykdomsdag}) legges til grunn.")
-        assert(beregningsperiode.inntekter).hasSize(3)
-        assert(beregningsperiode.inntekter).each {
-            val inntekt = it.actual
-            assert(inntekt.arbeidsgiver.orgnr).isEqualTo(stubbet_arbeidsforhold.arbeidsgiver.orgnummer)
-            assert(inntekt.beløp.toLong()).isEqualTo(25000L)
-            assert(inntekt.opptjeningsperiode.fom).isBetween(LocalDate.of(2018, 10, 1), LocalDate.of(2018, 12, 1))
-            assert(inntekt.opptjeningsperiode.tom).isBetween(LocalDate.of(2018, 10, 30), LocalDate.of(2018, 12, 31))
-        }
+    private fun checkBeregningsperiode3mnd(beregningsperiode: Beregningsperiode) {
+        assert(beregningsperiode.begrunnelse).isEqualTo(paragraf_8_28_tredje_ledd_bokstav_a + "(${første_dag_i_syketilfelle}) legges til grunn.")
+
+        checkInntekt(beregningsperiode.inntekter, beregningsgrunnlagStart, beregningsgrunnlagStart.plusMonths(2).with(lastDayOfMonth()))
     }
 
     private fun checkBeregningsperiode12mnd(beregningsperiode: Beregningsperiode) {
         assert(beregningsperiode.begrunnelse).isNotEmpty()
-        assert(beregningsperiode.inntekter).hasSize(12)
-        assert(beregningsperiode.inntekter).each {
+
+        checkInntekt(beregningsperiode.inntekter, sammenligningsgrunnlagStart, sammenligningsgrunnlagStart.plusMonths(11).with(lastDayOfMonth()))
+    }
+
+    private fun checkInntekt(inntekter: List<Inntekt>, startDate: LocalDate, endDate: LocalDate) {
+        assert(inntekter).hasSize(startDate.until(endDate.plusDays(1), ChronoUnit.MONTHS).toInt())
+        assert(inntekter).each {
             val inntekt = it.actual
             assert(inntekt.arbeidsgiver.orgnr).isEqualTo(stubbet_arbeidsforhold.arbeidsgiver.orgnummer)
             assert(inntekt.beløp.toLong()).isEqualTo(25000L)
-            assert(inntekt.opptjeningsperiode.fom).isBetween(LocalDate.of(2018, 1, 1), LocalDate.of(2018, 12, 1))
-            assert(inntekt.opptjeningsperiode.tom).isBetween(LocalDate.of(2018, 1, 31), LocalDate.of(2018, 12, 31))
+            assert(inntekt.opptjeningsperiode.fom).isBetween(startDate, endDate.with(firstDayOfMonth()))
+            assert(inntekt.opptjeningsperiode.tom).isBetween(startDate.with(lastDayOfMonth()), endDate)
         }
     }
 
-    private fun checkArbeidsforhold(arbeidsforholdVurdering: Vurdering.Avklart<Boolean, List<Arbeidsforhold>>) {
+    private fun checkArbeidsforholdVurdering(arbeidsforholdVurdering: Vurdering.Avklart<Boolean, List<Arbeidsforhold>>) {
         assert(arbeidsforholdVurdering.fastsattVerdi).isTrue()
         assert(arbeidsforholdVurdering.begrunnelse).isEqualTo(søker_har_arbeidsgiver + stubbet_arbeidsforhold.arbeidsgiver.orgnummer)
         assert(arbeidsforholdVurdering.vurderingstidspunkt).isBetween(LocalDateTime.now().minusHours(1), LocalDateTime.now().plusHours(1))
         assert(arbeidsforholdVurdering.fastsattAv).isEqualTo("SPA")
 
-        val arbeidsforhold = arbeidsforholdVurdering.grunnlag
-        assert(arbeidsforhold.size).isEqualTo(1)
-        assert(arbeidsforhold.get(0)).isEqualTo(stubbet_arbeidsforhold)
+        checkArbeidsforhold(arbeidsforholdVurdering.grunnlag)
+    }
+
+    private fun checkArbeidsforhold(arbeidsforhold: List<Arbeidsforhold>) {
+        assert(arbeidsforhold).containsExactly(stubbet_arbeidsforhold)
     }
 
     private fun checkOpptjeningstid(opptjeningstidVurdering: Vurdering.Avklart<Opptjeningstid, Opptjeningsgrunnlag>) {
@@ -297,12 +280,14 @@ class EndToEndTest {
 
         val opptjeningsgrunnlag = opptjeningstidVurdering.grunnlag
         assert(opptjeningsgrunnlag.førsteSykdomsdag).isEqualTo(første_dag_i_syketilfelle)
-        assert(opptjeningsgrunnlag.arbeidsforhold).containsExactly(stubbet_arbeidsforhold)
+        checkArbeidsforhold(opptjeningsgrunnlag.arbeidsforhold)
     }
 
-    /**  "sykepengeliste": [],
-     */
     private fun checkSykepengeliste(sykepengeliste: Collection<SykepengerPeriode>) {
+        assert(sykepengeliste).isEmpty()
+    }
+
+    private fun checkVilkårsprøving(vilkårsprøving: Evaluering) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
@@ -310,38 +295,12 @@ class EndToEndTest {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    private fun checkFaktagrunnlag(faktagrunnlag: Faktagrunnlag) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    private fun checkVilkårsprøving(vilkårsprøving: Evaluering) {
+    private fun checkSykepengeVedtak(vedtak: Vedtak) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     private fun forventetVedtak() = """
 {
-  "maksdato": {
-    "grunnlag": {
-      "førsteFraværsdag": "2019-01-01",
-      "førsteSykepengedag": "2019-01-01",
-      "personensAlder": 48,
-      "yrkesstatus": "ARBEIDSTAKER",
-      "tidligerePerioder": []
-    },
-    "begrunnelse": "§ 8-12: ARBEIDSTAKER på 48 år gir maks 248 dager. 0 av disse er forbrukt",
-    "fastsattVerdi": "2019-12-12",
-    "vurderingstidspunkt": "BLIR_IKKE_MATCHET",
-    "fastsattAv": "SPA"
-  },
-  "medlemsskap": {
-    "grunnlag": {
-      "bostedsland": "NOR"
-    },
-    "begrunnelse": "(Søker er bosatt i Norge. ELLER Vi har ikke nok informasjon til å kunne gi et entydig svar.)",
-    "fastsattVerdi": true,
-    "vurderingstidspunkt": "BLIR_IKKE_MATCHET",
-    "fastsattAv": "SPA"
-  },
   "sykepengegrunnlag": {
     "begrunnelse": "",
     "grunnlag": {
@@ -730,175 +689,6 @@ class EndToEndTest {
             bostedsland = "NOR"
     )
 
-    private fun personStub(aktørId: String) {
-        stubFor(any(urlPathEqualTo("/api/person/$aktørId"))
-                .willReturn(okJson(defaultObjectMapper.writeValueAsString(stubbet_person))))
-    }
-
-    private fun inntektStub(aktørId: String) {
-        var inntekter: List<Inntekt> = List(14, init = { index ->
-            Inntekt(
-                    arbeidsgiver = Inntektsarbeidsgiver(stubbet_arbeidsforhold.arbeidsgiver.orgnummer),
-                    beløp = BigDecimal.valueOf(25000),
-                    opptjeningsperiode = Opptjeningsperiode(
-                            fom = parse("2017-11-01").plusMonths(index.toLong()),
-                            tom = parse("2017-11-30").plusMonths(index.toLong())
-                    )
-            )
-        })
-
-        stubFor(any(urlPathEqualTo("/api/inntekt/$aktørId/beregningsgrunnlag"))
-                .willReturn(okJson(
-                        defaultObjectMapper.writeValueAsString(InntektsoppslagResultat(inntekter))
-                )))
-
-        stubFor(any(urlPathEqualTo("/api/inntekt/$aktørId/sammenligningsgrunnlag"))
-                .willReturn(okJson("""{
-    "inntekter": [
-        {
-            "arbeidsgiver": {
-                "orgnr": "97114455"
-            },
-            "beløp": 25000,
-            "opptjeningsperiode": {
-                "tom": "2019-01-31",
-                "fom": "2019-01-01"
-            }
-        },
-        {
-            "arbeidsgiver": {
-                "orgnr": "97114455"
-            },
-            "beløp": 25000,
-            "opptjeningsperiode": {
-                "tom": "2018-12-31",
-                "fom": "2018-12-01"
-            }
-        },
-        {
-            "arbeidsgiver": {
-                "orgnr": "97114455"
-            },
-            "beløp": 25000,
-            "opptjeningsperiode": {
-                "tom": "2018-11-30",
-                "fom": "2018-11-01"
-            }
-        },
-        {
-            "arbeidsgiver": {
-                "orgnr": "97114455"
-            },
-            "beløp": 25000,
-            "opptjeningsperiode": {
-                "tom": "2018-10-31",
-                "fom": "2018-10-01"
-            }
-        },
-        {
-            "arbeidsgiver": {
-                "orgnr": "97114455"
-            },
-            "beløp": 25000,
-            "opptjeningsperiode": {
-                "tom": "2018-09-30",
-                "fom": "2018-09-01"
-            }
-        },
-        {
-            "arbeidsgiver": {
-                "orgnr": "97114455"
-            },
-            "beløp": 25000,
-            "opptjeningsperiode": {
-                "tom": "2018-08-31",
-                "fom": "2018-08-01"
-            }
-        },
-        {
-            "arbeidsgiver": {
-                "orgnr": "97114455"
-            },
-            "beløp": 25000,
-            "opptjeningsperiode": {
-                "tom": "2018-07-31",
-                "fom": "2018-07-01"
-            }
-        },
-        {
-            "arbeidsgiver": {
-                "orgnr": "97114455"
-            },
-            "beløp": 25000,
-            "opptjeningsperiode": {
-                "tom": "2018-06-30",
-                "fom": "2018-06-01"
-            }
-        },
-        {
-            "arbeidsgiver": {
-                "orgnr": "97114455"
-            },
-            "beløp": 25000,
-            "opptjeningsperiode": {
-                "tom": "2018-05-31",
-                "fom": "2018-05-01"
-            }
-        },
-        {
-            "arbeidsgiver": {
-                "orgnr": "97114455"
-            },
-            "beløp": 25000,
-            "opptjeningsperiode": {
-                "tom": "2018-04-30",
-                "fom": "2018-04-01"
-            }
-        },
-        {
-            "arbeidsgiver": {
-                "orgnr": "97114455"
-            },
-            "beløp": 25000,
-            "opptjeningsperiode": {
-                "tom": "2018-03-31",
-                "fom": "2018-03-01"
-            }
-        },
-        {
-            "arbeidsgiver": {
-                "orgnr": "97114455"
-            },
-            "beløp": 25000,
-            "opptjeningsperiode": {
-                "tom": "2018-02-28",
-                "fom": "2018-02-01"
-            }
-        },
-        {
-            "arbeidsgiver": {
-                "orgnr": "97114455"
-            },
-            "beløp": 25000,
-            "opptjeningsperiode": {
-                "tom": "2018-01-31",
-                "fom": "2018-01-01"
-            }
-        },
-        {
-            "arbeidsgiver": {
-                "orgnr": "97114455"
-            },
-            "beløp": 25000,
-            "opptjeningsperiode": {
-                "tom": "2017-12-31",
-                "fom": "2017-12-01"
-            }
-        }
-    ]
-}""")))
-    }
-
     val stubbet_arbeidsforhold = Arbeidsforhold(
             Arbeidsgiver(
                     navn = "EQUINOR ASA, AVD STATOIL SOKKELVIRKSOMHET",
@@ -907,6 +697,48 @@ class EndToEndTest {
             startdato = parse("2017-01-01"),
             sluttdato = null
     )
+
+    val beregningsgrunnlagStart = første_dag_i_syketilfelle.minusMonths(3)
+    val stubbet_inntekt_beregningsgrunnlag: List<Inntekt> = List(3, init = { index ->
+        Inntekt(
+                arbeidsgiver = Inntektsarbeidsgiver(stubbet_arbeidsforhold.arbeidsgiver.orgnummer),
+                beløp = BigDecimal.valueOf(25000),
+                opptjeningsperiode = Opptjeningsperiode(
+                        fom = beregningsgrunnlagStart.plusMonths(index.toLong()),
+                        tom = beregningsgrunnlagStart.plusMonths(index.toLong()).with(lastDayOfMonth())
+                )
+        )
+    })
+
+    val sammenligningsgrunnlagStart = første_dag_i_syketilfelle.minusMonths(12)
+    val stubbet_inntekt_sammenligningsgrunnlag: List<Inntekt> = List(12, init = { index ->
+        Inntekt(
+                arbeidsgiver = Inntektsarbeidsgiver(stubbet_arbeidsforhold.arbeidsgiver.orgnummer),
+                beløp = BigDecimal.valueOf(25000),
+                opptjeningsperiode = Opptjeningsperiode(
+                        fom = sammenligningsgrunnlagStart.plusMonths(index.toLong()),
+                        tom = sammenligningsgrunnlagStart.plusMonths(index.toLong()).with(lastDayOfMonth())
+                )
+        )
+    })
+
+    private fun personStub(aktørId: String) {
+        stubFor(any(urlPathEqualTo("/api/person/$aktørId"))
+                .willReturn(okJson(defaultObjectMapper.writeValueAsString(stubbet_person))))
+    }
+
+    private fun inntektStub(aktørId: String) {
+        stubFor(any(urlPathEqualTo("/api/inntekt/$aktørId/beregningsgrunnlag"))
+                .willReturn(okJson(defaultObjectMapper.writeValueAsString(
+                        InntektsoppslagResultat(stubbet_inntekt_beregningsgrunnlag)
+                ))))
+
+        stubFor(any(urlPathEqualTo("/api/inntekt/$aktørId/sammenligningsgrunnlag"))
+                .willReturn(okJson(defaultObjectMapper.writeValueAsString(
+                        InntektsoppslagResultat(stubbet_inntekt_sammenligningsgrunnlag)
+                ))))
+    }
+
     private fun arbeidsforholdStub(aktørId: String) {
 
         val arbeidsforholdWrapper = ArbeidsforholdWrapper(
