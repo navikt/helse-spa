@@ -43,6 +43,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.slf4j.LoggerFactory
 import java.math.BigDecimal
+import java.time.DayOfWeek
 import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalDate.parse
@@ -136,7 +137,7 @@ class EndToEndTest {
         checkFaktagrunnlag(vedtak.faktagrunnlag)
         checkAvklarteVerdier(vedtak.faktagrunnlag, vedtak.avklarteVerdier)
         checkVilkårsprøving(vedtak.vilkårsprøving)
-        // TODO       checkBeregning(vedtak.beregning)
+        checkBeregning(vedtak.beregning)
         // TODO       checkSykepengeVedtak(vedtak.vedtak)
     }
 
@@ -289,11 +290,20 @@ class EndToEndTest {
     }
 
     private fun checkVilkårsprøving(vilkårsprøving: Evaluering) {
+        // Detaljene i vilkårsprøving testes ikke her, men resultatet for dette caset skal være JA
         assert(vilkårsprøving.resultat).isEqualTo(Resultat.JA)
     }
 
     private fun checkBeregning(beregning: Beregningsresultat) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        // Detaljene i beregningen testes ikke her, men resultatet for dette caset skal være 23 virkedager a 1154,-
+        assert(beregning.dagsatser).hasSize(23)
+        assert(beregning.dagsatser).each {
+            val dagsats = it.actual
+            assert(dagsats.dato).isBetween(første_dag_i_syketilfelle, siste_dag_i_syketilfelle)
+            assert(dagsats.dato.dayOfWeek).isNotIn(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY)
+            assert(dagsats.sats).isEqualTo(1154L)
+            assert(dagsats.skalUtbetales).isTrue()
+        }
     }
 
     private fun checkSykepengeVedtak(vedtak: Vedtak) {
@@ -301,6 +311,7 @@ class EndToEndTest {
     }
 
     val første_dag_i_syketilfelle = parse("2019-01-01")
+    val siste_dag_i_syketilfelle = parse("2019-01-31")
 
     private fun produserSykepengesøknadV2(aktørId: String): SykepengesøknadV2DTO {
         val søknad = SykepengesøknadV2DTO(
@@ -310,13 +321,13 @@ class EndToEndTest {
                 status = "SENDT",
                 arbeidsgiver = stubbet_arbeidsforhold.arbeidsgiver,
                 fom = første_dag_i_syketilfelle,
-                tom = parse("2019-01-31"),
+                tom = siste_dag_i_syketilfelle,
                 startSyketilfelle = første_dag_i_syketilfelle,
                 sendtNav = parse("2019-01-17").atStartOfDay(),
                 soknadsperioder = listOf(
                         Soknadsperiode(
                                 fom = første_dag_i_syketilfelle,
-                                tom = parse("2019-01-31"),
+                                tom = siste_dag_i_syketilfelle,
                                 sykmeldingsgrad = 100
                         )
                 ),
