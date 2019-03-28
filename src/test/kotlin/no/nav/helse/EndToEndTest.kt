@@ -307,7 +307,7 @@ class EndToEndTest {
     }
 
     private fun checkVedtak(vedtak: Vedtak) {
-        assert(vedtak.resultat).isEqualTo("Jeg har ikke laget noe vedtak")
+        assert(vedtak.resultat).isEqualTo("Burde antagelig gjøre noe med dette.")
     }
 
     val første_dag_i_syketilfelle = parse("2019-01-01")
