@@ -142,6 +142,7 @@ data class SykepengeVedtak(
         val vedtak: Vedtak
 )
 
+// TODO Implementer
 data class Vedtak(val resultat: String = "Jeg har ikke laget noe vedtak")
 
 @JsonIgnoreProperties(ignoreUnknown = true)

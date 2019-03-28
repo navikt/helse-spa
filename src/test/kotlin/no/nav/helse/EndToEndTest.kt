@@ -131,14 +131,14 @@ class EndToEndTest {
 
         val innsendtSøknad = produserSykepengesøknadV2(aktørId)
 
-        val vedtak: SykepengeVedtak = ventPåVedtak()!!
+        val sykepengeVedtak: SykepengeVedtak = ventPåVedtak()!!
 
-        checkSøknad(innsendtSøknad, vedtak.originalSøknad)
-        checkFaktagrunnlag(vedtak.faktagrunnlag)
-        checkAvklarteVerdier(vedtak.faktagrunnlag, vedtak.avklarteVerdier)
-        checkVilkårsprøving(vedtak.vilkårsprøving)
-        checkBeregning(vedtak.beregning)
-        // TODO       checkSykepengeVedtak(vedtak.vedtak)
+        checkSøknad(innsendtSøknad, sykepengeVedtak.originalSøknad)
+        checkFaktagrunnlag(sykepengeVedtak.faktagrunnlag)
+        checkAvklarteVerdier(sykepengeVedtak.faktagrunnlag, sykepengeVedtak.avklarteVerdier)
+        checkVilkårsprøving(sykepengeVedtak.vilkårsprøving)
+        checkBeregning(sykepengeVedtak.beregning)
+        checkVedtak(sykepengeVedtak.vedtak)
     }
 
     private fun checkSøknad(innsendtSøknad: SykepengesøknadV2DTO, faktiskSøknad: Sykepengesøknad) {
@@ -306,8 +306,8 @@ class EndToEndTest {
         }
     }
 
-    private fun checkSykepengeVedtak(vedtak: Vedtak) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    private fun checkVedtak(vedtak: Vedtak) {
+        assert(vedtak.resultat).isEqualTo("Jeg har ikke laget noe vedtak")
     }
 
     val første_dag_i_syketilfelle = parse("2019-01-01")
