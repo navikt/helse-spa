@@ -406,11 +406,13 @@ class EndToEndTest {
 
     private fun restStsStub() {
         stubFor(any(urlPathEqualTo("/rest/v1/sts/token"))
-                .willReturn(okJson("""{
-    "access_token": "test token",
-    "token_type": "Bearer",
-    "expires_in": 3600
-}""")))
+                .willReturn(okJson(defaultObjectMapper.writeValueAsString(
+                        StsRestClient.Token(
+                                accessToken = "test token",
+                                type = "Bearer",
+                                expiresIn = 3600
+                        )
+                ))))
     }
 
     val stubbet_person = Person(
