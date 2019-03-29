@@ -51,6 +51,7 @@ import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 import java.time.temporal.TemporalAdjusters.firstDayOfMonth
 import java.time.temporal.TemporalAdjusters.lastDayOfMonth
+import kotlin.concurrent.thread
 
 class EndToEndTest {
 
@@ -391,7 +392,7 @@ class EndToEndTest {
 
     private fun produceOneMessage(message: SykepengesøknadV2DTO) {
         val producer = KafkaProducer<String, JsonNode>(producerProperties(), StringSerializer(), JsonSerializer())
-        producer.send(ProducerRecord(SYKEPENGESØKNADER_INN.name, null, defaultObjectMapper.valueToTree(message)))
+        producer.send(ProducerRecord(SYKEPENGESØKNADER_INN.name, message.id, defaultObjectMapper.valueToTree(message)))
         producer.flush()
     }
 
