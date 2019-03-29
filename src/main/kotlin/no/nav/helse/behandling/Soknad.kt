@@ -39,7 +39,7 @@ data class SykepengesøknadV2DTO(
 
 fun mapToSykepengesøknad(dto: SykepengesøknadV2DTO): Either<Behandlingsfeil, Sykepengesøknad> {
     return if (dto.sendtNav == null) {
-        Either.Left(Behandlingsfeil.ukjentDeserialiseringsfeil(defaultObjectMapper.valueToTree(dto), Exception("sendtNav er null")))
+        Either.Left(Behandlingsfeil.ukjentDeserialiseringsfeil(dto.id, defaultObjectMapper.valueToTree(dto), Exception("sendtNav er null")))
     } else {
         Either.Right(Sykepengesøknad(
                 id = dto.id,

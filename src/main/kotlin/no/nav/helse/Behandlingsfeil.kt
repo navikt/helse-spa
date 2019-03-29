@@ -11,7 +11,7 @@ import no.nav.helse.fastsetting.Vurdering
 interface Behandlingsfeil {
     val feilmelding: String
 
-    data class Deserialiseringsfeil(val json: JsonNode, override val feilmelding: String): Behandlingsfeil
+    data class Deserialiseringsfeil(val soknadId: String, val json: JsonNode, override val feilmelding: String): Behandlingsfeil
 
     data class RegisterFeil(override val feilmelding: String, val søknad: Sykepengesøknad): Behandlingsfeil
 
@@ -31,10 +31,10 @@ interface Behandlingsfeil {
     companion object {
 
         // deserializering feilet pga null-verdi som ikke kan være null
-        fun manglendeFeilDeserialiseringsfeil(json: JsonNode, exception: MissingKotlinParameterException) = Deserialiseringsfeil(json, "Det mangler felt ${exception.parameter} i søknaden.")
+        fun manglendeFeilDeserialiseringsfeil(soknadId: String, json: JsonNode, exception: MissingKotlinParameterException) = Deserialiseringsfeil(soknadId, json, "Det mangler felt ${exception.parameter} i søknad med id $soknadId.")
 
         // deserializering feilet av ukjent årsak
-        fun ukjentDeserialiseringsfeil(json: JsonNode, exception: Exception) = Deserialiseringsfeil(json, "Det er en ukjent feil i søknaden som gjør at vi ikke kan tolke den: ${exception.javaClass.simpleName} : ${exception.message}")
+        fun ukjentDeserialiseringsfeil(soknadId: String, json: JsonNode, exception: Exception) = Deserialiseringsfeil(soknadId, json, "Det er en ukjent feil i søknaden (id $soknadId) som gjør at vi ikke kan tolke den: ${exception.javaClass.simpleName} : ${exception.message}")
 
         // vi klarte ikke avklare alle fakta
         fun avklaringsfeil(uavklarteFakta: UavklarteFakta) = Avklaringsfeil(uavklarteFakta, "Kunne ikke fastsette alle fakta.")

@@ -140,7 +140,7 @@ class SaksbehandlingStream(val env: Environment) {
                 .peek { _, value -> mottattCounter.labels(value.get("status").asText(), value.get("type").asText(), "v2").inc() }
                 .filter { _, value -> value.get("status").asText() == "SENDT" && value.has("sendtNav") && !value.get("sendtNav").isNull }
                 .peek { _, value -> mottattCounter.labels("SENDT_NAV", value.get("type").asText(), "v2").inc() }
-                .mapValues { _, jsonNode -> deserializeSykepengesøknadV2(jsonNode) }
+                .mapValues { soknadId, jsonNode -> deserializeSykepengesøknadV2(soknadId, jsonNode) }
                 .mapValues { either -> either.flatMap(::mapToSykepengesøknad) }
                 .mapValues { _, søknad -> søknad.flatMap { hentRegisterData(it) } }
                 .mapValues { _, faktagrunnlag -> faktagrunnlag.flatMap { fastsettFakta(it) } }
@@ -171,6 +171,7 @@ class SaksbehandlingStream(val env: Environment) {
             is Deserialiseringsfeil -> {
                 behandlingsfeilCounter.labels("deserialisering").inc()
                 influxMetricReporter.sendDataPoint("behandlingsfeil.event", mapOf(
+                        "soknadId" to behandlingsfeil.soknadId,
                         "feilmelding" to behandlingsfeil.feilmelding
                 ), mapOf(
                         "steg" to "deserialisering",
@@ -229,15 +230,15 @@ class SaksbehandlingStream(val env: Environment) {
         log.info("Søknad for aktør ${vedtak.originalSøknad.aktorId} med id ${vedtak.originalSøknad.id} behandlet OK.")
     }
 
-    private fun deserializeSykepengesøknadV2(soknad: JsonNode): Either<Behandlingsfeil, SykepengesøknadV2DTO> =
+    private fun deserializeSykepengesøknadV2(soknadId: String, soknad: JsonNode): Either<Behandlingsfeil, SykepengesøknadV2DTO> =
         try {
             Either.Right(defaultObjectMapper.treeToValue(soknad, SykepengesøknadV2DTO::class.java))
         } catch(e: MissingKotlinParameterException) {
             log.error("Failed to deserialize søknad due to missing non-nullable parameter: ${e.parameter.name} of type ${e.parameter.type}")
-            Either.Left(Behandlingsfeil.manglendeFeilDeserialiseringsfeil(soknad, e))
+            Either.Left(Behandlingsfeil.manglendeFeilDeserialiseringsfeil(soknadId, soknad, e))
         } catch (e: Exception) {
             log.error("Failed to deserialize søknad", e)
-            Either.Left(Behandlingsfeil.ukjentDeserialiseringsfeil(soknad, e))
+            Either.Left(Behandlingsfeil.ukjentDeserialiseringsfeil(soknadId, soknad, e))
         }
 
     fun start() {
@@ -259,16 +260,6 @@ fun serialize(vedtak: SykepengeVedtak): JsonNode = defaultObjectMapper.valueToTr
 fun serializeBehandlingsfeil(feil: Behandlingsfeil): JsonNode = defaultObjectMapper.valueToTree(feil)
 
 val narePrometheus = NarePrometheus(CollectorRegistry.defaultRegistry)
-
-// while we do that thing with old topic
-fun deserializeSykepengesøknadV1(soknad: JsonNode): Either<Behandlingsfeil, SykepengesøknadV1DTO> =
-        try {
-            Either.Right(defaultObjectMapper.treeToValue(soknad, SykepengesøknadV1DTO::class.java))
-        } catch (e: MissingKotlinParameterException) {
-            Either.Left(Behandlingsfeil.manglendeFeilDeserialiseringsfeil(soknad, e))
-        } catch (e: Exception) {
-            Either.Left(Behandlingsfeil.ukjentDeserialiseringsfeil(soknad, e))
-        }
 
 private data class SplitByType(
         val arbeidstakersøknader: KStream<String, JsonNode>,

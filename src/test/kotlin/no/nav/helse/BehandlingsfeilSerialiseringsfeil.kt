@@ -8,7 +8,7 @@ class BehandlingsfeilSerialiseringsfeil {
     @Test
     fun `bør kunne serialisere deserialiseringsfeil`() {
         val failJsonNode = defaultObjectMapper.readTree(failJson)
-        val fail = Behandlingsfeil.ukjentDeserialiseringsfeil(failJsonNode, RuntimeException("yep. fail."))
+        val fail = Behandlingsfeil.ukjentDeserialiseringsfeil("", failJsonNode, RuntimeException("yep. fail."))
 
         val serializedFail = serializeBehandlingsfeil(fail)
         Assertions.assertNotNull(serializedFail)
