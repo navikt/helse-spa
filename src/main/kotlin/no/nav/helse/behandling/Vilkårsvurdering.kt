@@ -3,6 +3,7 @@ package no.nav.helse.behandling
 import no.nav.helse.Behandlingsfeil
 import no.nav.helse.Either
 import no.nav.helse.narePrometheus
+import no.nav.helse.oppslag.getGrunnbeløpForDato
 import no.nav.helse.sykepenger.vilkar.Vilkårsgrunnlag
 import no.nav.helse.sykepenger.vilkar.sykepengevilkår
 import no.nav.nare.core.evaluations.Evaluering
@@ -30,7 +31,7 @@ private fun gjennomførVilkårsvurdering(avklarteFakta: AvklarteFakta): Evalueri
             søknadSendt = avklarteFakta.originalSøknad.sendtNav.toLocalDate(),
             førsteDagSøknadGjelderFor = avklarteFakta.originalSøknad.fom,
             fastsattÅrsinntekt = avklarteFakta.avklarteVerdier.sykepengegrunnlag.fastsattVerdi.sykepengegrunnlagNårTrygdenYter.fastsattVerdi,
-            grunnbeløp = 96883
+            grunnbeløp = getGrunnbeløpForDato(avklarteFakta.originalSøknad.fom)
     )
 
     return narePrometheus.tellEvaluering { sykepengevilkår.evaluer(grunnlag) }

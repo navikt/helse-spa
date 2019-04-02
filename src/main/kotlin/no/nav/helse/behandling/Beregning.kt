@@ -2,6 +2,7 @@ package no.nav.helse.behandling
 
 import no.nav.helse.Behandlingsfeil
 import no.nav.helse.Either
+import no.nav.helse.oppslag.getGrunnbeløpForDato
 import no.nav.helse.sykepenger.beregning.Beregningsgrunnlag
 import no.nav.helse.sykepenger.beregning.beregn
 
@@ -18,8 +19,6 @@ fun sykepengeBeregning(vilkårsprøving: Vilkårsprøving): Either<Behandlingsfe
             Either.Left(Behandlingsfeil.beregningsfeil(vilkårsprøving, e))
         }
 
-internal fun grunnbeløp() = 96883L // TODO: lookup?
-
 private fun lagBeregninggrunnlag(vilkårsprøving: Vilkårsprøving) : Beregningsgrunnlag =
         Beregningsgrunnlag(
                 fom = vilkårsprøving.originalSøknad.fom, // er dette første dag etter arbeidsgiverperiode ?
@@ -30,7 +29,7 @@ private fun lagBeregninggrunnlag(vilkårsprøving: Vilkårsprøving) : Beregning
                 },
                 sykepengegrunnlag =  no.nav.helse.sykepenger.beregning.Sykepengegrunnlag(
                         fastsattInntekt = vilkårsprøving.avklarteVerdier.sykepengegrunnlag.fastsattVerdi.sykepengegrunnlagNårTrygdenYter.fastsattVerdi,
-                        grunnbeløp = grunnbeløp()),
+                        grunnbeløp = getGrunnbeløpForDato(vilkårsprøving.originalSøknad.fom)),
                 sisteUtbetalingsdato = (vilkårsprøving.avklarteVerdier.maksdato.fastsattVerdi).let {
                     if (it.isBefore(vilkårsprøving.originalSøknad.tom)) it else vilkårsprøving.originalSøknad.tom
                 })

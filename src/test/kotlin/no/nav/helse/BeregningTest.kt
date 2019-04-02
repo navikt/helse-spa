@@ -4,7 +4,6 @@ import no.nav.helse.behandling.AvklarteVerdier
 import no.nav.helse.behandling.Soknadsperiode
 import no.nav.helse.behandling.Sykepengesøknad
 import no.nav.helse.behandling.Vilkårsprøving
-import no.nav.helse.behandling.grunnbeløp
 import no.nav.helse.behandling.sykepengeBeregning
 import no.nav.helse.domain.Arbeidsgiver
 import no.nav.helse.fastsetting.Aldersgrunnlag
@@ -13,6 +12,7 @@ import no.nav.helse.fastsetting.Medlemsskapgrunnlag
 import no.nav.helse.fastsetting.Opptjeningsgrunnlag
 import no.nav.helse.fastsetting.Sykepengegrunnlag
 import no.nav.helse.fastsetting.Vurdering.Avklart
+import no.nav.helse.oppslag.getGrunnbeløpForDato
 import no.nav.nare.core.evaluations.Evaluering
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
@@ -26,9 +26,12 @@ import java.time.ZoneOffset
 
 class BeregningTest {
 
+    val fom = parse("2019-01-01")
+    val gjeldendeGrunnbeløp = getGrunnbeløpForDato(fom)
+
     @Test
     fun `skal beregne for 50% grad`() {
-        val soknad = vilkårsprøvdSøknad(parse("2019-01-01"), parse("2019-01-02"), 400000, 50)
+        val soknad = vilkårsprøvdSøknad(fom, parse("2019-01-02"), 400000, 50)
         val beregningsresultat = (sykepengeBeregning(soknad) as Either.Right).right.beregning
 
         assertEquals(2, beregningsresultat.dagsatser.size)
@@ -46,14 +49,13 @@ class BeregningTest {
 
     @Test
     fun `skal skrelle av ved 6G`() {
-        val soknad = vilkårsprøvdSøknad(parse("2019-01-01"), parse("2019-01-02"), 10 * grunnbeløp(), 100)
+        val soknad = vilkårsprøvdSøknad(parse("2019-01-01"), parse("2019-01-02"), 10 * gjeldendeGrunnbeløp, 100)
         val beregningsresultat = (sykepengeBeregning(soknad) as Either.Right).right.beregning
 
         assertEquals(2, beregningsresultat.dagsatser.size)
-        assertEquals(BigDecimal.valueOf(6 * grunnbeløp()).divide(BigDecimal(260), 0, RoundingMode.HALF_UP).longValueExact(),
+        assertEquals(BigDecimal.valueOf(6 * gjeldendeGrunnbeløp).divide(BigDecimal(260), 0, RoundingMode.HALF_UP).longValueExact(),
                 beregningsresultat.dagsatser[0].sats)
     }
-
 
     fun vilkårsprøvdSøknad(fom: LocalDate, tom: LocalDate, årslønn: Long, sykmeldingsgrad: Int) =
             Vilkårsprøving(
