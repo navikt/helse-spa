@@ -16,7 +16,6 @@ import no.nav.helse.behandling.Oppslag
 import no.nav.helse.behandling.SykepengeVedtak
 import no.nav.helse.behandling.Sykepengeberegning
 import no.nav.helse.behandling.Sykepengesøknad
-import no.nav.helse.behandling.SykepengesøknadV1DTO
 import no.nav.helse.behandling.SykepengesøknadV2DTO
 import no.nav.helse.behandling.Vilkårsprøving
 import no.nav.helse.behandling.mapToSykepengesøknad
@@ -190,7 +189,7 @@ class SaksbehandlingStream(val env: Environment) {
             }
             is Avklaringsfeil -> {
                 behandlingsfeilCounter.labels("avklaring").inc()
-                behandlingsfeil.tellUavklarte(avklaringsfeilCounter)
+                behandlingsfeil.tellUavklarte(avklaringsfeilCounter, influxMetricReporter)
                 influxMetricReporter.sendDataPoint("behandlingsfeil.event", mapOf(
                         "soknadId" to behandlingsfeil.uavklarteFakta.originalSøknad.id
                 ), mapOf(

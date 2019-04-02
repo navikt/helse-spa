@@ -7,6 +7,8 @@ import no.nav.helse.behandling.Sykepengesøknad
 import no.nav.helse.behandling.UavklarteFakta
 import no.nav.helse.behandling.Vilkårsprøving
 import no.nav.helse.fastsetting.Vurdering
+import no.nav.helse.sensu.DataPoint
+import no.nav.helse.sensu.InfluxMetricReporter
 
 interface Behandlingsfeil {
     val feilmelding: String
@@ -16,9 +18,21 @@ interface Behandlingsfeil {
     data class RegisterFeil(override val feilmelding: String, val søknad: Sykepengesøknad): Behandlingsfeil
 
     data class Avklaringsfeil(val uavklarteFakta: UavklarteFakta, override val feilmelding: String): Behandlingsfeil {
-        fun tellUavklarte(avklaringsfeilCounter: Counter) {
+        fun tellUavklarte(avklaringsfeilCounter: Counter, influxMetricReporter: InfluxMetricReporter) {
             uavklarteFakta.uavklarteVerdier.asNamedList().forEach { (name, fakta) ->
-                if (fakta is Vurdering.Uavklart) avklaringsfeilCounter.labels(name).inc()
+                if (fakta is Vurdering.Uavklart) {
+                    avklaringsfeilCounter.labels(name).inc()
+                    influxMetricReporter.sendDataPoint(DataPoint(
+                            name = "avklaringsfeil.event",
+                            fields = mapOf(
+                                    "soknadId" to uavklarteFakta.originalSøknad.id
+                            ),
+                            tags = mapOf(
+                                    "datum" to name,
+                                    "aarsak" to fakta.årsak.name
+                            )
+                    ))
+                }
             }
         }
     }
