@@ -1,6 +1,7 @@
 package no.nav.helse
 
 import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException
 import io.prometheus.client.Counter
 import no.nav.helse.behandling.SykepengeVedtak
 import no.nav.helse.sensu.InfluxMetricReporter
@@ -17,37 +18,36 @@ class SaksbehandlingProbe(val env: Environment) {
             "namespace" to (System.getenv("NAIS_NAMESPACE") ?: "default")
     ))
 
+    companion object {
 
-    private val log = LoggerFactory.getLogger(SaksbehandlingStream::class.java)
+        private val log = LoggerFactory.getLogger(SaksbehandlingStream::class.java)
 
+        private val mottattCounter = Counter.build()
+                .name("soknader_mottatt_total")
+                .labelNames("status", "type", "version")
+                .help("Antall søknader mottatt fordelt på status og versjon (v1/v2)")
+                .register()
+        private val behandlingsCounter = Counter.build()
+                .name("soknader_behandlet_total")
+                .labelNames("outcome")
+                .help("Antall søknader behandlet, fordelt på utfall (ok/feil)")
+                .register()
+        private val behandlingsfeilCounter = Counter.build()
+                .name("behandlingsfeil_total")
+                .labelNames("steg")
+                .help("Antall ganger en søknad er forsøkt behandlet uten at vi kommer til et vedtak")
+                .register()
+        private val avklaringsfeilCounter = Counter.build()
+                .name("avklaringsfeil_total")
+                .labelNames("faktum")
+                .help("Hvilke faktum klarer vi ikke fastsette")
+                .register()
 
-    private val mottattCounter = Counter.build()
-            .name("soknader_mottatt_total")
-            .labelNames("status", "type", "version")
-            .help("Antall søknader mottatt fordelt på status og versjon (v1/v2)")
-            .register()
-    private val behandlingsCounter = Counter.build()
-            .name("soknader_behandlet_total")
-            .labelNames("outcome")
-            .help("Antall søknader behandlet, fordelt på utfall (ok/feil)")
-            .register()
-    private val behandlingsfeilCounter = Counter.build()
-            .name("behandlingsfeil_total")
-            .labelNames("steg")
-            .help("Antall ganger en søknad er forsøkt behandlet uten at vi kommer til et vedtak")
-            .register()
-    private val avklaringsfeilCounter = Counter.build()
-            .name("avklaringsfeil_total")
-            .labelNames("faktum")
-            .help("Hvilke faktum klarer vi ikke fastsette")
-            .register()
+    }
 
-
-    fun warn(message: String) = log.warn(message)
-    fun info(message: String) = log.warn(message)
-    fun error(message: String) = log.error(message)
-    fun error(message: String, e: Exception) = log.error(message, e)
-
+    fun startKakaWithPlainText() = log.warn("Using kafka plain text config only works in development!")
+    fun missingNonNullablefield(e: MissingKotlinParameterException) = log.error("Failed to deserialize søknad due to missing non-nullable parameter: ${e.parameter.name} of type ${e.parameter.type}")
+    fun failedToDeserialize(e: Exception) = log.error("Failed to deserialize søknad", e)
 
     fun mottattFrilansSøknad(value: JsonNode) = mottattCounter.labels(value.get("status").asText(), value.get("soknadstype").asText(), "v2").inc()
     fun mottattAnnenSøknad(value: JsonNode) = mottattCounter.labels(value.get("status").asText(), value.get("UKJENT").asText(), "v2").inc()
@@ -55,7 +55,7 @@ class SaksbehandlingProbe(val env: Environment) {
     fun mottattSøknadSendtNAV(value: JsonNode) = mottattCounter.labels("SENDT_NAV", value.get("type").asText(), "v2").inc()
 
     fun behandlingsFeilMedType(behandlingsfeil: Behandlingsfeil) {
-        info(behandlingsfeil.feilmelding)
+        log.info(behandlingsfeil.feilmelding)
         when (behandlingsfeil) {
             is Behandlingsfeil.Deserialiseringsfeil -> serialiseringsFeil(behandlingsfeil)
             is Behandlingsfeil.RegisterFeil -> registerFeil(behandlingsfeil)
@@ -97,7 +97,6 @@ class SaksbehandlingProbe(val env: Environment) {
                 "type" to feil.uavklarteFakta.originalSøknad.type
         ))
         log.info("Søknad for aktør ${feil.uavklarteFakta.originalSøknad.aktorId} med id ${feil.uavklarteFakta.originalSøknad.id} er uavklart")
-
     }
 
     fun vilkårsPrøvingsFeil(feil: Behandlingsfeil.Vilkårsprøvingsfeil) {

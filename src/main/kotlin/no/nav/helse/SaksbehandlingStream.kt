@@ -38,7 +38,7 @@ class SaksbehandlingStream(val env: Environment) {
     }
 
     private fun streamConfigPlainTextKafka(): Properties = Properties().apply {
-        probe.warn("Using kafka plain text config only works in development!")
+        probe.startKakaWithPlainText()
         put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, env.bootstrapServersUrl)
         put(StreamsConfig.APPLICATION_ID_CONFIG, appId)
         put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest")
@@ -114,10 +114,10 @@ class SaksbehandlingStream(val env: Environment) {
             try {
                 Either.Right(defaultObjectMapper.treeToValue(soknad, SykepengesøknadV2DTO::class.java))
             } catch (e: MissingKotlinParameterException) {
-                probe.error("Failed to deserialize søknad due to missing non-nullable parameter: ${e.parameter.name} of type ${e.parameter.type}")
+                probe.missingNonNullablefield(e)
                 Either.Left(Behandlingsfeil.manglendeFeilDeserialiseringsfeil(soknadId, soknad, e))
             } catch (e: Exception) {
-                probe.error("Failed to deserialize søknad", e)
+                probe.failedToDeserialize(e)
                 Either.Left(Behandlingsfeil.ukjentDeserialiseringsfeil(soknadId, soknad, e))
             }
 
