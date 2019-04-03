@@ -10,9 +10,7 @@ import no.nav.helse.sensu.SensuClient
 import org.slf4j.LoggerFactory
 
 class SaksbehandlingProbe(val env: Environment) {
-
-    val narePrometheus = NarePrometheus(CollectorRegistry.defaultRegistry)
-
+    
     private val sensuClient = SensuClient(env.sensuHostname, env.sensuPort)
 
     private val influxMetricReporter = InfluxMetricReporter(sensuClient, "spa-events", mapOf(
