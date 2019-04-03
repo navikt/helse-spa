@@ -1,16 +1,14 @@
 package no.nav.helse
 
 import com.fasterxml.jackson.databind.JsonNode
-import io.prometheus.client.CollectorRegistry
 import io.prometheus.client.Counter
-import no.nav.NarePrometheus
 import no.nav.helse.behandling.SykepengeVedtak
 import no.nav.helse.sensu.InfluxMetricReporter
 import no.nav.helse.sensu.SensuClient
 import org.slf4j.LoggerFactory
 
 class SaksbehandlingProbe(val env: Environment) {
-    
+
     private val sensuClient = SensuClient(env.sensuHostname, env.sensuPort)
 
     private val influxMetricReporter = InfluxMetricReporter(sensuClient, "spa-events", mapOf(
