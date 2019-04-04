@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException
 import io.prometheus.client.Counter
 import no.nav.helse.behandling.SykepengeVedtak
+import no.nav.helse.fastsetting.Vurdering
+import no.nav.helse.sensu.DataPoint
 import no.nav.helse.sensu.InfluxMetricReporter
 import no.nav.helse.sensu.SensuClient
 import org.slf4j.LoggerFactory
@@ -89,7 +91,21 @@ class SaksbehandlingProbe(val env: Environment) {
 
     fun avklaringsFeil(feil: Behandlingsfeil.Avklaringsfeil) {
         behandlingsfeilCounter.labels("avklaring").inc()
-        feil.tellUavklarte(avklaringsfeilCounter, influxMetricReporter)
+        feil.uavklarteFakta.uavklarteVerdier.asNamedList().forEach { (name, fakta) ->
+            if (fakta is Vurdering.Uavklart) {
+                avklaringsfeilCounter.labels(name).inc()
+                influxMetricReporter.sendDataPoint(DataPoint(
+                        name = "avklaringsfeil.event",
+                        fields = mapOf(
+                                "soknadId" to feil.uavklarteFakta.originalSøknad.id
+                        ),
+                        tags = mapOf(
+                                "datum" to name,
+                                "aarsak" to fakta.årsak.name
+                        )
+                ))
+            }
+        }
         influxMetricReporter.sendDataPoint("behandlingsfeil.event", mapOf(
                 "soknadId" to feil.uavklarteFakta.originalSøknad.id
         ), mapOf(
