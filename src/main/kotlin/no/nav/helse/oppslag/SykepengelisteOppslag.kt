@@ -6,6 +6,7 @@ import no.nav.helse.Either
 import no.nav.helse.streams.defaultObjectMapper
 import java.math.BigDecimal
 import java.time.LocalDate
+import java.util.*
 
 class SykepengelisteOppslag(val sparkelUrl: String, val stsRestClient: StsRestClient) {
     fun hentSykepengeliste(aktorId: String, tom: LocalDate): Either<Exception, Collection<SykepengerPeriode>> {
@@ -15,7 +16,7 @@ class SykepengelisteOppslag(val sparkelUrl: String, val stsRestClient: StsRestCl
                     .header(kotlin.collections.mapOf(
                             "Authorization" to "Bearer $bearer",
                             "Accept" to "application/json",
-                            "Nav-Call-Id" to "anything",
+                            "Nav-Call-Id" to UUID.randomUUID().toString(),
                             "Nav-Consumer-Id" to "spa"
                     ))
                     .responseString()

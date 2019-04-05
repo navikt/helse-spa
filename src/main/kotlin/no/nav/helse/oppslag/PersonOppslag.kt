@@ -8,6 +8,7 @@ import no.nav.helse.map
 import no.nav.helse.streams.defaultObjectMapper
 import org.slf4j.LoggerFactory
 import java.time.LocalDate
+import java.util.*
 
 class PersonOppslag(val sparkelUrl: String, val stsRestClient: StsRestClient) {
     private val log = LoggerFactory.getLogger(PersonOppslag::class.java.name)
@@ -24,7 +25,7 @@ class PersonOppslag(val sparkelUrl: String, val stsRestClient: StsRestClient) {
                 .header(mapOf(
                         "Authorization" to "Bearer $bearer",
                         "Accept" to "application/json",
-                        "Nav-Call-Id" to "anything",
+                        "Nav-Call-Id" to UUID.randomUUID().toString(),
                         "Nav-Consumer-Id" to "spa"
                         ))
                 .responseString()

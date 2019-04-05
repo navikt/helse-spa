@@ -11,6 +11,7 @@ import no.nav.helse.streams.defaultObjectMapper
 import org.slf4j.LoggerFactory
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
+import java.util.*
 
 class ArbeidsforholdOppslag(val sparkelUrl: String, val stsRestClient: StsRestClient) {
     private val log = LoggerFactory.getLogger(ArbeidsforholdOppslag::class.java.name)
@@ -32,7 +33,7 @@ class ArbeidsforholdOppslag(val sparkelUrl: String, val stsRestClient: StsRestCl
                         .header(mapOf(
                                 "Authorization" to "Bearer $bearer",
                                 "Accept" to "application/json",
-                                "Nav-Call-Id" to "anything",
+                                "Nav-Call-Id" to UUID.randomUUID().toString(),
                                 "Nav-Consumer-Id" to "spa"
                         ))
                         .responseString()
