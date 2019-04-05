@@ -25,10 +25,10 @@ class ArbeidsforholdOppslag(val sparkelUrl: String, val stsRestClient: StsRestCl
         }
     }
 
-    fun hentArbeidsforholdRest(aktørId: AktørId, fom: LocalDate, tom: LocalDate) : Either<Exception, Array<Arbeidsforhold>> {
+    fun hentArbeidsforholdRest(aktørId: AktørId, fom: LocalDate, tom: LocalDate) : Either<Exception, List<Arbeidsforhold>> {
         val bearer = stsRestClient.token()
         val (_, _, result) =
-                "$sparkelUrl/api/arbeidsforhold/${aktørId.aktor}?fom=$fom&tom=$tom".httpGet()
+                "$sparkelUrl/api/arbeidsforhold/${aktørId.aktor}/inntekter?fom=$fom&tom=$tom".httpGet()
                         .header(mapOf(
                                 "Authorization" to "Bearer $bearer",
                                 "Accept" to "application/json",
@@ -43,7 +43,9 @@ class ArbeidsforholdOppslag(val sparkelUrl: String, val stsRestClient: StsRestCl
             log.error("Error in arbeidsforhold lookup", it)
             Either.Left(it)
         } ?: try {
-            Either.Right(defaultObjectMapper.readValue<ArbeidsforholdWrapper>(result.component1()!!).arbeidsforhold)
+            Either.Right(defaultObjectMapper.readValue<ArbeidsforholdWrapper>(result.component1()!!).arbeidsforhold.map {
+                it.arbeidsforhold
+            })
         } catch (err: Exception) {
             Either.Left(err)
         }

@@ -15,6 +15,7 @@ import no.nav.common.JAASCredential
 import no.nav.common.KafkaEnvironment
 import no.nav.helse.behandling.*
 import no.nav.helse.domain.Arbeidsforhold
+import no.nav.helse.domain.ArbeidsforholdMedInntekter
 import no.nav.helse.domain.ArbeidsforholdWrapper
 import no.nav.helse.domain.Arbeidsgiver
 import no.nav.helse.fastsetting.*
@@ -51,7 +52,6 @@ import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 import java.time.temporal.TemporalAdjusters.firstDayOfMonth
 import java.time.temporal.TemporalAdjusters.lastDayOfMonth
-import kotlin.concurrent.thread
 
 class EndToEndTest {
 
@@ -478,10 +478,10 @@ class EndToEndTest {
     private fun arbeidsforholdStub(aktørId: String) {
 
         val arbeidsforholdWrapper = ArbeidsforholdWrapper(
-                arbeidsforhold = arrayOf(stubbet_arbeidsforhold)
+                arbeidsforhold = arrayOf(ArbeidsforholdMedInntekter(stubbet_arbeidsforhold))
         )
 
-        stubFor(any(urlPathEqualTo("/api/arbeidsforhold/$aktørId"))
+        stubFor(any(urlPathEqualTo("/api/arbeidsforhold/$aktørId/inntekter"))
                 .willReturn((okJson(defaultObjectMapper.writeValueAsString(arbeidsforholdWrapper)))))
     }
 }

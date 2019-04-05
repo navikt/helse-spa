@@ -7,6 +7,7 @@ import no.nav.helse.domain.Arbeidsforhold
 import no.nav.helse.domain.ArbeidsforholdWrapper
 import no.nav.helse.domain.Arbeidsgiver
 import no.nav.helse.originalSoknad
+import no.nav.helse.streams.defaultObjectMapper
 import no.nav.helse.tpsFaktaUtenVerdi
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.fail
@@ -15,7 +16,6 @@ import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
 import org.slf4j.LoggerFactory
 import java.time.LocalDate
-import no.nav.helse.streams.defaultObjectMapper
 class ArbeidsforholdTest {
 
     private val log = LoggerFactory.getLogger(ArbeidsforholdTest::class.java)
@@ -66,14 +66,32 @@ class ArbeidsforholdTest {
 
 }
 
-val jsonFromSparkel = """{
+val jsonFromSparkel = """
+{
   "arbeidsforhold": [
     {
-      "arbeidsgiver": {
-        "navn": "ÅSEN BOFELLESSKAP",
-        "orgnummer": "995816598"
+      "arbeidsforhold": {
+        "arbeidsgiver": {
+          "navn": "ÅSEN BOFELLESSKAP",
+          "orgnummer": "995816598"
+        },
+        "startdato": "2009-01-15"
       },
-      "startdato": "2009-01-15"
+      "inntekter": [
+        {
+          "beløp": 2500,
+          "utbetalingsperiode": "2019-01"
+        },
+        {
+          "beløp": 3500,
+          "utbetalingsperiode": "2019-02"
+        },
+        {
+          "beløp": 2500,
+          "utbetalingsperiode": "2019-03"
+        }
+      ]
     }
   ]
-}""".trimIndent()
+}
+""".trimIndent()
