@@ -32,7 +32,7 @@ script:
       -X POST \
       -d "$PREPROD_DEPLOYMENT" \
       -H "Accept: application/vnd.github.ant-man-preview+json" \
-      https://api.github.com/repos/navikt/helse-sparkel/deployments
+      https://api.github.com/repos/navikt/helse-spa/deployments
 
     PROD_NAISERATOR=$(docker run -v ${PWD}:/workdir mikefarah/yq yq r nais-prod.yaml -j)
     PROD_NAISERATOR=$(echo $PROD_NAISERATOR | jq '.spec.image = "'$DOCKER_IMG_NAME':'$COMMIT_SHORT'"' -c)
@@ -45,7 +45,7 @@ script:
       -X POST \
       -d "$PROD_DEPLOYMENT" \
       -H "Accept: application/vnd.github.ant-man-preview+json" \
-      https://api.github.com/repos/navikt/helse-sparkel/deployments
+      https://api.github.com/repos/navikt/helse-spa/deployments
   fi
 before_cache:
 - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
