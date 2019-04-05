@@ -12,8 +12,7 @@ before_install:
 - export GH_TOKEN=$(generate-installation-token.sh `generate-jwt.sh ./travis/helseci.key
   $GITHUB_APP_ID`)
 - export COMMIT_SHORT=$(git rev-parse --short HEAD)
-- export ORIGINAL_COMMITTER=$(git log -1 --pretty=format:'%an <%ae>')
-- echo -e "machine github.com\n  login $GH_TOKEN" > ~/.netrc
+- echo -e "machine api.github.com login x-access-token password $GH_TOKEN" > ~/.netrc
 script:
 - "./gradlew build && docker build --pull -t $DOCKER_IMG_NAME:$COMMIT_SHORT ."
 - |
@@ -22,23 +21,32 @@ script:
     echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin
     docker push $DOCKER_IMG_NAME:$COMMIT_SHORT
 
-    git clone https://x-access-token:$GH_TOKEN@github.com/navikt/helse-iac.git
+    PREPROD_NAISERATOR=$(docker run -v ${PWD}:/workdir mikefarah/yq yq r nais-preprod.yaml -j)
+    PREPROD_NAISERATOR=$(echo $PREPROD_NAISERATOR | jq '.spec.image = "'$DOCKER_IMG_NAME':'$COMMIT_SHORT'"' -c)
 
-    cd helse-iac
-    ./set-image.sh preprod/$APP_NAME/naiserator.yaml $DOCKER_IMG_NAME:$COMMIT_SHORT
-    ./set-image.sh prod/$APP_NAME/naiserator.yaml $DOCKER_IMG_NAME:$COMMIT_SHORT
+    PREPROD_DEPLOYMENT=$(cat deployment.json | jq '.payload.kubernetes.resources += ['$PREPROD_NAISERATOR']')
+    PREPROD_DEPLOYMENT=$(echo $PREPROD_DEPLOYMENT | jq '.environment = "dev-fss"')
+    PREPROD_DEPLOYMENT=$(echo $PREPROD_DEPLOYMENT | jq '.ref = "'$COMMIT_SHORT'"')
 
-    git config user.name team-helse[bot]
-    git config user.email team-helse[bot]@users.noreply.github.com
+    curl -i -n \
+      -X POST \
+      -d "$PREPROD_DEPLOYMENT" \
+      -H "Accept: application/vnd.github.ant-man-preview+json" \
+      https://api.github.com/repos/navikt/helse-sparkel/deployments
 
-    git add preprod/$APP_NAME/naiserator.yaml
-    git add prod/$APP_NAME/naiserator.yaml
-    git commit -m "Bump $APP_NAME" -m "Caused by $TRAVIS_BUILD_WEB_URL" --author "$ORIGINAL_COMMITTER"
+    PROD_NAISERATOR=$(docker run -v ${PWD}:/workdir mikefarah/yq yq r nais-prod.yaml -j)
+    PROD_NAISERATOR=$(echo $PROD_NAISERATOR | jq '.spec.image = "'$DOCKER_IMG_NAME':'$COMMIT_SHORT'"' -c)
 
-    git push https://x-access-token:$GH_TOKEN@github.com/navikt/helse-iac.git master
+    PROD_DEPLOYMENT=$(cat deployment.json | jq '.payload.kubernetes.resources += ['$PROD_NAISERATOR']')
+    PROD_DEPLOYMENT=$(echo $PROD_DEPLOYMENT | jq '.environment = "prod-fss"')
+    PROD_DEPLOYMENT=$(echo $PROD_DEPLOYMENT | jq '.ref = "'$COMMIT_SHORT'"')
 
-    cd ..
-    fi
+    curl -i -n \
+      -X POST \
+      -d "$PROD_DEPLOYMENT" \
+      -H "Accept: application/vnd.github.ant-man-preview+json" \
+      https://api.github.com/repos/navikt/helse-sparkel/deployments
+  fi
 before_cache:
 - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
 - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
