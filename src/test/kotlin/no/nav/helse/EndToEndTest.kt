@@ -129,6 +129,7 @@ class EndToEndTest {
         personStub(aktørId)
         inntektStub(aktørId)
         arbeidsforholdStub(aktørId)
+        infotrygdBeregningsgrunnlagStub(aktørId)
 
         val innsendtSøknad = produserSykepengesøknadV2(aktørId)
 
@@ -186,7 +187,7 @@ class EndToEndTest {
         assert(aldersVurdering.grunnlag.fodselsdato).isEqualTo(stubbet_person.fdato)
     }
 
-    private fun checkMaksdato(alder: Alder, sykepengeListe: Collection<SykepengerPeriode>, maksdato: Vurdering.Avklart<LocalDate, Grunnlagsdata>) {
+    private fun checkMaksdato(alder: Alder, sykepengeListe: List<PeriodeYtelse>, maksdato: Vurdering.Avklart<LocalDate, Grunnlagsdata>) {
         val forventetMaksdato = LocalDate.of(2019, 12, 12)
 
         assert(maksdato.fastsattVerdi).isEqualTo(forventetMaksdato)
@@ -286,7 +287,7 @@ class EndToEndTest {
         checkArbeidsforhold(opptjeningsgrunnlag.arbeidsforhold)
     }
 
-    private fun checkSykepengeliste(sykepengeliste: Collection<SykepengerPeriode>) {
+    private fun checkSykepengeliste(sykepengeliste: List<PeriodeYtelse>) {
         assert(sykepengeliste).isEmpty()
     }
 
@@ -472,6 +473,18 @@ class EndToEndTest {
         stubFor(any(urlPathEqualTo("/api/inntekt/$aktørId/sammenligningsgrunnlag"))
                 .willReturn(okJson(defaultObjectMapper.writeValueAsString(
                         InntektsoppslagResultat(stubbet_inntekt_sammenligningsgrunnlag)
+                ))))
+    }
+
+    private fun infotrygdBeregningsgrunnlagStub(aktørId: String) {
+        stubFor(any(urlPathEqualTo("/api/infotrygdberegningsgrunnlag/$aktørId"))
+                .willReturn(okJson(defaultObjectMapper.writeValueAsString(
+                        InfotrygdBeregningsgrunnlag(
+                            paaroerendeSykdomListe = emptyList(),
+                            engangstoenadListe = emptyList(),
+                            sykepengerListe = emptyList(),
+                            foreldrepengerListe = emptyList()
+                        )
                 ))))
     }
 

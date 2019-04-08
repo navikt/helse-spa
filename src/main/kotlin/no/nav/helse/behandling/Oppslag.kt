@@ -4,11 +4,7 @@ import no.nav.helse.Behandlingsfeil
 import no.nav.helse.Either
 import no.nav.helse.flatMap
 import no.nav.helse.mapLeft
-import no.nav.helse.oppslag.ArbeidsforholdOppslag
-import no.nav.helse.oppslag.Inntektsoppslag
-import no.nav.helse.oppslag.PersonOppslag
-import no.nav.helse.oppslag.StsRestClient
-import no.nav.helse.oppslag.SykepengelisteOppslag
+import no.nav.helse.oppslag.*
 
 class Oppslag(val sparkelBaseUrl: String, val stsClient: StsRestClient) {
 
@@ -25,9 +21,9 @@ class Oppslag(val sparkelBaseUrl: String, val stsClient: StsRestClient) {
                         ArbeidsforholdOppslag(sparkelBaseUrl, stsClient).hentArbeidsforhold(søknad).mapLeft {
                             Behandlingsfeil.registerFeil(it, søknad)
                         }.flatMap { arbeidsforhold ->
-                            SykepengelisteOppslag(sparkelBaseUrl, stsClient).hentSykepengeliste(søknad.aktorId, søknad.startSyketilfelle).mapLeft {
+                            InfotrygdBeregningsgrunnlagOppslag(sparkelBaseUrl, stsClient).hentInfotrygdBeregningsgrunnlag(søknad.aktorId, søknad.startSyketilfelle).mapLeft {
                                 Behandlingsfeil.registerFeil(it, søknad)
-                            }.flatMap { sykepengeperioder ->
+                            }.flatMap { infotrygdBeregningsgrunnlag ->
                                 try {
                                     Either.Right(FaktagrunnlagResultat(
                                             originalSøknad = søknad,
@@ -35,7 +31,7 @@ class Oppslag(val sparkelBaseUrl: String, val stsClient: StsRestClient) {
                                                     tps = tpsfakta,
                                                     beregningsperiode = beregningsperiode,
                                                     sammenligningsperiode = sammenligningsperiode,
-                                                    sykepengeliste = sykepengeperioder,
+                                                    sykepengeliste = infotrygdBeregningsgrunnlag.sykepengerListe,
                                                     arbeidsforhold = arbeidsforhold
                                             )))
                                 } catch (e: Exception) {

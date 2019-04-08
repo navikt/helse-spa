@@ -4,6 +4,7 @@ import no.nav.helse.Grunnlagsdata
 import no.nav.helse.Tidsperiode
 import no.nav.helse.Yrkesstatus
 import no.nav.helse.maksdato
+import no.nav.helse.oppslag.PeriodeYtelse
 import no.nav.helse.oppslag.SykepengerPeriode
 import java.time.LocalDate
 
@@ -12,7 +13,7 @@ fun vurderMaksdato(
         startSyketilfelle: LocalDate,
         førsteSykepengedag: LocalDate,
         yrkesstatus: Yrkesstatus,
-        sykepengeliste: Collection<SykepengerPeriode>
+        sykepengeliste: List<PeriodeYtelse>
 ): Vurdering<LocalDate, Grunnlagsdata?> {
     return when (alder) {
         is Vurdering.Uavklart -> Vurdering.Uavklart(årsak = Vurdering.Uavklart.Årsak.MANGELFULL_DATAGRUNNLAG, begrunnelse = "Kan ikke fastsette maksdato for bruker med uavklart alder", grunnlag = null)
@@ -22,7 +23,10 @@ fun vurderMaksdato(
                     førsteSykepengedag = førsteSykepengedag,
                     personensAlder = alder.fastsattVerdi,
                     yrkesstatus = yrkesstatus,
-                    tidligerePerioder = sykepengeliste.map { Tidsperiode(fom = it.fom, tom = it.tom) }
+                    tidligerePerioder = sykepengeliste.flatMap {
+                        it.vedtakListe.filter { it.utbetalingsgrad > 0 }
+                                .map {Tidsperiode(fom = it.anvistPeriode.fom, tom = it.anvistPeriode.tom) }
+                    }
             )
             val beregnetMaksdato = maksdato(grunnlag)
 

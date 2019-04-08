@@ -15,6 +15,7 @@ import no.nav.helse.fastsetting.Opptjeningstid
 import no.nav.helse.fastsetting.Sykepengegrunnlag
 import no.nav.helse.fastsetting.Vurdering
 import no.nav.helse.oppslag.Inntekt
+import no.nav.helse.oppslag.PeriodeYtelse
 import no.nav.helse.oppslag.SykepengerPeriode
 import no.nav.helse.streams.defaultObjectMapper
 import no.nav.helse.sykepenger.beregning.Beregningsresultat
@@ -88,7 +89,7 @@ data class AvklarteVerdier(
         val medlemsskap: Vurdering.Avklart<Boolean, Medlemsskapgrunnlag>,
         val alder: Vurdering.Avklart<Alder, Aldersgrunnlag>,
         val maksdato: Vurdering.Avklart<LocalDate, Grunnlagsdata>,
-        val sykepengeliste: Collection<SykepengerPeriode>,
+        val sykepengeliste: List<PeriodeYtelse>,
         val arbeidsforhold: Vurdering.Avklart<Boolean, List<Arbeidsforhold>>,
         val opptjeningstid: Vurdering.Avklart<Opptjeningstid, Opptjeningsgrunnlag>,
         val sykepengegrunnlag: Vurdering.Avklart<Sykepengegrunnlag, Beregningsperiode>
@@ -104,7 +105,7 @@ data class UavklarteVerdier(
         val medlemsskap: Vurdering<Boolean, Medlemsskapgrunnlag>,
         val alder: Vurdering<Alder, Aldersgrunnlag>,
         val maksdato: Vurdering<LocalDate, Grunnlagsdata?>,
-        val sykepengeliste: Collection<SykepengerPeriode>,
+        val sykepengeliste: List<PeriodeYtelse>,
         val arbeidsforhold: Vurdering<Boolean, List<Arbeidsforhold>>,
         val opptjeningstid: Vurdering<Opptjeningstid, Opptjeningsgrunnlag>,
         val sykepengegrunnlag: Vurdering<*, *>
@@ -153,7 +154,7 @@ data class Soknadsperiode(val fom: LocalDate,
 data class Faktagrunnlag(val tps: Tpsfakta,
                          val beregningsperiode: List<Inntekt>,
                          val sammenligningsperiode: List<Inntekt>,
-                         val sykepengeliste: Collection<SykepengerPeriode>,
+                         val sykepengeliste: List<PeriodeYtelse>,
                          val arbeidsforhold: List<Arbeidsforhold>)
 
 data class Tpsfakta(val fodselsdato: LocalDate, val bostedland: String)
