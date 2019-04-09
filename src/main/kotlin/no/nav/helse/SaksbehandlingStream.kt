@@ -7,6 +7,8 @@ import no.nav.NarePrometheus
 import no.nav.helse.behandling.*
 import no.nav.helse.fastsetting.vurderFakta
 import no.nav.helse.oppslag.StsRestClient
+import no.nav.helse.sensu.NareReporter
+import no.nav.helse.sensu.SensuClient
 import no.nav.helse.streams.*
 import no.nav.helse.streams.Topics.SYKEPENGEBEHANDLINGSFEIL
 import no.nav.helse.streams.Topics.VEDTAK_SYKEPENGER
@@ -23,7 +25,11 @@ import java.util.*
 class SaksbehandlingStream(val env: Environment) {
 
     private val stsClient = StsRestClient(baseUrl = env.stsRestUrl, username = env.username, password = env.password)
-    private val probe = SaksbehandlingProbe(env)
+
+    private val sensuClient = SensuClient(env.sensuHostname, env.sensuPort)
+
+    private val probe = SaksbehandlingProbe(sensuClient)
+    private val nareReporter = NareReporter(sensuClient)
 
 
     private val appId = "spa-behandling-1"
@@ -89,6 +95,7 @@ class SaksbehandlingStream(val env: Environment) {
                 .mapValues { _, søknad -> søknad.flatMap { hentRegisterData(it) } }
                 .mapValues { _, faktagrunnlag -> faktagrunnlag.flatMap { fastsettFakta(it) } }
                 .mapValues { _, avklarteFakta -> avklarteFakta.flatMap { prøvVilkår(it) } }
+                .peek {_, vilkårsprøving -> nareReporter.gjennomførtVilkårsprøving((vilkårsprøving as Either.Right).right.vilkårsprøving)}
                 .mapValues { _, vilkårsprøving -> vilkårsprøving.flatMap { beregnSykepenger(it) } }
                 .mapValues { _, sykepengeberegning -> sykepengeberegning.flatMap { fattVedtak(it) } }
                 .branch(
@@ -140,6 +147,7 @@ fun serialize(vedtak: SykepengeVedtak): JsonNode = defaultObjectMapper.valueToTr
 fun serializeBehandlingsfeil(feil: Behandlingsfeil): JsonNode = defaultObjectMapper.valueToTree(feil)
 
 val narePrometheus = NarePrometheus(CollectorRegistry.defaultRegistry)
+
 
 private data class SplitByType(
         val arbeidstakersøknader: KStream<String, JsonNode>,
