@@ -154,7 +154,7 @@ data class Vedtaksperiode(
 data class Fordeling(
         val mottager: String,
         val kontonummer: String,
-        val andel: BigDecimal
+        val andel: Int
 )
 
 @JsonIgnoreProperties(ignoreUnknown = true)

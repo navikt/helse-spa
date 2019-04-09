@@ -24,15 +24,15 @@ fun beregnVedtaksperioder(sykepengeberegning: Sykepengeberegning): List<Vedtaksp
             .sortedBy { it.dato }
             .fold(emptyList()) { resultSoFar, current ->
                 when {
-                    resultSoFar.isEmpty() -> resultSoFar.plus(Vedtaksperiode(fom = current.dato, tom = current.dato, dagsats = BigDecimal.valueOf(current.sats), fordeling = emptyList()))
-                    else -> {
+                    resultSoFar.isEmpty() -> resultSoFar.plus(Vedtaksperiode(fom = current.dato, tom = current.dato, dagsats = BigDecimal.valueOf(current.sats), fordeling = listOf(Fordeling(mottager = "ARBEIDSGIVER", kontonummer = "ukjent", andel = 100))))
+                            else -> {
                         val last = resultSoFar.last()
                         when {
                             last.dagsats == BigDecimal.valueOf(current.sats) -> {
                                 val chopped = resultSoFar.minus(last)
                                 chopped.plus(last.copy(tom = current.dato))
                             }
-                            else -> resultSoFar.plus(Vedtaksperiode(fom = current.dato, tom = current.dato, dagsats = BigDecimal.valueOf(current.sats), fordeling = emptyList()))
+                            else -> resultSoFar.plus(Vedtaksperiode(fom = current.dato, tom = current.dato, dagsats = BigDecimal.valueOf(current.sats), fordeling = listOf(Fordeling(mottager = "ARBEIDSGIVER", kontonummer = "ukjent", andel = 100))))
                         }
                     }
                 }

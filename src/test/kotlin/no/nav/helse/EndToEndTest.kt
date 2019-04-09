@@ -309,7 +309,7 @@ class EndToEndTest {
     }
 
     private fun checkVedtak(vedtak: Vedtak) {
-        assert(vedtak.perioder).containsExactly(Vedtaksperiode(fom = LocalDate.of(2019, 1, 1), tom = LocalDate.of(2019, 1, 31), dagsats = BigDecimal.valueOf(1154L), fordeling = emptyList()))
+        assert(vedtak.perioder).containsExactly(Vedtaksperiode(fom = LocalDate.of(2019, 1, 1), tom = LocalDate.of(2019, 1, 31), dagsats = BigDecimal.valueOf(1154L), fordeling = listOf(Fordeling(mottager = "ARBEIDSGIVER", kontonummer = "ukjent", andel = 100))))
     }
 
     val første_dag_i_syketilfelle = parse("2019-01-01")

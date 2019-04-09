@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import java.time.LocalDate
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-data class Arbeidsgiver(val navn: String, val orgnummer: String)
+data class  Arbeidsgiver(val navn: String, val orgnummer: String)
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class Arbeidsforhold(val arbeidsgiver: Arbeidsgiver, val startdato: LocalDate, val sluttdato: LocalDate?)
