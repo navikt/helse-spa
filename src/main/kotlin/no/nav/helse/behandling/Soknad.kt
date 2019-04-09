@@ -20,6 +20,7 @@ import no.nav.helse.oppslag.SykepengerPeriode
 import no.nav.helse.streams.defaultObjectMapper
 import no.nav.helse.sykepenger.beregning.Beregningsresultat
 import no.nav.nare.core.evaluations.Evaluering
+import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -143,8 +144,18 @@ data class SykepengeVedtak(
         val vedtak: Vedtak
 )
 
-// TODO Implementer
-data class Vedtak(val resultat: String = "Jeg har ikke laget noe vedtak")
+data class Vedtak(val perioder: List<Vedtaksperiode> = emptyList())
+data class Vedtaksperiode(
+        val fom: LocalDate,
+        val tom: LocalDate,
+        val dagsats: BigDecimal,
+        val fordeling: List<Fordeling>
+)
+data class Fordeling(
+        val mottager: String,
+        val kontonummer: String,
+        val andel: BigDecimal
+)
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class Soknadsperiode(val fom: LocalDate,
