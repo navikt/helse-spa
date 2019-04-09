@@ -2,13 +2,9 @@ package no.nav.helse
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException
-import io.prometheus.client.Counter
 import no.nav.helse.behandling.Sykepengesøknad
 import no.nav.helse.behandling.UavklarteFakta
 import no.nav.helse.behandling.Vilkårsprøving
-import no.nav.helse.fastsetting.Vurdering
-import no.nav.helse.sensu.DataPoint
-import no.nav.helse.sensu.InfluxMetricReporter
 
 interface Behandlingsfeil {
     val feilmelding: String
