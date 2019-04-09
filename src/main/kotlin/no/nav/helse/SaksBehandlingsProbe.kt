@@ -57,7 +57,7 @@ class SaksbehandlingProbe(val env: Environment) {
     fun mottattSøknadSendtNAV(value: JsonNode) = mottattCounter.labels("SENDT_NAV", value.get("type").asText(), "v2").inc()
 
     fun behandlingsFeilMedType(behandlingsfeil: Behandlingsfeil) {
-        log.info(behandlingsfeil.feilmelding)
+        log.warn(behandlingsfeil.feilmelding)
         when (behandlingsfeil) {
             is Behandlingsfeil.Deserialiseringsfeil -> serialiseringsFeil(behandlingsfeil)
             is Behandlingsfeil.RegisterFeil -> registerFeil(behandlingsfeil)
