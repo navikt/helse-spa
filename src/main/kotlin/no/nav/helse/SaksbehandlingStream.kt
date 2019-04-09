@@ -95,7 +95,7 @@ class SaksbehandlingStream(val env: Environment) {
                 .mapValues { _, søknad -> søknad.flatMap { hentRegisterData(it) } }
                 .mapValues { _, faktagrunnlag -> faktagrunnlag.flatMap { fastsettFakta(it) } }
                 .mapValues { _, avklarteFakta -> avklarteFakta.flatMap { prøvVilkår(it) } }
-                .peek {_, vilkårsprøving -> nareReporter.gjennomførtVilkårsprøving((vilkårsprøving as Either.Right).right.vilkårsprøving)}
+                .peek {_, vilkårsprøving -> peekAtVilkårsprøving(vilkårsprøving) }
                 .mapValues { _, vilkårsprøving -> vilkårsprøving.flatMap { beregnSykepenger(it) } }
                 .mapValues { _, sykepengeberegning -> sykepengeberegning.flatMap { fattVedtak(it) } }
                 .branch(
@@ -103,6 +103,13 @@ class SaksbehandlingStream(val env: Environment) {
                         Predicate { _, søknad -> søknad is Either.Right }
                 )
         return VedtakEllerFeil(feil, vedtak)
+    }
+
+    private fun peekAtVilkårsprøving(vilkårsprøving: Either<Behandlingsfeil, Vilkårsprøving>): Either<Behandlingsfeil, Vilkårsprøving> {
+        when(vilkårsprøving) {
+            is Either.Right -> nareReporter.gjennomførtVilkårsprøving(vilkårsprøving.right.vilkårsprøving)
+        }
+        return vilkårsprøving
     }
 
     private fun splittPåType(builder: StreamsBuilder): SplitByType {
