@@ -25,7 +25,7 @@ fun vurderMaksdato(
                     yrkesstatus = yrkesstatus,
                     tidligerePerioder = sykepengeliste.flatMap {
                         it.vedtakListe.filter { it.utbetalingsgrad > 0 }
-                                .map {Tidsperiode(fom = it.anvistPeriode.fom, tom = it.anvistPeriode.tom) }
+                                .map {Tidsperiode(fom = it.anvistPeriode.fom?:throw Exception("Periode.fom er NULL"), tom = it.anvistPeriode.tom?:throw Exception("Periode.tom er NULL")) } // FIXME
                     }
             )
             val beregnetMaksdato = maksdato(grunnlag)

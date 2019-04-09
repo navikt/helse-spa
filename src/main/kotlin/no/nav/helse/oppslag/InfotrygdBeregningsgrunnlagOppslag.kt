@@ -48,8 +48,8 @@ data class Behandlingstema(
 )
 
 data class Periode(
-    val fom: LocalDate,
-    val tom: LocalDate
+    val fom: LocalDate?,
+    val tom: LocalDate?   // TODO: ser ut til at det forekommer tomme perioder. Da på toppnivå, så burde ha en annen type for toppnivå-periode
 )
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -58,7 +58,7 @@ data class InfotrygdVedtak(
         val utbetalingsgrad : Int)
 
 enum class InntektsPeriodeVerdi {
-    M, F, U, D
+    Å, M, F, U, D
 }
 
 @JsonIgnoreProperties(ignoreUnknown = true)
