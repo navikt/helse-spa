@@ -54,11 +54,11 @@ fun fastsettingAvSykepengegrunnlagetIArbeidsgiverperioden(førsteSykdomsdag: Loc
     // TODO: sjekke om listen inneholder mer enn tre elementer? (hva om det er rapportert inn to inntekter for en måned?)
 
     return if (beregningsperiode.inntekter.isEmpty()) {
-        Uavklart(MANGELFULL_DATAGRUNNLAG, "Kan ikke avklare sykepengegrunnlaget fordi det ikke er inntekter i beregningsperioden", beregningsperiode)
+        Uavklart(HAR_IKKE_DATA, "Kan ikke avklare sykepengegrunnlaget fordi det ikke er inntekter i beregningsperioden", beregningsperiode)
     } else if (beregningsperiode.inntekter.any { it.arbeidsgiver.orgnr != arbeidsgiver.orgnummer }) {
         Uavklart(KREVER_SKJØNNSMESSIG_VURDERING, "Kan ikke avklare sykepengegrunnlaget fordi det andre inntekter i arbeidsgiverperioden enn i fra aktuell arbeidsgiver", beregningsperiode)
     } else if (beregningsperiode.inntekter.size > 3) {
-        Uavklart(DÅRLIG_DATAGRUNNLAG, "Kan ikke avklare sykepengegrunnlaget fordi det er ${beregningsperiode.inntekter.size} inntekter i beregningsperioden, vi forventer tre eller færre.", beregningsperiode)
+        Uavklart(FORSTÅR_IKKE_DATA, "Kan ikke avklare sykepengegrunnlaget fordi det er ${beregningsperiode.inntekter.size} inntekter i beregningsperioden, vi forventer tre eller færre.", beregningsperiode)
     } else {
         // § 8-28 andre ledd
         val aktuellMånedsinntekt = beregningsperiode.inntekter.sumBy { periode ->
