@@ -7,7 +7,7 @@ fun vurderArbeidsforhold(fakta : FaktagrunnlagResultat) : Vurdering<Boolean, Lis
     val arbeidsforholdFakta = fakta.faktagrunnlag.arbeidsforhold
 
     return when {
-        arbeidsforholdFakta.all {
+        arbeidsforholdFakta.any {
             it.type != "Arbeidstaker"
         } -> Vurdering.Uavklart(Vurdering.Uavklart.Årsak.FALLER_UTENFOR_MVP, "Søker har frilansarbeidsforhold", arbeidsforholdFakta)
         arbeidsforholdFakta.any {
