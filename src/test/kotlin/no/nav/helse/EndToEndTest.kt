@@ -260,7 +260,7 @@ class EndToEndTest {
 
     private fun checkArbeidsforholdVurdering(arbeidsforholdVurdering: Vurdering.Avklart<Boolean, List<Arbeidsforhold>>) {
         assert(arbeidsforholdVurdering.fastsattVerdi).isTrue()
-        assert(arbeidsforholdVurdering.begrunnelse).isEqualTo(søker_har_arbeidsgiver + stubbet_arbeidsforhold.arbeidsgiver.identifikator)
+        assert(arbeidsforholdVurdering.begrunnelse).isEqualTo("Søker har et aktivt arbeidsforhold hos MATBUTIKKEN")
         assert(arbeidsforholdVurdering.vurderingstidspunkt).isBetween(LocalDateTime.now().minusHours(1), LocalDateTime.now().plusHours(1))
         assert(arbeidsforholdVurdering.fastsattAv).isEqualTo("SPA")
 
@@ -316,7 +316,7 @@ class EndToEndTest {
                 aktorId = aktørId,
                 type = "ARBEIDSTAKERE",
                 status = "SENDT",
-                arbeidsgiver = ArbeidsgiverDTO(navn = "", orgnummer = stubbet_arbeidsforhold.arbeidsgiver.identifikator),
+                arbeidsgiver = ArbeidsgiverDTO(navn = "MATBUTIKKEN", orgnummer = stubbet_arbeidsforhold.arbeidsgiver.identifikator),
                 fom = første_dag_i_syketilfelle,
                 tom = siste_dag_i_syketilfelle,
                 startSyketilfelle = første_dag_i_syketilfelle,
