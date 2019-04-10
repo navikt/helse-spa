@@ -97,7 +97,7 @@ fun fastsettingAvSykepengegrunnlagetIArbeidsgiverperioden(førsteSykdomsdag: Loc
         val aktuellMånedsinntekt = sumInntekterTreMånederFør
                 .add(sumInntekterToMånederFør)
                 .add(sumInntekterEnMånedFør)
-                .divide(BigDecimal.valueOf(3))
+                .divide(BigDecimal.valueOf(3), RoundingMode.HALF_UP)
                 .longValueExact(RoundingMode.HALF_UP)
 
         return Vurdering.Avklart(aktuellMånedsinntekt, paragraf_8_28_andre_ledd, beregningsperiode, "SPA")
