@@ -1,6 +1,6 @@
 package no.nav.helse.fastsetting
 
-import no.nav.helse.domain.Arbeidsgiver
+import no.nav.helse.domain.ArbeidsgiverFraSøknad
 import no.nav.helse.oppslag.Inntekt
 import no.nav.helse.oppslag.Inntektsarbeidsgiver
 import no.nav.helse.oppslag.Opptjeningsperiode
@@ -29,7 +29,7 @@ class InntektsFastsettingTest {
                 Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), Opptjeningsperiode(LocalDate.parse("2018-06-01"), LocalDate.parse("2018-06-30")), BigDecimal.valueOf(30)),
                 Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), Opptjeningsperiode(LocalDate.parse("2018-05-01"), LocalDate.parse("2018-05-31")), BigDecimal.valueOf(30))
         )
-        val fastsattSykepengegrunnlag = fastsettingAvSykepengegrunnlagetIArbeidsgiverperioden(førsteSykdomsdag, Arbeidsgiver("NAV OSLO", orgnummer), inntekter)
+        val fastsattSykepengegrunnlag = fastsettingAvSykepengegrunnlagetIArbeidsgiverperioden(førsteSykdomsdag, ArbeidsgiverFraSøknad("NAV OSLO", orgnummer), inntekter)
 
         if (fastsattSykepengegrunnlag !is Vurdering.Avklart) {
             fail { "Expected fastsattSykepengegrunnlag to be Vurdering.Avklart" }
@@ -45,7 +45,7 @@ class InntektsFastsettingTest {
                 Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), Opptjeningsperiode(LocalDate.parse("2019-02-01"), LocalDate.parse("2019-02-28")), BigDecimal.valueOf(30)),
                 Inntekt(Inntektsarbeidsgiver(annetOrgnummer, "Organisasjon"), Opptjeningsperiode(LocalDate.parse("2019-01-01"), LocalDate.parse("2019-01-31")), BigDecimal.valueOf(12))
         )
-        val fastsattSykepengegrunnlag = fastsettingAvSykepengegrunnlagetIArbeidsgiverperioden(førsteSykdomsdag, Arbeidsgiver("NAV OSLO", orgnummer), inntekter)
+        val fastsattSykepengegrunnlag = fastsettingAvSykepengegrunnlagetIArbeidsgiverperioden(førsteSykdomsdag, ArbeidsgiverFraSøknad("NAV OSLO", orgnummer), inntekter)
 
         if (fastsattSykepengegrunnlag !is Vurdering.Uavklart) {
             fail { "Expected fastsattSykepengegrunnlag to be Vurdering.Uavklart" }
@@ -99,7 +99,7 @@ class InntektsFastsettingTest {
                 Inntekt(Inntektsarbeidsgiver(annetOrgnummer, "Organisasjon"), Opptjeningsperiode(LocalDate.parse("2017-03-01"), LocalDate.parse("2017-03-31")), BigDecimal.valueOf(29))
         )
 
-        val beregningsgrunnlag = fastsettingAvSykepengegrunnlagetIArbeidsgiverperioden(førsteSykdomsdag, Arbeidsgiver("NAV OSLO", orgnummer), inntekter)
+        val beregningsgrunnlag = fastsettingAvSykepengegrunnlagetIArbeidsgiverperioden(førsteSykdomsdag, ArbeidsgiverFraSøknad("NAV OSLO", orgnummer), inntekter)
         val sammenligningsgrunnlag = fastsettSammenligningsgrunnlag(førsteSykdomsdag, inntekter)
 
         if (beregningsgrunnlag !is Vurdering.Avklart || sammenligningsgrunnlag !is Vurdering.Avklart) {
@@ -133,7 +133,7 @@ class InntektsFastsettingTest {
                 Inntekt(Inntektsarbeidsgiver(annetOrgnummer, "Organisasjon"), Opptjeningsperiode(LocalDate.parse("2017-03-01"), LocalDate.parse("2017-03-31")), BigDecimal.valueOf(20))
         )
 
-        val beregningsgrunnlag = fastsettingAvSykepengegrunnlagetIArbeidsgiverperioden(førsteSykdomsdag, Arbeidsgiver("NAV OSLO", orgnummer), inntekter)
+        val beregningsgrunnlag = fastsettingAvSykepengegrunnlagetIArbeidsgiverperioden(førsteSykdomsdag, ArbeidsgiverFraSøknad("NAV OSLO", orgnummer), inntekter)
         val sammenligningsgrunnlag = fastsettSammenligningsgrunnlag(førsteSykdomsdag, inntekter)
 
         if (beregningsgrunnlag !is Vurdering.Avklart || sammenligningsgrunnlag !is Vurdering.Avklart) {
@@ -157,7 +157,7 @@ class InntektsFastsettingTest {
                 Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), Opptjeningsperiode(LocalDate.parse("2018-12-01"), LocalDate.parse("2018-12-31")), BigDecimal.valueOf(1)),
                 Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), Opptjeningsperiode(LocalDate.parse("2018-11-01"), LocalDate.parse("2018-11-30")), BigDecimal.valueOf(21))
         )
-        val fastsattSykepengegrunnlag = fastsettingAvSykepengegrunnlagetIArbeidsgiverperioden(førsteSykdomsdag, Arbeidsgiver("NAV OSLO", orgnummer), inntekter)
+        val fastsattSykepengegrunnlag = fastsettingAvSykepengegrunnlagetIArbeidsgiverperioden(førsteSykdomsdag, ArbeidsgiverFraSøknad("NAV OSLO", orgnummer), inntekter)
 
         if (fastsattSykepengegrunnlag !is Vurdering.Avklart) {
             fail { "Expected fastsattSykepengegrunnlag to be Vurdering.Avklart" }
@@ -170,7 +170,7 @@ class InntektsFastsettingTest {
     fun `uavklart sykepengegrunnlag når det ikke er noen inntekter i beregningsperioden`() {
         val førsteSykdomsdag = LocalDate.parse("2019-01-01")
         val inntekter = emptyList<Inntekt>()
-        val fastsattSykepengegrunnlag = fastsettingAvSykepengegrunnlagetIArbeidsgiverperioden(førsteSykdomsdag, Arbeidsgiver("NAV OSLO", orgnummer), inntekter)
+        val fastsattSykepengegrunnlag = fastsettingAvSykepengegrunnlagetIArbeidsgiverperioden(førsteSykdomsdag, ArbeidsgiverFraSøknad("NAV OSLO", orgnummer), inntekter)
 
         if (fastsattSykepengegrunnlag !is Vurdering.Uavklart) {
             fail { "Expected fastsattSykepengegrunnlag to be Vurdering.Uavklart" }
@@ -188,7 +188,7 @@ class InntektsFastsettingTest {
                 Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), Opptjeningsperiode(LocalDate.parse("2018-11-01"), LocalDate.parse("2018-11-30")), BigDecimal.valueOf(21)),
                 Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), Opptjeningsperiode(LocalDate.parse("2018-11-01"), LocalDate.parse("2018-11-30")), BigDecimal.valueOf(31))
         )
-        val fastsattSykepengegrunnlag = fastsettingAvSykepengegrunnlagetIArbeidsgiverperioden(førsteSykdomsdag, Arbeidsgiver("NAV OSLO", orgnummer), inntekter)
+        val fastsattSykepengegrunnlag = fastsettingAvSykepengegrunnlagetIArbeidsgiverperioden(førsteSykdomsdag, ArbeidsgiverFraSøknad("NAV OSLO", orgnummer), inntekter)
 
         if (fastsattSykepengegrunnlag !is Vurdering.Uavklart) {
             fail { "Expected fastsattSykepengegrunnlag to be Vurdering.Uavklart" }

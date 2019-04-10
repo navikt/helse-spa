@@ -24,7 +24,7 @@ fun evaluerArbeidsforhold(orgnummer: String, fakta: List<Arbeidsforhold>): Evalu
         when {
             fakta.isEmpty() -> Evaluering.nei("Søker har ikke en arbeidsgiver med orgnummer $orgnummer")
             fakta.size > 1 -> Evaluering.kanskje("Søker har flere arbeidsgivere, systemet støtter ikke dette enda")
-            fakta[0].arbeidsgiver.orgnummer == orgnummer -> {
+            fakta[0].arbeidsgiver.identifikator == orgnummer -> {
                 Evaluering.ja(søker_har_arbeidsgiver + orgnummer)
             }
             else -> Evaluering.nei("Søker har ikke en arbeidsgiver med orgnummer $orgnummer")

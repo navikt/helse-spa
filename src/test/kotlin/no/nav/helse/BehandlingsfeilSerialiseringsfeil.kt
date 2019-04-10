@@ -215,9 +215,10 @@ val uavklarteJson= """{
       } ],
       "sykepengeliste" : [ ],
       "arbeidsforhold" : [ {
+        "type": "Arbeidstaker",
         "arbeidsgiver" : {
-          "navn" : "AS, [",
-          "orgnummer" : "995816598"
+          "identifikator" : "995816598",
+          "type": "Organisasjon"
         },
         "startdato" : "2018-03-11",
         "sluttdato" : null
@@ -263,9 +264,10 @@ val uavklarteJson= """{
         "fastsattVerdi" : true,
         "begrunnelse" : "Søker har en arbeidsgiver med orgnummer 995816598",
         "grunnlag" : [ {
+          "type": "Arbeidstaker",
           "arbeidsgiver" : {
-            "navn" : "AS, [",
-            "orgnummer" : "995816598"
+            "identifikator" : "995816598",
+            "type": "Organisasjon"
           },
           "startdato" : "2018-03-11",
           "sluttdato" : null
@@ -280,9 +282,10 @@ val uavklarteJson= """{
         "grunnlag" : {
           "førsteSykdomsdag" : "2019-01-11",
           "arbeidsforhold" : [ {
+            "type": "Arbeidstaker",
             "arbeidsgiver" : {
-              "navn" : "AS, [",
-              "orgnummer" : "995816598"
+              "identifikator" : "995816598",
+              "type": "Organisasjon"
             },
             "startdato" : "2018-03-11",
             "sluttdato" : null

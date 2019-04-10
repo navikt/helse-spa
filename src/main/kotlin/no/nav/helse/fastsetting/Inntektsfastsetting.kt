@@ -1,6 +1,6 @@
 package no.nav.helse.fastsetting
 
-import no.nav.helse.domain.Arbeidsgiver
+import no.nav.helse.domain.ArbeidsgiverFraSøknad
 import no.nav.helse.fastsetting.Vurdering.Uavklart
 import no.nav.helse.fastsetting.Vurdering.Uavklart.Årsak.*
 import no.nav.helse.oppslag.Inntekt
@@ -12,7 +12,7 @@ import java.time.YearMonth
 
 fun LocalDate.yearMonth() = YearMonth.of(year, month.value)
 
-fun fastsettingAvSykepengegrunnlaget(førsteSykdomsdag: LocalDate, arbeidsgiver: Arbeidsgiver, beregningsgrunnlag: List<Inntekt>, sammenligningsgrunnlag: List<Inntekt>): Vurdering<*, *> {
+fun fastsettingAvSykepengegrunnlaget(førsteSykdomsdag: LocalDate, arbeidsgiver: ArbeidsgiverFraSøknad, beregningsgrunnlag: List<Inntekt>, sammenligningsgrunnlag: List<Inntekt>): Vurdering<*, *> {
     val sykepengegrunnlagIArbeidsgiverperioden = fastsettingAvSykepengegrunnlagetIArbeidsgiverperioden(førsteSykdomsdag,
             arbeidsgiver, beregningsgrunnlag)
 
@@ -38,7 +38,7 @@ fun fastsettingAvSykepengegrunnlaget(førsteSykdomsdag: LocalDate, arbeidsgiver:
 const val paragraf_8_28_tredje_ledd_bokstav_a = "§ 8-28 tredje ledd bokstav a) – De tre siste kalendermånedene før arbeidstakeren ble arbeidsufør"
 const val paragraf_8_28_andre_ledd = "§ 8-28 andre ledd"
 // https://lovdata.no/lov/1997-02-28-19/§8-28
-fun fastsettingAvSykepengegrunnlagetIArbeidsgiverperioden(førsteSykdomsdag: LocalDate, arbeidsgiver: Arbeidsgiver, inntekter: List<Inntekt>): Vurdering<Long, Beregningsperiode> {
+fun fastsettingAvSykepengegrunnlagetIArbeidsgiverperioden(førsteSykdomsdag: LocalDate, arbeidsgiver: ArbeidsgiverFraSøknad, inntekter: List<Inntekt>): Vurdering<Long, Beregningsperiode> {
     val enMånedFør = førsteSykdomsdag.minusMonths(1)
             .yearMonth()
     val treMånederFør = førsteSykdomsdag.minusMonths(3)

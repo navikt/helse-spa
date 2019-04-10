@@ -5,12 +5,8 @@ import no.nav.helse.behandling.Soknadsperiode
 import no.nav.helse.behandling.Sykepengesøknad
 import no.nav.helse.behandling.Vilkårsprøving
 import no.nav.helse.behandling.sykepengeBeregning
-import no.nav.helse.domain.Arbeidsgiver
-import no.nav.helse.fastsetting.Aldersgrunnlag
-import no.nav.helse.fastsetting.Beregningsperiode
-import no.nav.helse.fastsetting.Medlemsskapgrunnlag
-import no.nav.helse.fastsetting.Opptjeningsgrunnlag
-import no.nav.helse.fastsetting.Sykepengegrunnlag
+import no.nav.helse.domain.ArbeidsgiverFraSøknad
+import no.nav.helse.fastsetting.*
 import no.nav.helse.fastsetting.Vurdering.Avklart
 import no.nav.helse.oppslag.getGrunnbeløpForDato
 import no.nav.nare.core.evaluations.Evaluering
@@ -65,7 +61,7 @@ class BeregningTest {
                             type = "ARBEIDSTAKERE",
                             fom = fom,
                             tom = tom,
-                            arbeidsgiver = Arbeidsgiver("TheWorkplace", "999888777"),
+                            arbeidsgiver = ArbeidsgiverFraSøknad("TheWorkplace", "999888777"),
                             sendtNav = LocalDateTime.ofEpochSecond(parse("2019-01-31").toEpochSecond(LocalTime.NOON, ZoneOffset.UTC), 0, ZoneOffset.UTC),
                             soknadsperioder = listOf(Soknadsperiode(parse("2019-01-05"), parse("2019-01-31"), sykmeldingsgrad = sykmeldingsgrad)),
                             soktUtenlandsopphold = false,

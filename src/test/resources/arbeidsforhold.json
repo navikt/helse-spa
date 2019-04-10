@@ -1,15 +1,17 @@
 [
     {
+      "type": "Arbeidstaker",
       "arbeidsgiver": {
-        "navn": "FIRMA 1",
-        "orgnummer": "1111111111"
+        "type": "Organisasjon",
+        "identifikator": "1111111111"
       },
       "startdato": "2017-01-01"
     },
     {
+      "type": "Arbeidstaker",
       "arbeidsgiver": {
-        "navn": "FIRMA 2",
-        "orgnummer": "2222222222"
+        "type": "Organisasjon",
+        "identifikator": "2222222222"
       },
       "startdato": "2017-01-01"
     }

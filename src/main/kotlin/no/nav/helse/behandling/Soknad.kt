@@ -5,18 +5,10 @@ import no.nav.helse.Behandlingsfeil
 import no.nav.helse.Either
 import no.nav.helse.Grunnlagsdata
 import no.nav.helse.domain.Arbeidsforhold
-import no.nav.helse.domain.Arbeidsgiver
-import no.nav.helse.fastsetting.Alder
-import no.nav.helse.fastsetting.Aldersgrunnlag
-import no.nav.helse.fastsetting.Beregningsperiode
-import no.nav.helse.fastsetting.Medlemsskapgrunnlag
-import no.nav.helse.fastsetting.Opptjeningsgrunnlag
-import no.nav.helse.fastsetting.Opptjeningstid
-import no.nav.helse.fastsetting.Sykepengegrunnlag
-import no.nav.helse.fastsetting.Vurdering
+import no.nav.helse.domain.ArbeidsgiverFraSøknad
+import no.nav.helse.fastsetting.*
 import no.nav.helse.oppslag.Inntekt
 import no.nav.helse.oppslag.PeriodeYtelse
-import no.nav.helse.oppslag.SykepengerPeriode
 import no.nav.helse.streams.defaultObjectMapper
 import no.nav.helse.sykepenger.beregning.Beregningsresultat
 import no.nav.nare.core.evaluations.Evaluering
@@ -25,12 +17,15 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+data class ArbeidsgiverDTO(val navn: String, val orgnummer: String)
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 data class SykepengesøknadV2DTO(
         val id: String,
         val aktorId: String,
         val type: String,
         val status: String,
-        val arbeidsgiver: Arbeidsgiver,
+        val arbeidsgiver: ArbeidsgiverDTO,
         val soktUtenlandsopphold: Boolean,
         val fom: LocalDate,
         val tom: LocalDate,
@@ -48,7 +43,7 @@ fun mapToSykepengesøknad(dto: SykepengesøknadV2DTO): Either<Behandlingsfeil, S
                 aktorId = dto.aktorId,
                 type = dto.type,
                 status = dto.status,
-                arbeidsgiver = dto.arbeidsgiver,
+                arbeidsgiver = ArbeidsgiverFraSøknad(dto.arbeidsgiver.navn, dto.arbeidsgiver.orgnummer),
                 soktUtenlandsopphold = dto.soktUtenlandsopphold,
                 fom = dto.fom,
                 tom = dto.tom,
@@ -64,7 +59,7 @@ data class Sykepengesøknad(
         val aktorId: String,
         val type: String,
         val status: String,
-        val arbeidsgiver: Arbeidsgiver,
+        val arbeidsgiver: ArbeidsgiverFraSøknad,
         val soktUtenlandsopphold: Boolean,
         val fom: LocalDate,
         val tom: LocalDate,

@@ -24,12 +24,12 @@ class ArbeidsforholdTest {
     fun hentArbeidsforhold() {
         val arbeidsforhold : List<Arbeidsforhold> = defaultObjectMapper.readValue(ArbeidsforholdTest::class.java.
                 classLoader.getResourceAsStream("arbeidsforhold.json"))
-        assertEquals("1111111111", arbeidsforhold[0].arbeidsgiver.orgnummer)
+        assertEquals("1111111111", arbeidsforhold[0].arbeidsgiver.identifikator)
     }
 
     @Test
     fun `vurder arbeidsforhold med en arbeidsgiver`() {
-        val arbeidsforhold = listOf(Arbeidsforhold(Arbeidsgiver("Test 1", "1111"), LocalDate.now(), null))
+        val arbeidsforhold = listOf(Arbeidsforhold("Arbeidstaker", Arbeidsgiver("1111", "Organisasjon"), LocalDate.now(), null))
         val faktagrunnlag = Faktagrunnlag(tps = tpsFaktaUtenVerdi, beregningsperiode = emptyList(), sammenligningsperiode = emptyList(), arbeidsforhold = arbeidsforhold,
                 sykepengeliste = emptyList())
         val vurdering = vurderArbeidsforhold(FaktagrunnlagResultat(originalSoknad, faktagrunnlag))
@@ -39,7 +39,7 @@ class ArbeidsforholdTest {
 
     @Test
     fun `vurder arbeidsforhold med feil arbeidsgiver`() {
-        val arbeidsforhold = listOf(Arbeidsforhold(Arbeidsgiver("Test 2", "2222"), LocalDate.now(), null))
+        val arbeidsforhold = listOf(Arbeidsforhold("Arbeidstaker", Arbeidsgiver("2222", "Organisasjon"), LocalDate.now(), null))
         val faktagrunnlag = Faktagrunnlag(tps = tpsFaktaUtenVerdi, beregningsperiode = emptyList(), sammenligningsperiode = emptyList(), arbeidsforhold = arbeidsforhold,
                 sykepengeliste = emptyList())
         val vurdering = vurderArbeidsforhold(FaktagrunnlagResultat(originalSoknad, faktagrunnlag))
@@ -49,8 +49,8 @@ class ArbeidsforholdTest {
 
     @Test
     fun `vurder arbeidsforhold med flere arbeidsgiverer`() {
-        val arbeidsforhold = listOf(Arbeidsforhold(Arbeidsgiver("Test 1", "1111"), LocalDate.now(), null),
-                Arbeidsforhold(Arbeidsgiver("Test 2", "2222"), LocalDate.now(), null))
+        val arbeidsforhold = listOf(Arbeidsforhold("Arbeidstaker", Arbeidsgiver("1111", "Organisasjon"), LocalDate.now(), null),
+                Arbeidsforhold("Arbeidstaker", Arbeidsgiver("2222", "Organisasjon"), LocalDate.now(), null))
         val faktagrunnlag = Faktagrunnlag(tps = tpsFaktaUtenVerdi, beregningsperiode = emptyList(), sammenligningsperiode = emptyList(), arbeidsforhold = arbeidsforhold,
                 sykepengeliste = emptyList())
         val vurdering = vurderArbeidsforhold(FaktagrunnlagResultat(originalSoknad, faktagrunnlag))
@@ -72,10 +72,11 @@ val jsonFromSparkel = """
     {
       "arbeidsforhold": {
         "arbeidsgiver": {
-          "navn": "ÅSEN BOFELLESSKAP",
-          "orgnummer": "995816598"
+          "identifikator": "995816598",
+          "type": "Organisasjon"
         },
-        "startdato": "2009-01-15"
+        "startdato": "2009-01-15",
+        "type": "Arbeidstaker"
       },
       "inntekter": [
         {

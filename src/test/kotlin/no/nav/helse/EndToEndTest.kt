@@ -146,7 +146,7 @@ class EndToEndTest {
     private fun checkSøknad(innsendtSøknad: SykepengesøknadV2DTO, faktiskSøknad: Sykepengesøknad) {
         assert(innsendtSøknad.aktorId).isEqualTo(faktiskSøknad.aktorId)
         assert(innsendtSøknad.status).isEqualTo(faktiskSøknad.status)
-        assert(innsendtSøknad.arbeidsgiver).isEqualTo(faktiskSøknad.arbeidsgiver)
+        assert(innsendtSøknad.arbeidsgiver.orgnummer).isEqualTo(faktiskSøknad.arbeidsgiver.orgnummer)
         assert(innsendtSøknad.soktUtenlandsopphold).isEqualTo(faktiskSøknad.soktUtenlandsopphold)
         assert(innsendtSøknad.fom).isEqualTo(første_dag_i_syketilfelle)
         assert(innsendtSøknad.tom).isEqualTo(faktiskSøknad.tom)
@@ -256,7 +256,7 @@ class EndToEndTest {
         assert(inntekter).hasSize(startDate.until(endDate.plusDays(1), ChronoUnit.MONTHS).toInt())
         assert(inntekter).each {
             val inntekt = it.actual
-            assert(inntekt.arbeidsgiver.identifikator).isEqualTo(stubbet_arbeidsforhold.arbeidsgiver.orgnummer)
+            assert(inntekt.arbeidsgiver.identifikator).isEqualTo(stubbet_arbeidsforhold.arbeidsgiver.identifikator)
             assert(inntekt.beløp.toLong()).isEqualTo(25000L)
             assert(inntekt.opptjeningsperiode.fom).isBetween(startDate, endDate.with(firstDayOfMonth()))
             assert(inntekt.opptjeningsperiode.tom).isBetween(startDate.with(lastDayOfMonth()), endDate)
@@ -265,7 +265,7 @@ class EndToEndTest {
 
     private fun checkArbeidsforholdVurdering(arbeidsforholdVurdering: Vurdering.Avklart<Boolean, List<Arbeidsforhold>>) {
         assert(arbeidsforholdVurdering.fastsattVerdi).isTrue()
-        assert(arbeidsforholdVurdering.begrunnelse).isEqualTo(søker_har_arbeidsgiver + stubbet_arbeidsforhold.arbeidsgiver.orgnummer)
+        assert(arbeidsforholdVurdering.begrunnelse).isEqualTo(søker_har_arbeidsgiver + stubbet_arbeidsforhold.arbeidsgiver.identifikator)
         assert(arbeidsforholdVurdering.vurderingstidspunkt).isBetween(LocalDateTime.now().minusHours(1), LocalDateTime.now().plusHours(1))
         assert(arbeidsforholdVurdering.fastsattAv).isEqualTo("SPA")
 
@@ -321,7 +321,7 @@ class EndToEndTest {
                 aktorId = aktørId,
                 type = "ARBEIDSTAKERE",
                 status = "SENDT",
-                arbeidsgiver = stubbet_arbeidsforhold.arbeidsgiver,
+                arbeidsgiver = ArbeidsgiverDTO(navn = "", orgnummer = stubbet_arbeidsforhold.arbeidsgiver.identifikator),
                 fom = første_dag_i_syketilfelle,
                 tom = siste_dag_i_syketilfelle,
                 startSyketilfelle = første_dag_i_syketilfelle,
@@ -427,9 +427,10 @@ class EndToEndTest {
     )
 
     val stubbet_arbeidsforhold = Arbeidsforhold(
-            Arbeidsgiver(
-                    navn = "EQUINOR ASA, AVD STATOIL SOKKELVIRKSOMHET",
-                    orgnummer = "97114455"
+            type = "Arbeidstaker",
+            arbeidsgiver = Arbeidsgiver(
+                    type = "Organisasjon",
+                    identifikator = "97114455"
             ),
             startdato = parse("2017-01-01"),
             sluttdato = null
@@ -438,7 +439,7 @@ class EndToEndTest {
     val beregningsgrunnlagStart = første_dag_i_syketilfelle.minusMonths(3)
     val stubbet_inntekt_beregningsgrunnlag: List<Inntekt> = List(3, init = { index ->
         Inntekt(
-                arbeidsgiver = Inntektsarbeidsgiver(stubbet_arbeidsforhold.arbeidsgiver.orgnummer, "Organisasjon"),
+                arbeidsgiver = Inntektsarbeidsgiver(stubbet_arbeidsforhold.arbeidsgiver.identifikator, "Organisasjon"),
                 beløp = BigDecimal.valueOf(25000),
                 opptjeningsperiode = Opptjeningsperiode(
                         fom = beregningsgrunnlagStart.plusMonths(index.toLong()),
@@ -450,7 +451,7 @@ class EndToEndTest {
     val sammenligningsgrunnlagStart = første_dag_i_syketilfelle.minusMonths(12)
     val stubbet_inntekt_sammenligningsgrunnlag: List<Inntekt> = List(12, init = { index ->
         Inntekt(
-                arbeidsgiver = Inntektsarbeidsgiver(stubbet_arbeidsforhold.arbeidsgiver.orgnummer, "Organisasjon"),
+                arbeidsgiver = Inntektsarbeidsgiver(stubbet_arbeidsforhold.arbeidsgiver.identifikator, "Organisasjon"),
                 beløp = BigDecimal.valueOf(25000),
                 opptjeningsperiode = Opptjeningsperiode(
                         fom = sammenligningsgrunnlagStart.plusMonths(index.toLong()),

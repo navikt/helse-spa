@@ -2,7 +2,7 @@ package no.nav.helse
 
 import no.nav.helse.behandling.*
 import no.nav.helse.domain.Arbeidsforhold
-import no.nav.helse.domain.Arbeidsgiver
+import no.nav.helse.domain.ArbeidsgiverFraSøknad
 import no.nav.helse.fastsetting.*
 import no.nav.helse.sykepenger.beregning.Beregningsresultat
 import no.nav.helse.sykepenger.beregning.Dagsats
@@ -29,7 +29,7 @@ val originalSoknad = Sykepengesøknad(
         id = "1",
         aktorId = "1",
         type = "ARBEIDSTAKERE",
-        arbeidsgiver = Arbeidsgiver("Test 1", "1111"),
+        arbeidsgiver = ArbeidsgiverFraSøknad("Test 1", "1111"),
         startSyketilfelle = LocalDate.now(),
         soktUtenlandsopphold = true,
         soknadsperioder = emptyList(),

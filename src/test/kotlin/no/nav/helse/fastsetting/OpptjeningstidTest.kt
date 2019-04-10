@@ -28,8 +28,8 @@ class OpptjeningstidTest {
     fun `kan ikke fastsette opptjeningstid om søker har flere enn 1 arbeidsgiver`() {
         val førsteSykdomsdag = LocalDate.parse("2019-01-01")
         val arbeidsforhold = listOf(
-                Arbeidsforhold(Arbeidsgiver("ukjent", "11223344"), LocalDate.now(), null),
-                Arbeidsforhold(Arbeidsgiver("ukjwnt", "11223344"), LocalDate.now(), null)
+                Arbeidsforhold("Arbeidstaker", Arbeidsgiver("11223344", "Organisasjon"), LocalDate.now(), null),
+                Arbeidsforhold("Arbeidstaker", Arbeidsgiver("11223344", "Organisasjon"), LocalDate.now(), null)
         )
         val actual = vurderOpptjeningstid(Opptjeningsgrunnlag(førsteSykdomsdag, arbeidsforhold))
 
@@ -46,7 +46,7 @@ class OpptjeningstidTest {
     fun `kan ikke fastsette opptjeningstid om søker har avsluttet arbeidsforholdet`() {
         val førsteSykdomsdag = LocalDate.parse("2019-01-01")
         val arbeidsforhold = listOf(
-                Arbeidsforhold(Arbeidsgiver("ukjwnt", "11223344"), LocalDate.now(), LocalDate.now())
+                Arbeidsforhold("Arbeidstaker", Arbeidsgiver("11223344", "Organisasjon"), LocalDate.now(), LocalDate.now())
         )
         val actual = vurderOpptjeningstid(Opptjeningsgrunnlag(førsteSykdomsdag, arbeidsforhold))
 
@@ -63,7 +63,7 @@ class OpptjeningstidTest {
     fun `opptjeningstid er lik antall dager søker har vært i arbeid før han eller hun ble syk`() {
         val førsteSykdomsdag = LocalDate.parse("2019-01-01")
         val arbeidsforhold = listOf(
-                Arbeidsforhold(Arbeidsgiver("ukjwnt", "11223344"), LocalDate.parse("2018-12-01"), null)
+                Arbeidsforhold("Arbeidstaker", Arbeidsgiver("11223344", "Organisasjon"), LocalDate.parse("2018-12-01"), null)
         )
         val actual = vurderOpptjeningstid(Opptjeningsgrunnlag(førsteSykdomsdag, arbeidsforhold))
 
