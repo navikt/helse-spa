@@ -148,7 +148,6 @@ data class Vedtaksperiode(
 )
 data class Fordeling(
         val mottager: String,
-        val kontonummer: String,
         val andel: Int
 )
 
