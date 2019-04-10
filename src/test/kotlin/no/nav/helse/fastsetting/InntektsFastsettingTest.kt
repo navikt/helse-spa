@@ -51,7 +51,7 @@ class InntektsFastsettingTest {
             fail { "Expected fastsattSykepengegrunnlag to be Vurdering.Uavklart" }
         }
 
-        assertEquals("Kan ikke avklare sykepengegrunnlaget fordi det andre inntekter i arbeidsgiverperioden enn i fra aktuell arbeidsgiver", fastsattSykepengegrunnlag.begrunnelse)
+        assertEquals("Kan ikke avklare sykepengegrunnlaget fordi det andre inntekter i arbeidsgiverperioden i tillegg til aktuell arbeidsgiver", fastsattSykepengegrunnlag.begrunnelse)
     }
 
     @Test
@@ -151,7 +151,7 @@ class InntektsFastsettingTest {
 
 
     @Test
-    fun `gjennomsnittet av kortere periode skal legges til grunn`() {
+    fun `uavklart sykepengegrunnlag når det er færre enn tre inntekter i beregningsperioden`() {
         val førsteSykdomsdag = LocalDate.parse("2019-01-01")
         val inntekter = listOf(
                 Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), YearMonth.parse("2018-12"), BigDecimal.valueOf(1)),
@@ -159,11 +159,11 @@ class InntektsFastsettingTest {
         )
         val fastsattSykepengegrunnlag = fastsettingAvSykepengegrunnlagetIArbeidsgiverperioden(førsteSykdomsdag, ArbeidsgiverFraSøknad("NAV OSLO", orgnummer), inntekter)
 
-        if (fastsattSykepengegrunnlag !is Vurdering.Avklart) {
-            fail { "Expected fastsattSykepengegrunnlag to be Vurdering.Avklart" }
+        if (fastsattSykepengegrunnlag !is Vurdering.Uavklart) {
+            fail { "Expected fastsattSykepengegrunnlag to be Vurdering.Uavklart" }
         }
 
-        assertEquals(11, fastsattSykepengegrunnlag.fastsattVerdi)
+        assertEquals("Kan ikke avklare sykepengegrunnlaget fordi vi forventer inntekter fra tre måneder", fastsattSykepengegrunnlag.begrunnelse)
     }
 
     @Test
@@ -194,7 +194,7 @@ class InntektsFastsettingTest {
             fail { "Expected fastsattSykepengegrunnlag to be Vurdering.Uavklart" }
         }
 
-        Assertions.assertEquals("Kan ikke avklare sykepengegrunnlaget fordi det er 4 inntekter i beregningsperioden, vi forventer tre eller færre.", fastsattSykepengegrunnlag.begrunnelse)
+        Assertions.assertEquals("Kan ikke avklare sykepengegrunnlaget fordi vi forventer inntekter fra tre måneder", fastsattSykepengegrunnlag.begrunnelse)
     }
 
 }

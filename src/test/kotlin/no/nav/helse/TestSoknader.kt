@@ -56,18 +56,18 @@ val enkleAvklarteVerdier = AvklarteVerdier(
                                 fastsattAv = "test",
                                 begrunnelse = "whatevs",
                                 grunnlag = Beregningsperiode(
-                                        inntekter = emptyList(),
+                                        inntekter = emptyMap(),
                                         begrunnelse = "whatevs")),
                         sykepengegrunnlagIArbeidsgiverperioden = Vurdering.Avklart(
                                 fastsattVerdi = 1L,
                                 fastsattAv = "test",
                                 begrunnelse = "whatevs",
                                 grunnlag = Beregningsperiode(
-                                        inntekter = emptyList(),
+                                        inntekter = emptyMap(),
                                         begrunnelse = "whatevs"))),
                 fastsattAv = "test",
                 begrunnelse = "whatevs",
-                grunnlag = Beregningsperiode(inntekter = emptyList(), begrunnelse = "whatevs")),
+                grunnlag = Beregningsperiode(inntekter = emptyMap(), begrunnelse = "whatevs")),
         maksdato = Vurdering.Avklart(fastsattVerdi = LocalDate.now().plusDays(248), fastsattAv = "test", begrunnelse = "whatevs", grunnlag = Grunnlagsdata(førsteFraværsdag = LocalDate.now(), førsteSykepengedag = LocalDate.now(), tidligerePerioder = emptyList(), yrkesstatus = Yrkesstatus.ARBEIDSTAKER, personensAlder = 50)),
         sykepengeliste = emptyList())
 
