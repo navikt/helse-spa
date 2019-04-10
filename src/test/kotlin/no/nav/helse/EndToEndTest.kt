@@ -44,13 +44,9 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.slf4j.LoggerFactory
 import java.math.BigDecimal
-import java.time.DayOfWeek
-import java.time.Duration
-import java.time.LocalDate
+import java.time.*
 import java.time.LocalDate.parse
-import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
-import java.time.temporal.TemporalAdjusters.firstDayOfMonth
 import java.time.temporal.TemporalAdjusters.lastDayOfMonth
 
 class EndToEndTest {
@@ -258,8 +254,7 @@ class EndToEndTest {
             val inntekt = it.actual
             assert(inntekt.arbeidsgiver.identifikator).isEqualTo(stubbet_arbeidsforhold.arbeidsgiver.identifikator)
             assert(inntekt.beløp.toLong()).isEqualTo(25000L)
-            assert(inntekt.opptjeningsperiode.fom).isBetween(startDate, endDate.with(firstDayOfMonth()))
-            assert(inntekt.opptjeningsperiode.tom).isBetween(startDate.with(lastDayOfMonth()), endDate)
+            assert(inntekt.utbetalingsperiode).isBetween(YearMonth.from(startDate), YearMonth.from(endDate))
         }
     }
 
@@ -441,10 +436,7 @@ class EndToEndTest {
         Inntekt(
                 arbeidsgiver = Inntektsarbeidsgiver(stubbet_arbeidsforhold.arbeidsgiver.identifikator, "Organisasjon"),
                 beløp = BigDecimal.valueOf(25000),
-                opptjeningsperiode = Opptjeningsperiode(
-                        fom = beregningsgrunnlagStart.plusMonths(index.toLong()),
-                        tom = beregningsgrunnlagStart.plusMonths(index.toLong()).with(lastDayOfMonth())
-                )
+                utbetalingsperiode = YearMonth.from(beregningsgrunnlagStart.plusMonths(index.toLong()))
         )
     })
 
@@ -453,10 +445,7 @@ class EndToEndTest {
         Inntekt(
                 arbeidsgiver = Inntektsarbeidsgiver(stubbet_arbeidsforhold.arbeidsgiver.identifikator, "Organisasjon"),
                 beløp = BigDecimal.valueOf(25000),
-                opptjeningsperiode = Opptjeningsperiode(
-                        fom = sammenligningsgrunnlagStart.plusMonths(index.toLong()),
-                        tom = sammenligningsgrunnlagStart.plusMonths(index.toLong()).with(lastDayOfMonth())
-                )
+                utbetalingsperiode = YearMonth.from(sammenligningsgrunnlagStart.plusMonths(index.toLong()))
         )
     })
 

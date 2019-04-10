@@ -51,33 +51,21 @@ val uavklarteJson= """{
           "identifikator" : "995816598",
           "type": "Organisasjon"
         },
-        "opptjeningsperiode" : {
-          "fom" : "2018-10-01",
-          "tom" : "2018-10-31",
-          "antattPeriode" : false
-        },
+        "utbetalingsperiode": "2018-10",
         "beløp" : 25000.0
       }, {
         "arbeidsgiver" : {
           "identifikator" : "995816598",
           "type": "Organisasjon"
         },
-        "opptjeningsperiode" : {
-          "fom" : "2018-11-01",
-          "tom" : "2018-11-30",
-          "antattPeriode" : false
-        },
+        "utbetalingsperiode": "2018-11",
         "beløp" : 25000.0
       }, {
         "arbeidsgiver" : {
           "identifikator" : "995816598",
           "type": "Organisasjon"
         },
-        "opptjeningsperiode" : {
-          "fom" : "2018-12-01",
-          "tom" : "2018-12-31",
-          "antattPeriode" : false
-        },
+        "utbetalingsperiode": "2018-12",
         "beløp" : 25000.0
       } ],
       "sammenligningsperiode" : [ {
@@ -85,132 +73,84 @@ val uavklarteJson= """{
           "identifikator" : "995816598",
           "type": "Organisasjon"
         },
-        "opptjeningsperiode" : {
-          "fom" : "2018-01-01",
-          "tom" : "2018-01-31",
-          "antattPeriode" : false
-        },
+        "utbetalingsperiode": "2018-01",
         "beløp" : 25000.0
       }, {
         "arbeidsgiver" : {
           "identifikator" : "995816598",
           "type": "Organisasjon"
         },
-        "opptjeningsperiode" : {
-          "fom" : "2018-02-01",
-          "tom" : "2018-02-28",
-          "antattPeriode" : false
-        },
+        "utbetalingsperiode": "2018-02",
         "beløp" : 25000.0
       }, {
         "arbeidsgiver" : {
           "identifikator" : "995816598",
           "type": "Organisasjon"
         },
-        "opptjeningsperiode" : {
-          "fom" : "2018-03-01",
-          "tom" : "2018-03-31",
-          "antattPeriode" : false
-        },
+        "utbetalingsperiode": "2018-03",
         "beløp" : 25000.0
       }, {
         "arbeidsgiver" : {
           "identifikator" : "995816598",
           "type": "Organisasjon"
         },
-        "opptjeningsperiode" : {
-          "fom" : "2018-04-01",
-          "tom" : "2018-04-30",
-          "antattPeriode" : false
-        },
+        "utbetalingsperiode": "2018-04",
         "beløp" : 25000.0
       }, {
         "arbeidsgiver" : {
           "identifikator" : "995816598",
           "type": "Organisasjon"
         },
-        "opptjeningsperiode" : {
-          "fom" : "2018-05-01",
-          "tom" : "2018-05-31",
-          "antattPeriode" : false
-        },
+        "utbetalingsperiode": "2018-05",
         "beløp" : 25000.0
       }, {
         "arbeidsgiver" : {
           "identifikator" : "995816598",
           "type": "Organisasjon"
         },
-        "opptjeningsperiode" : {
-          "fom" : "2018-06-01",
-          "tom" : "2018-06-30",
-          "antattPeriode" : false
-        },
+        "utbetalingsperiode": "2018-06",
         "beløp" : 25000.0
       }, {
         "arbeidsgiver" : {
           "identifikator" : "995816598",
           "type": "Organisasjon"
         },
-        "opptjeningsperiode" : {
-          "fom" : "2018-07-01",
-          "tom" : "2018-07-31",
-          "antattPeriode" : false
-        },
+        "utbetalingsperiode": "2018-07",
         "beløp" : 25000.0
       }, {
         "arbeidsgiver" : {
           "identifikator" : "995816598",
           "type": "Organisasjon"
         },
-        "opptjeningsperiode" : {
-          "fom" : "2018-08-01",
-          "tom" : "2018-08-31",
-          "antattPeriode" : false
-        },
+        "utbetalingsperiode": "2018-08",
         "beløp" : 25000.0
       }, {
         "arbeidsgiver" : {
           "identifikator" : "995816598",
           "type": "Organisasjon"
         },
-        "opptjeningsperiode" : {
-          "fom" : "2018-09-01",
-          "tom" : "2018-09-30",
-          "antattPeriode" : false
-        },
+        "utbetalingsperiode": "2018-09",
         "beløp" : 25000.0
       }, {
         "arbeidsgiver" : {
           "identifikator" : "995816598",
           "type": "Organisasjon"
         },
-        "opptjeningsperiode" : {
-          "fom" : "2018-10-01",
-          "tom" : "2018-10-31",
-          "antattPeriode" : false
-        },
+        "utbetalingsperiode": "2018-10",
         "beløp" : 25000.0
       }, {
         "arbeidsgiver" : {
           "identifikator" : "995816598",
           "type": "Organisasjon"
         },
-        "opptjeningsperiode" : {
-          "fom" : "2018-11-01",
-          "tom" : "2018-11-30",
-          "antattPeriode" : false
-        },
+        "utbetalingsperiode": "2018-11",
         "beløp" : 25000.0
       }, {
         "arbeidsgiver" : {
           "identifikator" : "995816598",
           "type": "Organisasjon"
         },
-        "opptjeningsperiode" : {
-          "fom" : "2018-12-01",
-          "tom" : "2018-12-31",
-          "antattPeriode" : false
-        },
+       "utbetalingsperiode": "2018-12",
         "beløp" : 25000.0
       } ],
       "sykepengeliste" : [ ],
@@ -307,33 +247,21 @@ val uavklarteJson= """{
                   "identifikator" : "995816598",
                   "type": "Organisasjon"
                 },
-                "opptjeningsperiode" : {
-                  "fom" : "2018-10-01",
-                  "tom" : "2018-10-31",
-                  "antattPeriode" : false
-                },
+                "utbetalingsperiode": "2018-10",
                 "beløp" : 25000.0
               }, {
                 "arbeidsgiver" : {
                   "identifikator" : "995816598",
                   "type": "Organisasjon"
                 },
-                "opptjeningsperiode" : {
-                  "fom" : "2018-11-01",
-                  "tom" : "2018-11-30",
-                  "antattPeriode" : false
-                },
+                "utbetalingsperiode": "2018-11",
                 "beløp" : 25000.0
               }, {
                 "arbeidsgiver" : {
                   "identifikator" : "995816598",
                   "type": "Organisasjon"
                 },
-                "opptjeningsperiode" : {
-                  "fom" : "2018-12-01",
-                  "tom" : "2018-12-31",
-                  "antattPeriode" : false
-                },
+                "utbetalingsperiode": "2018-12",
                 "beløp" : 25000.0
               } ],
               "begrunnelse" : "§ 8-28 tredje ledd bokstav a) – De tre siste kalendermånedene før arbeidstakeren ble arbeidsufør (2019-01-11) legges til grunn."
@@ -351,33 +279,21 @@ val uavklarteJson= """{
                   "identifikator" : "995816598",
                   "type": "Organisasjon"
                 },
-                "opptjeningsperiode" : {
-                  "fom" : "2018-10-01",
-                  "tom" : "2018-10-31",
-                  "antattPeriode" : false
-                },
+                "utbetalingsperiode": "2018-10",
                 "beløp" : 25000.0
               }, {
                 "arbeidsgiver" : {
                   "identifikator" : "995816598",
                   "type": "Organisasjon"
                 },
-                "opptjeningsperiode" : {
-                  "fom" : "2018-11-01",
-                  "tom" : "2018-11-30",
-                  "antattPeriode" : false
-                },
+                "utbetalingsperiode": "2018-11",
                 "beløp" : 25000.0
               }, {
                 "arbeidsgiver" : {
                   "identifikator" : "995816598",
                   "type": "Organisasjon"
                 },
-                "opptjeningsperiode" : {
-                  "fom" : "2018-12-01",
-                  "tom" : "2018-12-31",
-                  "antattPeriode" : false
-                },
+                "utbetalingsperiode": "2018-12",
                 "beløp" : 25000.0
               } ],
               "begrunnelse" : "§ 8-28 tredje ledd bokstav a) – De tre siste kalendermånedene før arbeidstakeren ble arbeidsufør (2019-01-11) legges til grunn."
@@ -393,132 +309,84 @@ val uavklarteJson= """{
               "identifikator" : "995816598",
               "type": "Organisasjon"
             },
-            "opptjeningsperiode" : {
-              "fom" : "2018-01-01",
-              "tom" : "2018-01-31",
-              "antattPeriode" : false
-            },
+            "utbetalingsperiode": "2018-01",
             "beløp" : 25000.0
           }, {
             "arbeidsgiver" : {
               "identifikator" : "995816598",
               "type": "Organisasjon"
             },
-            "opptjeningsperiode" : {
-              "fom" : "2018-02-01",
-              "tom" : "2018-02-28",
-              "antattPeriode" : false
-            },
+            "utbetalingsperiode": "2018-02",
             "beløp" : 25000.0
           }, {
             "arbeidsgiver" : {
               "identifikator" : "995816598",
               "type": "Organisasjon"
             },
-            "opptjeningsperiode" : {
-              "fom" : "2018-03-01",
-              "tom" : "2018-03-31",
-              "antattPeriode" : false
-            },
+            "utbetalingsperiode": "2018-03",
             "beløp" : 25000.0
           }, {
             "arbeidsgiver" : {
               "identifikator" : "995816598",
               "type": "Organisasjon"
             },
-            "opptjeningsperiode" : {
-              "fom" : "2018-04-01",
-              "tom" : "2018-04-30",
-              "antattPeriode" : false
-            },
+            "utbetalingsperiode": "2018-04",
             "beløp" : 25000.0
           }, {
             "arbeidsgiver" : {
               "identifikator" : "995816598",
               "type": "Organisasjon"
             },
-            "opptjeningsperiode" : {
-              "fom" : "2018-05-01",
-              "tom" : "2018-05-31",
-              "antattPeriode" : false
-            },
+            "utbetalingsperiode": "2018-05",
             "beløp" : 25000.0
           }, {
             "arbeidsgiver" : {
               "identifikator" : "995816598",
               "type": "Organisasjon"
             },
-            "opptjeningsperiode" : {
-              "fom" : "2018-06-01",
-              "tom" : "2018-06-30",
-              "antattPeriode" : false
-            },
+            "utbetalingsperiode": "2018-06",
             "beløp" : 25000.0
           }, {
             "arbeidsgiver" : {
               "identifikator" : "995816598",
               "type": "Organisasjon"
             },
-            "opptjeningsperiode" : {
-              "fom" : "2018-07-01",
-              "tom" : "2018-07-31",
-              "antattPeriode" : false
-            },
+            "utbetalingsperiode": "2018-07",
             "beløp" : 25000.0
           }, {
             "arbeidsgiver" : {
               "identifikator" : "995816598",
               "type": "Organisasjon"
             },
-            "opptjeningsperiode" : {
-              "fom" : "2018-08-01",
-              "tom" : "2018-08-31",
-              "antattPeriode" : false
-            },
+            "utbetalingsperiode": "2018-08",
             "beløp" : 25000.0
           }, {
             "arbeidsgiver" : {
               "identifikator" : "995816598",
               "type": "Organisasjon"
             },
-            "opptjeningsperiode" : {
-              "fom" : "2018-09-01",
-              "tom" : "2018-09-30",
-              "antattPeriode" : false
-            },
+            "utbetalingsperiode": "2018-09",
             "beløp" : 25000.0
           }, {
             "arbeidsgiver" : {
               "identifikator" : "995816598",
               "type": "Organisasjon"
             },
-            "opptjeningsperiode" : {
-              "fom" : "2018-10-01",
-              "tom" : "2018-10-31",
-              "antattPeriode" : false
-            },
+            "utbetalingsperiode": "2018-10",
             "beløp" : 25000.0
           }, {
             "arbeidsgiver" : {
               "identifikator" : "995816598",
               "type": "Organisasjon"
             },
-            "opptjeningsperiode" : {
-              "fom" : "2018-11-01",
-              "tom" : "2018-11-30",
-              "antattPeriode" : false
-            },
+            "utbetalingsperiode": "2018-11",
             "beløp" : 25000.0
           }, {
             "arbeidsgiver" : {
               "identifikator" : "995816598",
               "type": "Organisasjon"
             },
-            "opptjeningsperiode" : {
-              "fom" : "2018-12-01",
-              "tom" : "2018-12-31",
-              "antattPeriode" : false
-            },
+            "utbetalingsperiode": "2018-12",
             "beløp" : 25000.0
           } ],
           "begrunnelse" : "§ 8-30 andre ledd – rapportert inntekt (se § 8-29) til a-ordningen etter reglene i a-opplysningsloven de siste tolv kalendermånedene før arbeidsuførheten inntraff (2019-01-11) legges til grunn."
@@ -539,10 +407,7 @@ val failJson = """{
                 "type": "Organisasjon"
             },
             "beløp": 25000,
-            "opptjeningsperiode": {
-                "tom": "2019-01-31",
-                "fom": "2019-01-01"
-            }
+            "utbetalingsperiode": "2019-01"
         },
         {
             "arbeidsgiver": {
@@ -550,10 +415,7 @@ val failJson = """{
                 "type": "Organisasjon"
             },
             "beløp": 25000,
-            "opptjeningsperiode": {
-
-                "fom": "2018-12-01"
-            }
+            "utbetalingsperiode": "2018-12"
         },
         {
             "arbeidsgiver": {
@@ -561,10 +423,7 @@ val failJson = """{
                 "type": "Organisasjon"
             },
             "beløp": 25000,
-            "opptjeningsperiode": {
-                "tom": "2018-11-30",
-                "fom": "2018-11-01"
-            }
+            "utbetalingsperiode": "2018-11"
         },
         {
             "arbeidsgiver": {
@@ -572,10 +431,7 @@ val failJson = """{
                 "type": "Organisasjon"
             },
             "beløp": 25000,
-            "opptjeningsperiode": {
-                "tom": "2018-10-31",
-                "fom": "2018-10-01"
-            }
+            "utbetalingsperiode": "2018-10"
         },
         {
             "arbeidsgiver": {
@@ -583,10 +439,7 @@ val failJson = """{
                 "type": "Organisasjon"
             },
             "beløp": 25000,
-            "opptjeningsperiode": {
-                "tom": "2018-09-30",
-                "fom": "2018-09-01"
-            }
+            "utbetalingsperiode": "2018-09"
         },
         {
             "arbeidsgiver": {
@@ -594,10 +447,7 @@ val failJson = """{
                 "type": "Organisasjon"
             },
             "beløp": 25000,
-            "opptjeningsperiode": {
-                "tom": "2018-08-31",
-                "fom": "2018-08-01"
-            }
+            "utbetalingsperiode": "2018-08"
         },
         {
             "arbeidsgiver": {
@@ -605,10 +455,7 @@ val failJson = """{
                 "type": "Organisasjon"
             },
             "beløp": 25000,
-            "opptjeningsperiode": {
-                "tom": "2018-07-31",
-                "fom": "2018-07-01"
-            }
+            "utbetalingsperiode": "2018-07"
         },
         {
             "arbeidsgiver": {
@@ -616,10 +463,7 @@ val failJson = """{
                 "type": "Organisasjon"
             },
             "beløp": 25000,
-            "opptjeningsperiode": {
-                "tom": "2018-06-30",
-                "fom": "2018-06-01"
-            }
+            "utbetalingsperiode": "2018-06"
         },
         {
             "arbeidsgiver": {
@@ -627,10 +471,7 @@ val failJson = """{
                 "type": "Organisasjon"
             },
             "beløp": 25000,
-            "opptjeningsperiode": {
-                "tom": "2018-05-31",
-                "fom": "2018-05-01"
-            }
+            "utbetalingsperiode": "2018-05"
         },
         {
             "arbeidsgiver": {
@@ -638,10 +479,7 @@ val failJson = """{
                 "type": "Organisasjon"
             },
             "beløp": 25000,
-            "opptjeningsperiode": {
-                "tom": "2018-04-30",
-                "fom": "2018-04-01"
-            }
+            "utbetalingsperiode": "2018-04"
         },
         {
             "arbeidsgiver": {
@@ -649,10 +487,7 @@ val failJson = """{
                 "type": "Organisasjon"
             },
             "beløp": 25000,
-            "opptjeningsperiode": {
-                "tom": "2018-03-31",
-                "fom": "2018-03-01"
-            }
+            "utbetalingsperiode": "2018-03"
         },
         {
             "arbeidsgiver": {
@@ -660,10 +495,7 @@ val failJson = """{
                 "type": "Organisasjon"
             },
             "beløp": 25000,
-            "opptjeningsperiode": {
-                "tom": "2018-02-28",
-                "fom": "2018-02-01"
-            }
+            "utbetalingsperiode": "2018-02"
         },
         {
             "arbeidsgiver": {
@@ -671,10 +503,7 @@ val failJson = """{
                 "type": "Organisasjon"
             },
             "beløp": 25000,
-            "opptjeningsperiode": {
-                "tom": "2018-01-31",
-                "fom": "2018-01-01"
-            }
+            "utbetalingsperiode": "2018-01"
         },
         {
             "arbeidsgiver": {
@@ -682,10 +511,7 @@ val failJson = """{
                 "type": "Organisasjon"
             },
             "beløp": 25000,
-            "opptjeningsperiode": {
-                "tom": "2017-12-31",
-                "fom": "2017-12-01"
-            }
+            "utbetalingsperiode": "2017-12"
         }
     ]
 }"""

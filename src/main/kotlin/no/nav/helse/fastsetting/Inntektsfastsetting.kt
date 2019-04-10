@@ -45,8 +45,7 @@ fun fastsettingAvSykepengegrunnlagetIArbeidsgiverperioden(førsteSykdomsdag: Loc
             .yearMonth()
 
     val beregningsperiode = inntekter.filter { inntekt ->
-        inntekt.opptjeningsperiode.fom in treMånederFør.atDay(1)..enMånedFør.atEndOfMonth()
-                && inntekt.opptjeningsperiode.tom in treMånederFør.atDay(1)..enMånedFør.atEndOfMonth()
+        inntekt.utbetalingsperiode in treMånederFør..enMånedFør
     }.let {
         Beregningsperiode(it, paragraf_8_28_tredje_ledd_bokstav_a + "(${førsteSykdomsdag}) legges til grunn.")
     }
@@ -76,8 +75,7 @@ fun fastsettSammenligningsgrunnlag(førsteSykdomsdag: LocalDate, sammenligningsg
             .yearMonth()
 
     val beregningsperiode = sammenligningsgrunnlag.filter { inntekt ->
-        inntekt.opptjeningsperiode.fom in tolvMånederFør.atDay(1)..enMånedFør.atEndOfMonth()
-                && inntekt.opptjeningsperiode.tom in tolvMånederFør.atDay(1)..enMånedFør.atEndOfMonth()
+        inntekt.utbetalingsperiode in tolvMånederFør..enMånedFør
     }.let {
         Beregningsperiode(it, "§ 8-30 andre ledd – rapportert inntekt (se § 8-29) til a-ordningen etter reglene i a-opplysningsloven de siste tolv kalendermånedene før arbeidsuførheten inntraff (${førsteSykdomsdag}) legges til grunn.")
     }
