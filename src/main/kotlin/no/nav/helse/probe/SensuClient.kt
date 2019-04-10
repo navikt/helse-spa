@@ -1,4 +1,4 @@
-package no.nav.helse.sensu
+package no.nav.helse.probe
 
 import org.json.JSONArray
 import org.json.JSONObject
@@ -24,7 +24,7 @@ class SensuClient(private val hostname: String, private val port: Int) {
 
     fun sendEvent(event: SensuEvent) {
         writeToSocket(hostname, port, event.asJson())
-        log.debug("Sent event({}) via sensu-client", event.asJson())
+        log.debug("Sent event({}) via probe-client", event.asJson())
     }
 
     companion object {
@@ -49,7 +49,7 @@ class SensuClient(private val hostname: String, private val port: Int) {
                 } catch (err: IOException) {
                     log.error("Unable to connect to {}:{} because of IO problems", hostname, port, err)
                 } catch (err: Exception) {
-                    log.error("Unable to send event via sensu-client", err)
+                    log.error("Unable to send event via probe-client", err)
                 }
             }
         }

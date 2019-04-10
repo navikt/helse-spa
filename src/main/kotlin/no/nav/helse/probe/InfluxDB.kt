@@ -1,4 +1,4 @@
-package no.nav.helse.sensu
+package no.nav.helse.probe
 
 import java.util.concurrent.TimeUnit
 
@@ -54,6 +54,8 @@ class InfluxMetricReporter(private val sensuClient: SensuClient, private val sen
                     sensuClient.sendEvent(event)
                 }
             }
+
+    fun sendDataPoints(dataPoints: List<DataPoint>) = dataPoints.forEach { sendDataPoint(it)}
 
     private fun addDefaultTags(tags: Map<String, String>) = tags + defaultTags
 

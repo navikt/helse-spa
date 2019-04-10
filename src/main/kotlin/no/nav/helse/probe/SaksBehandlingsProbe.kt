@@ -1,17 +1,18 @@
-package no.nav.helse
+package no.nav.helse.probe
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException
 import io.prometheus.client.Counter
+import no.nav.helse.Behandlingsfeil
+import no.nav.helse.Environment
+import no.nav.helse.SaksbehandlingStream
 import no.nav.helse.behandling.SykepengeVedtak
 import no.nav.helse.fastsetting.Vurdering
-import no.nav.helse.sensu.DataPoint
-import no.nav.helse.sensu.InfluxMetricReporter
-import no.nav.helse.sensu.SensuClient
+import no.nav.nare.core.evaluations.Evaluering
 import org.slf4j.LoggerFactory
 
-class SaksbehandlingProbe(val sensuClient: SensuClient) {
-
+class SaksbehandlingProbe(val env: Environment) {
+    private val sensuClient = SensuClient(env.sensuHostname, env.sensuPort)
 
     private val influxMetricReporter = InfluxMetricReporter(sensuClient, "spa-events", mapOf(
             "application" to (System.getenv("NAIS_APP_NAME") ?: "spa"),
@@ -54,6 +55,11 @@ class SaksbehandlingProbe(val sensuClient: SensuClient) {
     fun mottattAnnenSøknad(value: JsonNode) = mottattCounter.labels(value.get("status").asText(), value.get("UKJENT").asText(), "v2").inc()
     fun mottattArbeidstakerSøknad(value: JsonNode) = mottattCounter.labels(value.get("status").asText(), value.get("type").asText(), "v2").inc()
     fun mottattSøknadSendtNAV(value: JsonNode) = mottattCounter.labels("SENDT_NAV", value.get("type").asText(), "v2").inc()
+
+    fun gjennomførtVilkårsprøving(value: Evaluering) {
+            influxMetricReporter.sendDataPoints(toDatapoints(value))
+    }
+
 
     fun behandlingsFeilMedType(behandlingsfeil: Behandlingsfeil) {
         log.warn(behandlingsfeil.feilmelding)
@@ -147,6 +153,7 @@ class SaksbehandlingProbe(val sensuClient: SensuClient) {
 
     fun behandlingOk() = behandlingsCounter.labels("ok").inc()
     fun behandlingFeil() = behandlingsCounter.labels("feil").inc()
+
 }
 
 

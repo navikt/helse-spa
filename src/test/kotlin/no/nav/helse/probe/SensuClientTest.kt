@@ -1,4 +1,4 @@
-package no.nav.helse.sensu
+package no.nav.helse.probe
 
 import no.nav.helse.assertJsonEquals
 import org.json.JSONObject

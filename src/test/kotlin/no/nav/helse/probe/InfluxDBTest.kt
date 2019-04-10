@@ -1,4 +1,4 @@
-package no.nav.helse.sensu
+package no.nav.helse.probe
 
 import io.mockk.ConstantAnswer
 import io.mockk.every

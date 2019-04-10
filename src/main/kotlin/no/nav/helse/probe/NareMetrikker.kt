@@ -1,16 +1,8 @@
-package no.nav.helse.sensu
+package no.nav.helse.probe
 
 import no.nav.nare.core.evaluations.Evaluering
 import java.util.*
 import java.util.Arrays.asList
-
-class NareReporter(sensuClient: SensuClient) {
-
-    private val reporter = InfluxMetricReporter(sensuClient, "spa-events", mapOf(
-            "application" to (System.getenv("NAIS_APP_NAME") ?: "spa"),
-            "cluster" to (System.getenv("NAIS_CLUSTER_NAME") ?: "dev-fss"),
-            "namespace" to (System.getenv("NAIS_NAMESPACE") ?: "default")
-    ))
 
 
     fun toDatapoints(eval: Evaluering): List<DataPoint> {
@@ -30,10 +22,3 @@ class NareReporter(sensuClient: SensuClient) {
         return asList(eval) + eval.children.flatMap { flatten(it) }
     }
 
-    fun gjennomførtVilkårsprøving(vilkårsprøving: Evaluering) {
-        toDatapoints(vilkårsprøving).forEach {
-            reporter.sendDataPoint(it)
-        }
-
-    }
-}

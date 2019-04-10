@@ -2,8 +2,8 @@ package no.nav.helse.behandling
 
 import no.nav.helse.Behandlingsfeil
 import no.nav.helse.Either
-import no.nav.helse.narePrometheus
 import no.nav.helse.oppslag.getGrunnbeløpForDato
+import no.nav.helse.probe
 import no.nav.helse.sykepenger.vilkar.Vilkårsgrunnlag
 import no.nav.helse.sykepenger.vilkar.sykepengevilkår
 import no.nav.nare.core.evaluations.Evaluering
@@ -16,7 +16,7 @@ fun vilkårsprøving(avklarteFakta: AvklarteFakta): Either<Behandlingsfeil, Vilk
             avklarteVerdier = avklarteFakta.avklarteVerdier,
             vilkårsprøving = gjennomførVilkårsvurdering(avklarteFakta))
 
-    return when(vilkår.vilkårsprøving.resultat) {
+    return when (vilkår.vilkårsprøving.resultat) {
         Resultat.JA -> Either.Right(vilkår)
         else -> Either.Left(Behandlingsfeil.vilkårErIkkeOppfylt(vilkår))
     }
@@ -33,6 +33,8 @@ private fun gjennomførVilkårsvurdering(avklarteFakta: AvklarteFakta): Evalueri
             fastsattÅrsinntekt = avklarteFakta.avklarteVerdier.sykepengegrunnlag.fastsattVerdi.sykepengegrunnlagNårTrygdenYter.fastsattVerdi,
             grunnbeløp = getGrunnbeløpForDato(avklarteFakta.originalSøknad.fom)
     )
+    val evaluering = sykepengevilkår.evaluer(grunnlag)
+    probe.gjennomførtVilkårsprøving(evaluering)
+    return evaluering;
 
-    return narePrometheus.tellEvaluering { sykepengevilkår.evaluer(grunnlag) }
 }
