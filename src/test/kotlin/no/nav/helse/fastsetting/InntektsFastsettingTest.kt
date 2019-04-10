@@ -20,14 +20,14 @@ class InntektsFastsettingTest {
     fun `gjennomsnittet av de tre siste kalendermånedene før arbeidsuførhet skal legges til grunn`() {
         val førsteSykdomsdag = LocalDate.parse("2019-01-01")
         val inntekter = listOf(
-                Inntekt(Inntektsarbeidsgiver(orgnummer), Opptjeningsperiode(LocalDate.parse("2018-12-01"), LocalDate.parse("2018-12-31")), BigDecimal.valueOf(1)),
-                Inntekt(Inntektsarbeidsgiver(orgnummer), Opptjeningsperiode(LocalDate.parse("2018-11-01"), LocalDate.parse("2018-11-30")), BigDecimal.valueOf(21)),
-                Inntekt(Inntektsarbeidsgiver(orgnummer), Opptjeningsperiode(LocalDate.parse("2018-10-01"), LocalDate.parse("2018-10-31")), BigDecimal.valueOf(29)),
-                Inntekt(Inntektsarbeidsgiver(orgnummer), Opptjeningsperiode(LocalDate.parse("2018-09-01"), LocalDate.parse("2018-09-30")), BigDecimal.valueOf(30)),
-                Inntekt(Inntektsarbeidsgiver(orgnummer), Opptjeningsperiode(LocalDate.parse("2018-08-01"), LocalDate.parse("2018-08-31")), BigDecimal.valueOf(30)),
-                Inntekt(Inntektsarbeidsgiver(orgnummer), Opptjeningsperiode(LocalDate.parse("2018-07-01"), LocalDate.parse("2018-07-31")), BigDecimal.valueOf(30)),
-                Inntekt(Inntektsarbeidsgiver(orgnummer), Opptjeningsperiode(LocalDate.parse("2018-06-01"), LocalDate.parse("2018-06-30")), BigDecimal.valueOf(30)),
-                Inntekt(Inntektsarbeidsgiver(orgnummer), Opptjeningsperiode(LocalDate.parse("2018-05-01"), LocalDate.parse("2018-05-31")), BigDecimal.valueOf(30))
+                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), Opptjeningsperiode(LocalDate.parse("2018-12-01"), LocalDate.parse("2018-12-31")), BigDecimal.valueOf(1)),
+                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), Opptjeningsperiode(LocalDate.parse("2018-11-01"), LocalDate.parse("2018-11-30")), BigDecimal.valueOf(21)),
+                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), Opptjeningsperiode(LocalDate.parse("2018-10-01"), LocalDate.parse("2018-10-31")), BigDecimal.valueOf(29)),
+                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), Opptjeningsperiode(LocalDate.parse("2018-09-01"), LocalDate.parse("2018-09-30")), BigDecimal.valueOf(30)),
+                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), Opptjeningsperiode(LocalDate.parse("2018-08-01"), LocalDate.parse("2018-08-31")), BigDecimal.valueOf(30)),
+                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), Opptjeningsperiode(LocalDate.parse("2018-07-01"), LocalDate.parse("2018-07-31")), BigDecimal.valueOf(30)),
+                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), Opptjeningsperiode(LocalDate.parse("2018-06-01"), LocalDate.parse("2018-06-30")), BigDecimal.valueOf(30)),
+                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), Opptjeningsperiode(LocalDate.parse("2018-05-01"), LocalDate.parse("2018-05-31")), BigDecimal.valueOf(30))
         )
         val fastsattSykepengegrunnlag = fastsettingAvSykepengegrunnlagetIArbeidsgiverperioden(førsteSykdomsdag, Arbeidsgiver("NAV OSLO", orgnummer), inntekter)
 
@@ -42,8 +42,8 @@ class InntektsFastsettingTest {
     fun `uavklart ved inntekt fra andre arbeidsgivere i arbeidsgiverperioden`() {
         val førsteSykdomsdag = LocalDate.parse("2019-03-01")
         val inntekter = listOf(
-                Inntekt(Inntektsarbeidsgiver(orgnummer), Opptjeningsperiode(LocalDate.parse("2019-02-01"), LocalDate.parse("2019-02-28")), BigDecimal.valueOf(30)),
-                Inntekt(Inntektsarbeidsgiver(annetOrgnummer), Opptjeningsperiode(LocalDate.parse("2019-01-01"), LocalDate.parse("2019-01-31")), BigDecimal.valueOf(12))
+                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), Opptjeningsperiode(LocalDate.parse("2019-02-01"), LocalDate.parse("2019-02-28")), BigDecimal.valueOf(30)),
+                Inntekt(Inntektsarbeidsgiver(annetOrgnummer, "Organisasjon"), Opptjeningsperiode(LocalDate.parse("2019-01-01"), LocalDate.parse("2019-01-31")), BigDecimal.valueOf(12))
         )
         val fastsattSykepengegrunnlag = fastsettingAvSykepengegrunnlagetIArbeidsgiverperioden(førsteSykdomsdag, Arbeidsgiver("NAV OSLO", orgnummer), inntekter)
 
@@ -58,19 +58,19 @@ class InntektsFastsettingTest {
     fun `sammenligningsgrunnlaget er summen av inntekter de siste 12 måneder`() {
         val førsteSykdomsdag = LocalDate.parse("2019-03-01")
         val inntekter = listOf(
-                Inntekt(Inntektsarbeidsgiver(orgnummer), Opptjeningsperiode(LocalDate.parse("2019-02-01"), LocalDate.parse("2019-02-28")), BigDecimal.valueOf(30)),
-                Inntekt(Inntektsarbeidsgiver(annetOrgnummer), Opptjeningsperiode(LocalDate.parse("2019-01-01"), LocalDate.parse("2019-01-31")), BigDecimal.valueOf(12)),
-                Inntekt(Inntektsarbeidsgiver(orgnummer), Opptjeningsperiode(LocalDate.parse("2019-01-01"), LocalDate.parse("2019-01-31")), BigDecimal.valueOf(30)),
-                Inntekt(Inntektsarbeidsgiver(annetOrgnummer), Opptjeningsperiode(LocalDate.parse("2018-12-01"), LocalDate.parse("2018-12-31")), BigDecimal.valueOf(12)),
-                Inntekt(Inntektsarbeidsgiver(orgnummer), Opptjeningsperiode(LocalDate.parse("2018-12-01"), LocalDate.parse("2018-12-31")), BigDecimal.valueOf(30)),
-                Inntekt(Inntektsarbeidsgiver(orgnummer), Opptjeningsperiode(LocalDate.parse("2018-11-01"), LocalDate.parse("2018-11-30")), BigDecimal.valueOf(25)),
-                Inntekt(Inntektsarbeidsgiver(orgnummer), Opptjeningsperiode(LocalDate.parse("2018-10-01"), LocalDate.parse("2018-10-31")), BigDecimal.valueOf(25)),
-                Inntekt(Inntektsarbeidsgiver(orgnummer), Opptjeningsperiode(LocalDate.parse("2018-09-01"), LocalDate.parse("2018-09-30")), BigDecimal.valueOf(17)),
-                Inntekt(Inntektsarbeidsgiver(annetOrgnummer), Opptjeningsperiode(LocalDate.parse("2018-05-01"), LocalDate.parse("2018-05-31")), BigDecimal.valueOf(16)),
-                Inntekt(Inntektsarbeidsgiver(annetOrgnummer), Opptjeningsperiode(LocalDate.parse("2018-03-01"), LocalDate.parse("2018-03-31")), BigDecimal.valueOf(15)),
-                Inntekt(Inntektsarbeidsgiver(annetOrgnummer), Opptjeningsperiode(LocalDate.parse("2018-02-01"), LocalDate.parse("2018-02-28")), BigDecimal.valueOf(14)),
-                Inntekt(Inntektsarbeidsgiver(annetOrgnummer), Opptjeningsperiode(LocalDate.parse("2018-01-01"), LocalDate.parse("2018-01-31")), BigDecimal.valueOf(13)),
-                Inntekt(Inntektsarbeidsgiver(annetOrgnummer), Opptjeningsperiode(LocalDate.parse("2017-12-01"), LocalDate.parse("2017-12-31")), BigDecimal.valueOf(12))
+                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), Opptjeningsperiode(LocalDate.parse("2019-02-01"), LocalDate.parse("2019-02-28")), BigDecimal.valueOf(30)),
+                Inntekt(Inntektsarbeidsgiver(annetOrgnummer, "Organisasjon"), Opptjeningsperiode(LocalDate.parse("2019-01-01"), LocalDate.parse("2019-01-31")), BigDecimal.valueOf(12)),
+                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), Opptjeningsperiode(LocalDate.parse("2019-01-01"), LocalDate.parse("2019-01-31")), BigDecimal.valueOf(30)),
+                Inntekt(Inntektsarbeidsgiver(annetOrgnummer, "Organisasjon"), Opptjeningsperiode(LocalDate.parse("2018-12-01"), LocalDate.parse("2018-12-31")), BigDecimal.valueOf(12)),
+                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), Opptjeningsperiode(LocalDate.parse("2018-12-01"), LocalDate.parse("2018-12-31")), BigDecimal.valueOf(30)),
+                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), Opptjeningsperiode(LocalDate.parse("2018-11-01"), LocalDate.parse("2018-11-30")), BigDecimal.valueOf(25)),
+                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), Opptjeningsperiode(LocalDate.parse("2018-10-01"), LocalDate.parse("2018-10-31")), BigDecimal.valueOf(25)),
+                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), Opptjeningsperiode(LocalDate.parse("2018-09-01"), LocalDate.parse("2018-09-30")), BigDecimal.valueOf(17)),
+                Inntekt(Inntektsarbeidsgiver(annetOrgnummer, "Organisasjon"), Opptjeningsperiode(LocalDate.parse("2018-05-01"), LocalDate.parse("2018-05-31")), BigDecimal.valueOf(16)),
+                Inntekt(Inntektsarbeidsgiver(annetOrgnummer, "Organisasjon"), Opptjeningsperiode(LocalDate.parse("2018-03-01"), LocalDate.parse("2018-03-31")), BigDecimal.valueOf(15)),
+                Inntekt(Inntektsarbeidsgiver(annetOrgnummer, "Organisasjon"), Opptjeningsperiode(LocalDate.parse("2018-02-01"), LocalDate.parse("2018-02-28")), BigDecimal.valueOf(14)),
+                Inntekt(Inntektsarbeidsgiver(annetOrgnummer, "Organisasjon"), Opptjeningsperiode(LocalDate.parse("2018-01-01"), LocalDate.parse("2018-01-31")), BigDecimal.valueOf(13)),
+                Inntekt(Inntektsarbeidsgiver(annetOrgnummer, "Organisasjon"), Opptjeningsperiode(LocalDate.parse("2017-12-01"), LocalDate.parse("2017-12-31")), BigDecimal.valueOf(12))
         )
         val fastsattSammenligningsgrunnlag = fastsettSammenligningsgrunnlag(førsteSykdomsdag, inntekter)
 
@@ -85,18 +85,18 @@ class InntektsFastsettingTest {
     fun `sykepengegrunnlag baseres på arbeidsgiverperioden dersom mindre enn 25% avvik fra sammenlikningsgrunnlaget`() {
         val førsteSykdomsdag = LocalDate.parse("2019-03-01")
         val inntekter = listOf(
-                Inntekt(Inntektsarbeidsgiver(orgnummer), Opptjeningsperiode(LocalDate.parse("2019-02-01"), LocalDate.parse("2019-02-28")), BigDecimal.valueOf(30)),
-                Inntekt(Inntektsarbeidsgiver(orgnummer), Opptjeningsperiode(LocalDate.parse("2019-01-01"), LocalDate.parse("2019-01-31")), BigDecimal.valueOf(30)),
-                Inntekt(Inntektsarbeidsgiver(orgnummer), Opptjeningsperiode(LocalDate.parse("2018-12-01"), LocalDate.parse("2018-12-31")), BigDecimal.valueOf(30)),
-                Inntekt(Inntektsarbeidsgiver(orgnummer), Opptjeningsperiode(LocalDate.parse("2018-11-01"), LocalDate.parse("2018-11-30")), BigDecimal.valueOf(29)),
-                Inntekt(Inntektsarbeidsgiver(orgnummer), Opptjeningsperiode(LocalDate.parse("2018-10-01"), LocalDate.parse("2018-10-31")), BigDecimal.valueOf(29)),
-                Inntekt(Inntektsarbeidsgiver(orgnummer), Opptjeningsperiode(LocalDate.parse("2018-09-01"), LocalDate.parse("2018-09-30")), BigDecimal.valueOf(29)),
-                Inntekt(Inntektsarbeidsgiver(annetOrgnummer), Opptjeningsperiode(LocalDate.parse("2018-08-01"), LocalDate.parse("2018-08-31")), BigDecimal.valueOf(29)),
-                Inntekt(Inntektsarbeidsgiver(annetOrgnummer), Opptjeningsperiode(LocalDate.parse("2018-07-01"), LocalDate.parse("2018-07-31")), BigDecimal.valueOf(29)),
-                Inntekt(Inntektsarbeidsgiver(annetOrgnummer), Opptjeningsperiode(LocalDate.parse("2018-06-01"), LocalDate.parse("2018-06-30")), BigDecimal.valueOf(29)),
-                Inntekt(Inntektsarbeidsgiver(annetOrgnummer), Opptjeningsperiode(LocalDate.parse("2018-05-01"), LocalDate.parse("2018-05-31")), BigDecimal.valueOf(29)),
-                Inntekt(Inntektsarbeidsgiver(annetOrgnummer), Opptjeningsperiode(LocalDate.parse("2017-04-01"), LocalDate.parse("2017-04-30")), BigDecimal.valueOf(29)),
-                Inntekt(Inntektsarbeidsgiver(annetOrgnummer), Opptjeningsperiode(LocalDate.parse("2017-03-01"), LocalDate.parse("2017-03-31")), BigDecimal.valueOf(29))
+                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), Opptjeningsperiode(LocalDate.parse("2019-02-01"), LocalDate.parse("2019-02-28")), BigDecimal.valueOf(30)),
+                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), Opptjeningsperiode(LocalDate.parse("2019-01-01"), LocalDate.parse("2019-01-31")), BigDecimal.valueOf(30)),
+                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), Opptjeningsperiode(LocalDate.parse("2018-12-01"), LocalDate.parse("2018-12-31")), BigDecimal.valueOf(30)),
+                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), Opptjeningsperiode(LocalDate.parse("2018-11-01"), LocalDate.parse("2018-11-30")), BigDecimal.valueOf(29)),
+                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), Opptjeningsperiode(LocalDate.parse("2018-10-01"), LocalDate.parse("2018-10-31")), BigDecimal.valueOf(29)),
+                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), Opptjeningsperiode(LocalDate.parse("2018-09-01"), LocalDate.parse("2018-09-30")), BigDecimal.valueOf(29)),
+                Inntekt(Inntektsarbeidsgiver(annetOrgnummer, "Organisasjon"), Opptjeningsperiode(LocalDate.parse("2018-08-01"), LocalDate.parse("2018-08-31")), BigDecimal.valueOf(29)),
+                Inntekt(Inntektsarbeidsgiver(annetOrgnummer, "Organisasjon"), Opptjeningsperiode(LocalDate.parse("2018-07-01"), LocalDate.parse("2018-07-31")), BigDecimal.valueOf(29)),
+                Inntekt(Inntektsarbeidsgiver(annetOrgnummer, "Organisasjon"), Opptjeningsperiode(LocalDate.parse("2018-06-01"), LocalDate.parse("2018-06-30")), BigDecimal.valueOf(29)),
+                Inntekt(Inntektsarbeidsgiver(annetOrgnummer, "Organisasjon"), Opptjeningsperiode(LocalDate.parse("2018-05-01"), LocalDate.parse("2018-05-31")), BigDecimal.valueOf(29)),
+                Inntekt(Inntektsarbeidsgiver(annetOrgnummer, "Organisasjon"), Opptjeningsperiode(LocalDate.parse("2017-04-01"), LocalDate.parse("2017-04-30")), BigDecimal.valueOf(29)),
+                Inntekt(Inntektsarbeidsgiver(annetOrgnummer, "Organisasjon"), Opptjeningsperiode(LocalDate.parse("2017-03-01"), LocalDate.parse("2017-03-31")), BigDecimal.valueOf(29))
         )
 
         val beregningsgrunnlag = fastsettingAvSykepengegrunnlagetIArbeidsgiverperioden(førsteSykdomsdag, Arbeidsgiver("NAV OSLO", orgnummer), inntekter)
@@ -119,18 +119,18 @@ class InntektsFastsettingTest {
     fun `sykepengegrunnlag er uavklart dersom mer enn 25% avvik fra sammenlikningsgrunnlaget`() {
         val førsteSykdomsdag = LocalDate.parse("2019-03-01")
         val inntekter = listOf(
-                Inntekt(Inntektsarbeidsgiver(orgnummer), Opptjeningsperiode(LocalDate.parse("2019-02-01"), LocalDate.parse("2019-02-28")), BigDecimal.valueOf(30)),
-                Inntekt(Inntektsarbeidsgiver(orgnummer), Opptjeningsperiode(LocalDate.parse("2019-01-01"), LocalDate.parse("2019-01-31")), BigDecimal.valueOf(30)),
-                Inntekt(Inntektsarbeidsgiver(orgnummer), Opptjeningsperiode(LocalDate.parse("2018-12-01"), LocalDate.parse("2018-12-31")), BigDecimal.valueOf(30)),
-                Inntekt(Inntektsarbeidsgiver(orgnummer), Opptjeningsperiode(LocalDate.parse("2018-11-01"), LocalDate.parse("2018-11-30")), BigDecimal.valueOf(20)),
-                Inntekt(Inntektsarbeidsgiver(orgnummer), Opptjeningsperiode(LocalDate.parse("2018-10-01"), LocalDate.parse("2018-10-31")), BigDecimal.valueOf(20)),
-                Inntekt(Inntektsarbeidsgiver(orgnummer), Opptjeningsperiode(LocalDate.parse("2018-09-01"), LocalDate.parse("2018-09-30")), BigDecimal.valueOf(20)),
-                Inntekt(Inntektsarbeidsgiver(annetOrgnummer), Opptjeningsperiode(LocalDate.parse("2018-08-01"), LocalDate.parse("2018-08-31")), BigDecimal.valueOf(20)),
-                Inntekt(Inntektsarbeidsgiver(annetOrgnummer), Opptjeningsperiode(LocalDate.parse("2018-07-01"), LocalDate.parse("2018-07-31")), BigDecimal.valueOf(20)),
-                Inntekt(Inntektsarbeidsgiver(annetOrgnummer), Opptjeningsperiode(LocalDate.parse("2018-06-01"), LocalDate.parse("2018-06-30")), BigDecimal.valueOf(20)),
-                Inntekt(Inntektsarbeidsgiver(annetOrgnummer), Opptjeningsperiode(LocalDate.parse("2018-05-01"), LocalDate.parse("2018-05-31")), BigDecimal.valueOf(20)),
-                Inntekt(Inntektsarbeidsgiver(annetOrgnummer), Opptjeningsperiode(LocalDate.parse("2017-04-01"), LocalDate.parse("2017-04-30")), BigDecimal.valueOf(20)),
-                Inntekt(Inntektsarbeidsgiver(annetOrgnummer), Opptjeningsperiode(LocalDate.parse("2017-03-01"), LocalDate.parse("2017-03-31")), BigDecimal.valueOf(20))
+                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), Opptjeningsperiode(LocalDate.parse("2019-02-01"), LocalDate.parse("2019-02-28")), BigDecimal.valueOf(30)),
+                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), Opptjeningsperiode(LocalDate.parse("2019-01-01"), LocalDate.parse("2019-01-31")), BigDecimal.valueOf(30)),
+                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), Opptjeningsperiode(LocalDate.parse("2018-12-01"), LocalDate.parse("2018-12-31")), BigDecimal.valueOf(30)),
+                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), Opptjeningsperiode(LocalDate.parse("2018-11-01"), LocalDate.parse("2018-11-30")), BigDecimal.valueOf(20)),
+                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), Opptjeningsperiode(LocalDate.parse("2018-10-01"), LocalDate.parse("2018-10-31")), BigDecimal.valueOf(20)),
+                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), Opptjeningsperiode(LocalDate.parse("2018-09-01"), LocalDate.parse("2018-09-30")), BigDecimal.valueOf(20)),
+                Inntekt(Inntektsarbeidsgiver(annetOrgnummer, "Organisasjon"), Opptjeningsperiode(LocalDate.parse("2018-08-01"), LocalDate.parse("2018-08-31")), BigDecimal.valueOf(20)),
+                Inntekt(Inntektsarbeidsgiver(annetOrgnummer, "Organisasjon"), Opptjeningsperiode(LocalDate.parse("2018-07-01"), LocalDate.parse("2018-07-31")), BigDecimal.valueOf(20)),
+                Inntekt(Inntektsarbeidsgiver(annetOrgnummer, "Organisasjon"), Opptjeningsperiode(LocalDate.parse("2018-06-01"), LocalDate.parse("2018-06-30")), BigDecimal.valueOf(20)),
+                Inntekt(Inntektsarbeidsgiver(annetOrgnummer, "Organisasjon"), Opptjeningsperiode(LocalDate.parse("2018-05-01"), LocalDate.parse("2018-05-31")), BigDecimal.valueOf(20)),
+                Inntekt(Inntektsarbeidsgiver(annetOrgnummer, "Organisasjon"), Opptjeningsperiode(LocalDate.parse("2017-04-01"), LocalDate.parse("2017-04-30")), BigDecimal.valueOf(20)),
+                Inntekt(Inntektsarbeidsgiver(annetOrgnummer, "Organisasjon"), Opptjeningsperiode(LocalDate.parse("2017-03-01"), LocalDate.parse("2017-03-31")), BigDecimal.valueOf(20))
         )
 
         val beregningsgrunnlag = fastsettingAvSykepengegrunnlagetIArbeidsgiverperioden(førsteSykdomsdag, Arbeidsgiver("NAV OSLO", orgnummer), inntekter)
@@ -154,8 +154,8 @@ class InntektsFastsettingTest {
     fun `gjennomsnittet av kortere periode skal legges til grunn`() {
         val førsteSykdomsdag = LocalDate.parse("2019-01-01")
         val inntekter = listOf(
-                Inntekt(Inntektsarbeidsgiver(orgnummer), Opptjeningsperiode(LocalDate.parse("2018-12-01"), LocalDate.parse("2018-12-31")), BigDecimal.valueOf(1)),
-                Inntekt(Inntektsarbeidsgiver(orgnummer), Opptjeningsperiode(LocalDate.parse("2018-11-01"), LocalDate.parse("2018-11-30")), BigDecimal.valueOf(21))
+                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), Opptjeningsperiode(LocalDate.parse("2018-12-01"), LocalDate.parse("2018-12-31")), BigDecimal.valueOf(1)),
+                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), Opptjeningsperiode(LocalDate.parse("2018-11-01"), LocalDate.parse("2018-11-30")), BigDecimal.valueOf(21))
         )
         val fastsattSykepengegrunnlag = fastsettingAvSykepengegrunnlagetIArbeidsgiverperioden(førsteSykdomsdag, Arbeidsgiver("NAV OSLO", orgnummer), inntekter)
 
@@ -183,10 +183,10 @@ class InntektsFastsettingTest {
     fun `uavklart sykepengegrunnlag når det er flere enn tre inntekter i beregningsperioden`() {
         val førsteSykdomsdag = LocalDate.parse("2019-01-01")
         val inntekter = listOf(
-                Inntekt(Inntektsarbeidsgiver(orgnummer), Opptjeningsperiode(LocalDate.parse("2018-12-01"), LocalDate.parse("2018-12-31")), BigDecimal.valueOf(1)),
-                Inntekt(Inntektsarbeidsgiver(orgnummer), Opptjeningsperiode(LocalDate.parse("2018-12-01"), LocalDate.parse("2018-12-31")), BigDecimal.valueOf(10)),
-                Inntekt(Inntektsarbeidsgiver(orgnummer), Opptjeningsperiode(LocalDate.parse("2018-11-01"), LocalDate.parse("2018-11-30")), BigDecimal.valueOf(21)),
-                Inntekt(Inntektsarbeidsgiver(orgnummer), Opptjeningsperiode(LocalDate.parse("2018-11-01"), LocalDate.parse("2018-11-30")), BigDecimal.valueOf(31))
+                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), Opptjeningsperiode(LocalDate.parse("2018-12-01"), LocalDate.parse("2018-12-31")), BigDecimal.valueOf(1)),
+                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), Opptjeningsperiode(LocalDate.parse("2018-12-01"), LocalDate.parse("2018-12-31")), BigDecimal.valueOf(10)),
+                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), Opptjeningsperiode(LocalDate.parse("2018-11-01"), LocalDate.parse("2018-11-30")), BigDecimal.valueOf(21)),
+                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), Opptjeningsperiode(LocalDate.parse("2018-11-01"), LocalDate.parse("2018-11-30")), BigDecimal.valueOf(31))
         )
         val fastsattSykepengegrunnlag = fastsettingAvSykepengegrunnlagetIArbeidsgiverperioden(førsteSykdomsdag, Arbeidsgiver("NAV OSLO", orgnummer), inntekter)
 

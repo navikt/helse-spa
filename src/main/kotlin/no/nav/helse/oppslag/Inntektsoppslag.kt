@@ -51,7 +51,7 @@ data class InntektsoppslagResultat(val inntekter : List<Inntekt>)
 data class Opptjeningsperiode(val fom: LocalDate, val tom: LocalDate, val antattPeriode: Boolean = true)
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-data class Inntektsarbeidsgiver(val orgnr: String)
+data class Inntektsarbeidsgiver(val identifikator: String, val type: String)
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class Inntekt(val arbeidsgiver: Inntektsarbeidsgiver, val opptjeningsperiode: Opptjeningsperiode, val beløp: BigDecimal)

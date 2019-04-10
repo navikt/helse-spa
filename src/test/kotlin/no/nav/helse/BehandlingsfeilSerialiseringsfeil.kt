@@ -48,7 +48,8 @@ val uavklarteJson= """{
       },
       "beregningsperiode" : [ {
         "arbeidsgiver" : {
-          "orgnr" : "995816598"
+          "identifikator" : "995816598",
+          "type": "Organisasjon"
         },
         "opptjeningsperiode" : {
           "fom" : "2018-10-01",
@@ -58,7 +59,8 @@ val uavklarteJson= """{
         "beløp" : 25000.0
       }, {
         "arbeidsgiver" : {
-          "orgnr" : "995816598"
+          "identifikator" : "995816598",
+          "type": "Organisasjon"
         },
         "opptjeningsperiode" : {
           "fom" : "2018-11-01",
@@ -68,7 +70,8 @@ val uavklarteJson= """{
         "beløp" : 25000.0
       }, {
         "arbeidsgiver" : {
-          "orgnr" : "995816598"
+          "identifikator" : "995816598",
+          "type": "Organisasjon"
         },
         "opptjeningsperiode" : {
           "fom" : "2018-12-01",
@@ -79,7 +82,8 @@ val uavklarteJson= """{
       } ],
       "sammenligningsperiode" : [ {
         "arbeidsgiver" : {
-          "orgnr" : "995816598"
+          "identifikator" : "995816598",
+          "type": "Organisasjon"
         },
         "opptjeningsperiode" : {
           "fom" : "2018-01-01",
@@ -89,7 +93,8 @@ val uavklarteJson= """{
         "beløp" : 25000.0
       }, {
         "arbeidsgiver" : {
-          "orgnr" : "995816598"
+          "identifikator" : "995816598",
+          "type": "Organisasjon"
         },
         "opptjeningsperiode" : {
           "fom" : "2018-02-01",
@@ -99,7 +104,8 @@ val uavklarteJson= """{
         "beløp" : 25000.0
       }, {
         "arbeidsgiver" : {
-          "orgnr" : "995816598"
+          "identifikator" : "995816598",
+          "type": "Organisasjon"
         },
         "opptjeningsperiode" : {
           "fom" : "2018-03-01",
@@ -109,7 +115,8 @@ val uavklarteJson= """{
         "beløp" : 25000.0
       }, {
         "arbeidsgiver" : {
-          "orgnr" : "995816598"
+          "identifikator" : "995816598",
+          "type": "Organisasjon"
         },
         "opptjeningsperiode" : {
           "fom" : "2018-04-01",
@@ -119,7 +126,8 @@ val uavklarteJson= """{
         "beløp" : 25000.0
       }, {
         "arbeidsgiver" : {
-          "orgnr" : "995816598"
+          "identifikator" : "995816598",
+          "type": "Organisasjon"
         },
         "opptjeningsperiode" : {
           "fom" : "2018-05-01",
@@ -129,7 +137,8 @@ val uavklarteJson= """{
         "beløp" : 25000.0
       }, {
         "arbeidsgiver" : {
-          "orgnr" : "995816598"
+          "identifikator" : "995816598",
+          "type": "Organisasjon"
         },
         "opptjeningsperiode" : {
           "fom" : "2018-06-01",
@@ -139,7 +148,8 @@ val uavklarteJson= """{
         "beløp" : 25000.0
       }, {
         "arbeidsgiver" : {
-          "orgnr" : "995816598"
+          "identifikator" : "995816598",
+          "type": "Organisasjon"
         },
         "opptjeningsperiode" : {
           "fom" : "2018-07-01",
@@ -149,7 +159,8 @@ val uavklarteJson= """{
         "beløp" : 25000.0
       }, {
         "arbeidsgiver" : {
-          "orgnr" : "995816598"
+          "identifikator" : "995816598",
+          "type": "Organisasjon"
         },
         "opptjeningsperiode" : {
           "fom" : "2018-08-01",
@@ -159,7 +170,8 @@ val uavklarteJson= """{
         "beløp" : 25000.0
       }, {
         "arbeidsgiver" : {
-          "orgnr" : "995816598"
+          "identifikator" : "995816598",
+          "type": "Organisasjon"
         },
         "opptjeningsperiode" : {
           "fom" : "2018-09-01",
@@ -169,7 +181,8 @@ val uavklarteJson= """{
         "beløp" : 25000.0
       }, {
         "arbeidsgiver" : {
-          "orgnr" : "995816598"
+          "identifikator" : "995816598",
+          "type": "Organisasjon"
         },
         "opptjeningsperiode" : {
           "fom" : "2018-10-01",
@@ -179,7 +192,8 @@ val uavklarteJson= """{
         "beløp" : 25000.0
       }, {
         "arbeidsgiver" : {
-          "orgnr" : "995816598"
+          "identifikator" : "995816598",
+          "type": "Organisasjon"
         },
         "opptjeningsperiode" : {
           "fom" : "2018-11-01",
@@ -189,7 +203,8 @@ val uavklarteJson= """{
         "beløp" : 25000.0
       }, {
         "arbeidsgiver" : {
-          "orgnr" : "995816598"
+          "identifikator" : "995816598",
+          "type": "Organisasjon"
         },
         "opptjeningsperiode" : {
           "fom" : "2018-12-01",
@@ -286,7 +301,8 @@ val uavklarteJson= """{
             "grunnlag" : {
               "inntekter" : [ {
                 "arbeidsgiver" : {
-                  "orgnr" : "995816598"
+                  "identifikator" : "995816598",
+                  "type": "Organisasjon"
                 },
                 "opptjeningsperiode" : {
                   "fom" : "2018-10-01",
@@ -296,7 +312,8 @@ val uavklarteJson= """{
                 "beløp" : 25000.0
               }, {
                 "arbeidsgiver" : {
-                  "orgnr" : "995816598"
+                  "identifikator" : "995816598",
+                  "type": "Organisasjon"
                 },
                 "opptjeningsperiode" : {
                   "fom" : "2018-11-01",
@@ -306,7 +323,8 @@ val uavklarteJson= """{
                 "beløp" : 25000.0
               }, {
                 "arbeidsgiver" : {
-                  "orgnr" : "995816598"
+                  "identifikator" : "995816598",
+                  "type": "Organisasjon"
                 },
                 "opptjeningsperiode" : {
                   "fom" : "2018-12-01",
@@ -327,7 +345,8 @@ val uavklarteJson= """{
             "grunnlag" : {
               "inntekter" : [ {
                 "arbeidsgiver" : {
-                  "orgnr" : "995816598"
+                  "identifikator" : "995816598",
+                  "type": "Organisasjon"
                 },
                 "opptjeningsperiode" : {
                   "fom" : "2018-10-01",
@@ -337,7 +356,8 @@ val uavklarteJson= """{
                 "beløp" : 25000.0
               }, {
                 "arbeidsgiver" : {
-                  "orgnr" : "995816598"
+                  "identifikator" : "995816598",
+                  "type": "Organisasjon"
                 },
                 "opptjeningsperiode" : {
                   "fom" : "2018-11-01",
@@ -347,7 +367,8 @@ val uavklarteJson= """{
                 "beløp" : 25000.0
               }, {
                 "arbeidsgiver" : {
-                  "orgnr" : "995816598"
+                  "identifikator" : "995816598",
+                  "type": "Organisasjon"
                 },
                 "opptjeningsperiode" : {
                   "fom" : "2018-12-01",
@@ -366,7 +387,8 @@ val uavklarteJson= """{
         "grunnlag" : {
           "inntekter" : [ {
             "arbeidsgiver" : {
-              "orgnr" : "995816598"
+              "identifikator" : "995816598",
+              "type": "Organisasjon"
             },
             "opptjeningsperiode" : {
               "fom" : "2018-01-01",
@@ -376,7 +398,8 @@ val uavklarteJson= """{
             "beløp" : 25000.0
           }, {
             "arbeidsgiver" : {
-              "orgnr" : "995816598"
+              "identifikator" : "995816598",
+              "type": "Organisasjon"
             },
             "opptjeningsperiode" : {
               "fom" : "2018-02-01",
@@ -386,7 +409,8 @@ val uavklarteJson= """{
             "beløp" : 25000.0
           }, {
             "arbeidsgiver" : {
-              "orgnr" : "995816598"
+              "identifikator" : "995816598",
+              "type": "Organisasjon"
             },
             "opptjeningsperiode" : {
               "fom" : "2018-03-01",
@@ -396,7 +420,8 @@ val uavklarteJson= """{
             "beløp" : 25000.0
           }, {
             "arbeidsgiver" : {
-              "orgnr" : "995816598"
+              "identifikator" : "995816598",
+              "type": "Organisasjon"
             },
             "opptjeningsperiode" : {
               "fom" : "2018-04-01",
@@ -406,7 +431,8 @@ val uavklarteJson= """{
             "beløp" : 25000.0
           }, {
             "arbeidsgiver" : {
-              "orgnr" : "995816598"
+              "identifikator" : "995816598",
+              "type": "Organisasjon"
             },
             "opptjeningsperiode" : {
               "fom" : "2018-05-01",
@@ -416,7 +442,8 @@ val uavklarteJson= """{
             "beløp" : 25000.0
           }, {
             "arbeidsgiver" : {
-              "orgnr" : "995816598"
+              "identifikator" : "995816598",
+              "type": "Organisasjon"
             },
             "opptjeningsperiode" : {
               "fom" : "2018-06-01",
@@ -426,7 +453,8 @@ val uavklarteJson= """{
             "beløp" : 25000.0
           }, {
             "arbeidsgiver" : {
-              "orgnr" : "995816598"
+              "identifikator" : "995816598",
+              "type": "Organisasjon"
             },
             "opptjeningsperiode" : {
               "fom" : "2018-07-01",
@@ -436,7 +464,8 @@ val uavklarteJson= """{
             "beløp" : 25000.0
           }, {
             "arbeidsgiver" : {
-              "orgnr" : "995816598"
+              "identifikator" : "995816598",
+              "type": "Organisasjon"
             },
             "opptjeningsperiode" : {
               "fom" : "2018-08-01",
@@ -446,7 +475,8 @@ val uavklarteJson= """{
             "beløp" : 25000.0
           }, {
             "arbeidsgiver" : {
-              "orgnr" : "995816598"
+              "identifikator" : "995816598",
+              "type": "Organisasjon"
             },
             "opptjeningsperiode" : {
               "fom" : "2018-09-01",
@@ -456,7 +486,8 @@ val uavklarteJson= """{
             "beløp" : 25000.0
           }, {
             "arbeidsgiver" : {
-              "orgnr" : "995816598"
+              "identifikator" : "995816598",
+              "type": "Organisasjon"
             },
             "opptjeningsperiode" : {
               "fom" : "2018-10-01",
@@ -466,7 +497,8 @@ val uavklarteJson= """{
             "beløp" : 25000.0
           }, {
             "arbeidsgiver" : {
-              "orgnr" : "995816598"
+              "identifikator" : "995816598",
+              "type": "Organisasjon"
             },
             "opptjeningsperiode" : {
               "fom" : "2018-11-01",
@@ -476,7 +508,8 @@ val uavklarteJson= """{
             "beløp" : 25000.0
           }, {
             "arbeidsgiver" : {
-              "orgnr" : "995816598"
+              "identifikator" : "995816598",
+              "type": "Organisasjon"
             },
             "opptjeningsperiode" : {
               "fom" : "2018-12-01",
@@ -499,7 +532,8 @@ val failJson = """{
     "inntekter": [
         {
             "arbeidsgiver": {
-                "orgnr": "97114455"
+                "identifikator": "97114455",
+                "type": "Organisasjon"
             },
             "beløp": 25000,
             "opptjeningsperiode": {
@@ -509,7 +543,8 @@ val failJson = """{
         },
         {
             "arbeidsgiver": {
-                "orgnr": "97114455"
+                "identifikator": "97114455",
+                "type": "Organisasjon"
             },
             "beløp": 25000,
             "opptjeningsperiode": {
@@ -519,7 +554,8 @@ val failJson = """{
         },
         {
             "arbeidsgiver": {
-                "orgnr": "97114455"
+                "identifikator": "97114455",
+                "type": "Organisasjon"
             },
             "beløp": 25000,
             "opptjeningsperiode": {
@@ -529,7 +565,8 @@ val failJson = """{
         },
         {
             "arbeidsgiver": {
-                "orgnr": "97114455"
+                "identifikator": "97114455",
+                "type": "Organisasjon"
             },
             "beløp": 25000,
             "opptjeningsperiode": {
@@ -539,7 +576,8 @@ val failJson = """{
         },
         {
             "arbeidsgiver": {
-                "orgnr": "97114455"
+                "identifikator": "97114455",
+                "type": "Organisasjon"
             },
             "beløp": 25000,
             "opptjeningsperiode": {
@@ -549,7 +587,8 @@ val failJson = """{
         },
         {
             "arbeidsgiver": {
-                "orgnr": "97114455"
+                "identifikator": "97114455",
+                "type": "Organisasjon"
             },
             "beløp": 25000,
             "opptjeningsperiode": {
@@ -559,7 +598,8 @@ val failJson = """{
         },
         {
             "arbeidsgiver": {
-                "orgnr": "97114455"
+                "identifikator": "97114455",
+                "type": "Organisasjon"
             },
             "beløp": 25000,
             "opptjeningsperiode": {
@@ -569,7 +609,8 @@ val failJson = """{
         },
         {
             "arbeidsgiver": {
-                "orgnr": "97114455"
+                "identifikator": "97114455",
+                "type": "Organisasjon"
             },
             "beløp": 25000,
             "opptjeningsperiode": {
@@ -579,7 +620,8 @@ val failJson = """{
         },
         {
             "arbeidsgiver": {
-                "orgnr": "97114455"
+                "identifikator": "97114455",
+                "type": "Organisasjon"
             },
             "beløp": 25000,
             "opptjeningsperiode": {
@@ -589,7 +631,8 @@ val failJson = """{
         },
         {
             "arbeidsgiver": {
-                "orgnr": "97114455"
+                "identifikator": "97114455",
+                "type": "Organisasjon"
             },
             "beløp": 25000,
             "opptjeningsperiode": {
@@ -599,7 +642,8 @@ val failJson = """{
         },
         {
             "arbeidsgiver": {
-                "orgnr": "97114455"
+                "identifikator": "97114455",
+                "type": "Organisasjon"
             },
             "beløp": 25000,
             "opptjeningsperiode": {
@@ -609,7 +653,8 @@ val failJson = """{
         },
         {
             "arbeidsgiver": {
-                "orgnr": "97114455"
+                "identifikator": "97114455",
+                "type": "Organisasjon"
             },
             "beløp": 25000,
             "opptjeningsperiode": {
@@ -619,7 +664,8 @@ val failJson = """{
         },
         {
             "arbeidsgiver": {
-                "orgnr": "97114455"
+                "identifikator": "97114455",
+                "type": "Organisasjon"
             },
             "beløp": 25000,
             "opptjeningsperiode": {
@@ -629,7 +675,8 @@ val failJson = """{
         },
         {
             "arbeidsgiver": {
-                "orgnr": "97114455"
+                "identifikator": "97114455",
+                "type": "Organisasjon"
             },
             "beløp": 25000,
             "opptjeningsperiode": {

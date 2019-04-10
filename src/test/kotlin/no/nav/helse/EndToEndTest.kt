@@ -256,7 +256,7 @@ class EndToEndTest {
         assert(inntekter).hasSize(startDate.until(endDate.plusDays(1), ChronoUnit.MONTHS).toInt())
         assert(inntekter).each {
             val inntekt = it.actual
-            assert(inntekt.arbeidsgiver.orgnr).isEqualTo(stubbet_arbeidsforhold.arbeidsgiver.orgnummer)
+            assert(inntekt.arbeidsgiver.identifikator).isEqualTo(stubbet_arbeidsforhold.arbeidsgiver.orgnummer)
             assert(inntekt.beløp.toLong()).isEqualTo(25000L)
             assert(inntekt.opptjeningsperiode.fom).isBetween(startDate, endDate.with(firstDayOfMonth()))
             assert(inntekt.opptjeningsperiode.tom).isBetween(startDate.with(lastDayOfMonth()), endDate)
@@ -438,7 +438,7 @@ class EndToEndTest {
     val beregningsgrunnlagStart = første_dag_i_syketilfelle.minusMonths(3)
     val stubbet_inntekt_beregningsgrunnlag: List<Inntekt> = List(3, init = { index ->
         Inntekt(
-                arbeidsgiver = Inntektsarbeidsgiver(stubbet_arbeidsforhold.arbeidsgiver.orgnummer),
+                arbeidsgiver = Inntektsarbeidsgiver(stubbet_arbeidsforhold.arbeidsgiver.orgnummer, "Organisasjon"),
                 beløp = BigDecimal.valueOf(25000),
                 opptjeningsperiode = Opptjeningsperiode(
                         fom = beregningsgrunnlagStart.plusMonths(index.toLong()),
@@ -450,7 +450,7 @@ class EndToEndTest {
     val sammenligningsgrunnlagStart = første_dag_i_syketilfelle.minusMonths(12)
     val stubbet_inntekt_sammenligningsgrunnlag: List<Inntekt> = List(12, init = { index ->
         Inntekt(
-                arbeidsgiver = Inntektsarbeidsgiver(stubbet_arbeidsforhold.arbeidsgiver.orgnummer),
+                arbeidsgiver = Inntektsarbeidsgiver(stubbet_arbeidsforhold.arbeidsgiver.orgnummer, "Organisasjon"),
                 beløp = BigDecimal.valueOf(25000),
                 opptjeningsperiode = Opptjeningsperiode(
                         fom = sammenligningsgrunnlagStart.plusMonths(index.toLong()),
