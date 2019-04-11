@@ -35,7 +35,7 @@ fun fastsettingAvSykepengegrunnlaget(førsteSykdomsdag: LocalDate, arbeidsgiver:
     return Vurdering.Avklart(Sykepengegrunnlag(sykepengegrunnlagNårTrygdenYter as Vurdering.Avklart, sykepengegrunnlagIArbeidsgiverperioden), "", fastsattSammenligningsgrunnlag.grunnlag , "SPA")
 }
 
-const val paragraf_8_28_tredje_ledd_bokstav_a = "§ 8-28 tredje ledd bokstav a) – De tre siste kalendermånedene før arbeidstakeren ble arbeidsufør"
+const val paragraf_8_28_tredje_ledd_bokstav_a = "§ 8-28 tredje ledd bokstav a) - De tre siste kalendermånedene før arbeidstakeren ble arbeidsufør"
 const val paragraf_8_28_andre_ledd = "§ 8-28 andre ledd"
 // https://lovdata.no/lov/1997-02-28-19/§8-28
 fun fastsettingAvSykepengegrunnlagetIArbeidsgiverperioden(førsteSykdomsdag: LocalDate, arbeidsgiver: ArbeidsgiverFraSøknad, inntekter: List<Inntekt>): Vurdering<Long, Beregningsperiode> {
@@ -119,7 +119,7 @@ fun fastsettSammenligningsgrunnlag(førsteSykdomsdag: LocalDate, sammenligningsg
             inntekt.utbetalingsperiode
         }
     }.let {
-        Beregningsperiode(it, "§ 8-30 andre ledd – rapportert inntekt (se § 8-29) til a-ordningen etter reglene i a-opplysningsloven de siste tolv kalendermånedene før arbeidsuførheten inntraff (${førsteSykdomsdag}) legges til grunn.")
+        Beregningsperiode(it, "§ 8-30 andre ledd - rapportert inntekt (se § 8-29) til a-ordningen etter reglene i a-opplysningsloven de siste tolv kalendermånedene før arbeidsuførheten inntraff (${førsteSykdomsdag}) legges til grunn.")
     }
 
     return Vurdering.Avklart(beregningsperiode.inntekter

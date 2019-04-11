@@ -264,7 +264,7 @@ val uavklarteJson= """{
                 "utbetalingsperiode": "2018-12",
                 "beløp" : 25000.0
               } ],
-              "begrunnelse" : "§ 8-28 tredje ledd bokstav a) – De tre siste kalendermånedene før arbeidstakeren ble arbeidsufør (2019-01-11) legges til grunn."
+              "begrunnelse" : "§ 8-28 tredje ledd bokstav a) - De tre siste kalendermånedene før arbeidstakeren ble arbeidsufør (2019-01-11) legges til grunn."
             },
             "fastsattAv" : "spa",
             "vurderingstidspunkt" : "2019-03-11T13:07:47.959582"
@@ -296,7 +296,7 @@ val uavklarteJson= """{
                 "utbetalingsperiode": "2018-12",
                 "beløp" : 25000.0
               } ],
-              "begrunnelse" : "§ 8-28 tredje ledd bokstav a) – De tre siste kalendermånedene før arbeidstakeren ble arbeidsufør (2019-01-11) legges til grunn."
+              "begrunnelse" : "§ 8-28 tredje ledd bokstav a) - De tre siste kalendermånedene før arbeidstakeren ble arbeidsufør (2019-01-11) legges til grunn."
             },
             "fastsattAv" : "spa",
             "vurderingstidspunkt" : "2019-03-11T13:07:47.959344"
@@ -389,7 +389,7 @@ val uavklarteJson= """{
             "utbetalingsperiode": "2018-12",
             "beløp" : 25000.0
           } ],
-          "begrunnelse" : "§ 8-30 andre ledd – rapportert inntekt (se § 8-29) til a-ordningen etter reglene i a-opplysningsloven de siste tolv kalendermånedene før arbeidsuførheten inntraff (2019-01-11) legges til grunn."
+          "begrunnelse" : "§ 8-30 andre ledd - rapportert inntekt (se § 8-29) til a-ordningen etter reglene i a-opplysningsloven de siste tolv kalendermånedene før arbeidsuførheten inntraff (2019-01-11) legges til grunn."
         },
         "fastsattAv" : "SPA",
         "vurderingstidspunkt" : "2019-03-11T13:07:47.959915"
