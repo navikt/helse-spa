@@ -72,11 +72,11 @@ class BeregningTest {
                             medlemsskap = Avklart(fastsattVerdi = true, begrunnelse = "derfor", fastsattAv = "test", grunnlag = Medlemsskapgrunnlag("NO")),
                             sykepengegrunnlag = Avklart(fastsattVerdi =
                             Sykepengegrunnlag(
-                                    sykepengegrunnlagNårTrygdenYter = Avklart(fastsattVerdi = årslønn, grunnlag = Beregningsperiode(emptyList(), "derfor"), begrunnelse = "derfor", fastsattAv = "test"),
-                                    sykepengegrunnlagIArbeidsgiverperioden = Avklart(fastsattVerdi = årslønn, grunnlag = Beregningsperiode(emptyList(), "derfor"), begrunnelse = "derfor", fastsattAv = "test")),
+                                    sykepengegrunnlagNårTrygdenYter = Avklart(fastsattVerdi = årslønn, grunnlag = Beregningsperiode(emptyMap(), "derfor"), begrunnelse = "derfor", fastsattAv = "test"),
+                                    sykepengegrunnlagIArbeidsgiverperioden = Avklart(fastsattVerdi = årslønn, grunnlag = Beregningsperiode(emptyMap(), "derfor"), begrunnelse = "derfor", fastsattAv = "test")),
                                     fastsattAv = "test",
                                     begrunnelse = "derfor",
-                                    grunnlag = Beregningsperiode(emptyList(), "derfor")),
+                                    grunnlag = Beregningsperiode(emptyMap(), "derfor")),
                             alder = Avklart(fastsattVerdi = 40, grunnlag = Aldersgrunnlag(parse("1979-01-01")), begrunnelse = "derfor", fastsattAv = "test"),
                             arbeidsforhold = Avklart(fastsattVerdi = true, grunnlag = arbeidsforholdUtenVerdi, begrunnelse = "derfor", fastsattAv = "test"),
                             maksdato = Avklart(fastsattVerdi = parse("2019-03-03"),

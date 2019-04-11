@@ -35,7 +35,7 @@ fun fastsettingAvSykepengegrunnlaget(førsteSykdomsdag: LocalDate, arbeidsgiver:
     return Vurdering.Avklart(Sykepengegrunnlag(sykepengegrunnlagNårTrygdenYter as Vurdering.Avklart, sykepengegrunnlagIArbeidsgiverperioden), "", fastsattSammenligningsgrunnlag.grunnlag , "SPA")
 }
 
-const val paragraf_8_28_tredje_ledd_bokstav_a = "§ 8-28 tredje ledd bokstav a) – De tre siste kalendermånedene før arbeidstakeren ble arbeidsufør"
+const val paragraf_8_28_tredje_ledd_bokstav_a = "§ 8-28 tredje ledd bokstav a) - De tre siste kalendermånedene før arbeidstakeren ble arbeidsufør"
 const val paragraf_8_28_andre_ledd = "§ 8-28 andre ledd"
 // https://lovdata.no/lov/1997-02-28-19/§8-28
 fun fastsettingAvSykepengegrunnlagetIArbeidsgiverperioden(førsteSykdomsdag: LocalDate, arbeidsgiver: ArbeidsgiverFraSøknad, inntekter: List<Inntekt>): Vurdering<Long, Beregningsperiode> {
@@ -46,25 +46,61 @@ fun fastsettingAvSykepengegrunnlagetIArbeidsgiverperioden(førsteSykdomsdag: Loc
 
     val beregningsperiode = inntekter.filter { inntekt ->
         inntekt.utbetalingsperiode in treMånederFør..enMånedFør
+    }.groupBy { inntekt ->
+        inntekt.arbeidsgiver.identifikator
+    }.mapValues { entry ->
+        entry.value.groupBy {  inntekt ->
+            inntekt.utbetalingsperiode
+        }
     }.let {
         Beregningsperiode(it, paragraf_8_28_tredje_ledd_bokstav_a + "(${førsteSykdomsdag}) legges til grunn.")
     }
 
-    // TODO: sjekke om listen inneholder mer enn tre elementer? (hva om det er rapportert inn to inntekter for en måned?)
+    if (beregningsperiode.inntekter.isEmpty()) {
+        return Uavklart(HAR_IKKE_DATA, "Kan ikke avklare sykepengegrunnlaget fordi det ikke er inntekter i beregningsperioden", beregningsperiode)
+    } else if (beregningsperiode.inntekter.keys.size > 1) {
+        return if (beregningsperiode.inntekter.keys.firstOrNull { it == arbeidsgiver.orgnummer } == null) {
+            Uavklart(HAR_IKKE_DATA, "Kan ikke avklare sykepengegrunnlaget fordi det finnes ikke inntekter fra aktuell arbeidsgiver", beregningsperiode)
+        } else {
+            Uavklart(KREVER_SKJØNNSMESSIG_VURDERING, "Kan ikke avklare sykepengegrunnlaget fordi det andre inntekter i arbeidsgiverperioden i tillegg til aktuell arbeidsgiver", beregningsperiode)
+        }
+    }
 
-    return if (beregningsperiode.inntekter.isEmpty()) {
-        Uavklart(HAR_IKKE_DATA, "Kan ikke avklare sykepengegrunnlaget fordi det ikke er inntekter i beregningsperioden", beregningsperiode)
-    } else if (beregningsperiode.inntekter.any { it.arbeidsgiver.identifikator != arbeidsgiver.orgnummer }) {
-        Uavklart(KREVER_SKJØNNSMESSIG_VURDERING, "Kan ikke avklare sykepengegrunnlaget fordi det andre inntekter i arbeidsgiverperioden enn i fra aktuell arbeidsgiver", beregningsperiode)
-    } else if (beregningsperiode.inntekter.size > 3) {
-        Uavklart(FORSTÅR_IKKE_DATA, "Kan ikke avklare sykepengegrunnlaget fordi det er ${beregningsperiode.inntekter.size} inntekter i beregningsperioden, vi forventer tre eller færre.", beregningsperiode)
+    val inntekter = beregningsperiode.inntekter.getValue(arbeidsgiver.orgnummer)
+
+    if (inntekter.size != 3) {
+        return Uavklart(FALLER_UTENFOR_MVP, "Kan ikke avklare sykepengegrunnlaget fordi vi forventer inntekter fra tre måneder", beregningsperiode)
     } else {
-        // § 8-28 andre ledd
-        val aktuellMånedsinntekt = beregningsperiode.inntekter.sumBy { periode ->
-            periode.beløp.toInt()
-        } / beregningsperiode.inntekter.size
+        val inntekterFraTreMånederFør = inntekter[treMånederFør]
+        val inntekterFraToMånederFør = inntekter[treMånederFør.plusMonths(1)]
+        val inntekterFraEnMånedFør = inntekter[treMånederFør.plusMonths(2)]
 
-        Vurdering.Avklart(aktuellMånedsinntekt.toLong(), paragraf_8_28_andre_ledd, beregningsperiode, "SPA")
+        if (inntekterFraTreMånederFør == null || inntekterFraToMånederFør == null || inntekterFraEnMånedFør == null) {
+            return Uavklart(HAR_IKKE_DATA, "Kan ikke avklare sykepengegrunnlaget fordi vi forventer inntekter fra tre måneder før", beregningsperiode)
+        }
+
+        if (inntekterFraTreMånederFør.isEmpty() || inntekterFraToMånederFør.isEmpty() || inntekterFraEnMånedFør.isEmpty()) {
+            return Uavklart(HAR_IKKE_DATA, "Kan ikke avklare sykepengegrunnlaget fordi vi forventer inntekter fra tre måneder før", beregningsperiode)
+        }
+
+        val sumInntekterTreMånederFør = inntekterFraTreMånederFør.fold(BigDecimal.ZERO) { acc, current ->
+            acc.add(current.beløp)
+        }
+        val sumInntekterToMånederFør = inntekterFraToMånederFør.fold(BigDecimal.ZERO) { acc, current ->
+            acc.add(current.beløp)
+        }
+        val sumInntekterEnMånedFør = inntekterFraEnMånedFør.fold(BigDecimal.ZERO) { acc, current ->
+            acc.add(current.beløp)
+        }
+
+        // § 8-28 andre ledd
+        val aktuellMånedsinntekt = sumInntekterTreMånederFør
+                .add(sumInntekterToMånederFør)
+                .add(sumInntekterEnMånedFør)
+                .divide(BigDecimal.valueOf(3), RoundingMode.HALF_UP)
+                .longValueExact(RoundingMode.HALF_UP)
+
+        return Vurdering.Avklart(aktuellMånedsinntekt, paragraf_8_28_andre_ledd, beregningsperiode, "SPA")
     }
 }
 
@@ -76,12 +112,22 @@ fun fastsettSammenligningsgrunnlag(førsteSykdomsdag: LocalDate, sammenligningsg
 
     val beregningsperiode = sammenligningsgrunnlag.filter { inntekt ->
         inntekt.utbetalingsperiode in tolvMånederFør..enMånedFør
+    }.groupBy { inntekt ->
+        inntekt.arbeidsgiver.identifikator
+    }.mapValues { entry ->
+        entry.value.groupBy {  inntekt ->
+            inntekt.utbetalingsperiode
+        }
     }.let {
-        Beregningsperiode(it, "§ 8-30 andre ledd – rapportert inntekt (se § 8-29) til a-ordningen etter reglene i a-opplysningsloven de siste tolv kalendermånedene før arbeidsuførheten inntraff (${førsteSykdomsdag}) legges til grunn.")
+        Beregningsperiode(it, "§ 8-30 andre ledd - rapportert inntekt (se § 8-29) til a-ordningen etter reglene i a-opplysningsloven de siste tolv kalendermånedene før arbeidsuførheten inntraff (${førsteSykdomsdag}) legges til grunn.")
     }
 
     return Vurdering.Avklart(beregningsperiode.inntekter
-            .map {
+            .flatMap {
+                it.value.flatMap {
+                    it.value
+                }
+            }.map {
                 it.beløp
             }.reduce(BigDecimal::add).longValueExact(RoundingMode.HALF_UP), "§ 8-30 andre ledd", beregningsperiode, "SPA")
 }
@@ -104,7 +150,7 @@ fun fastsettingAvSykepengegrunnlagetNårTrygdenYterSykepenger(sammenligningsgrun
     return Vurdering.Avklart(omregnetÅrsinntekt, paragraf_8_30_første_ledd, beregnetAktuellMånedsinntekt.grunnlag, "SPA")
 }
 
-data class Beregningsperiode(val inntekter: List<Inntekt>, val begrunnelse: String)
+data class Beregningsperiode(val inntekter: Map<String, Map<YearMonth, List<Inntekt>>>, val begrunnelse: String)
 
 data class Sykepengegrunnlag(val sykepengegrunnlagNårTrygdenYter: Vurdering.Avklart<Long, Beregningsperiode>, val sykepengegrunnlagIArbeidsgiverperioden: Vurdering.Avklart<Long, Beregningsperiode>)
 
