@@ -43,6 +43,7 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.slf4j.LoggerFactory
+import java.lang.RuntimeException
 import java.math.BigDecimal
 import java.time.*
 import java.time.LocalDate.parse
@@ -129,7 +130,7 @@ class EndToEndTest {
 
         val innsendtSøknad = produserSykepengesøknadV2(aktørId)
 
-        val sykepengeVedtak: SykepengeVedtak = ventPåVedtak()!!
+        val sykepengeVedtak: SykepengeVedtak = ventPåVedtak()
 
         checkSøknad(innsendtSøknad, sykepengeVedtak.originalSøknad)
         checkFaktagrunnlag(sykepengeVedtak.faktagrunnlag)
@@ -354,11 +355,11 @@ class EndToEndTest {
 
     }
 
-    private fun ventPåVedtak(): SykepengeVedtak? {
+    private fun ventPåVedtak(): SykepengeVedtak {
         val resultConsumer = KafkaConsumer<String, SykepengeVedtak>(consumerProperties(), StringDeserializer(), SykepengeVedtakDeserializer())
         resultConsumer.subscribe(listOf(VEDTAK_SYKEPENGER.name))
 
-        val end = System.currentTimeMillis() + 60 * 1000
+        val end = System.currentTimeMillis() + 20 * 1000
 
         while (System.currentTimeMillis() < end) {
             resultConsumer.seekToBeginning(resultConsumer.assignment())
@@ -373,7 +374,7 @@ class EndToEndTest {
             }
         }
 
-        return null
+        throw RuntimeException("fant ingen vedtak etter 20 sekunder")
     }
 
     private fun consumerProperties(): MutableMap<String, Any>? {
