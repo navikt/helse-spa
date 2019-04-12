@@ -17,23 +17,42 @@ fun vurderMaksdato(
     return when (alder) {
         is Vurdering.Uavklart -> Vurdering.Uavklart(årsak = Vurdering.Uavklart.Årsak.HAR_IKKE_DATA, begrunnelse = "Kan ikke fastsette maksdato for bruker med uavklart alder", grunnlag = null)
         is Vurdering.Avklart -> {
-            val grunnlag = Grunnlagsdata(
-                    førsteFraværsdag = startSyketilfelle,
-                    førsteSykepengedag = førsteSykepengedag,
-                    personensAlder = alder.fastsattVerdi,
-                    yrkesstatus = yrkesstatus,
-                    tidligerePerioder = sykepengeliste.flatMap {
-                        it.vedtakListe.filter { it.utbetalingsgrad > 0 }
-                                .map {Tidsperiode(fom = it.anvistPeriode.fom?:throw Exception("Periode.fom er NULL"), tom = it.anvistPeriode.tom?:throw Exception("Periode.tom er NULL")) } // FIXME
-                    }
-            )
-            val beregnetMaksdato = maksdato(grunnlag)
+            val tidligerePerioder = finnTidligerePerioder(sykepengeliste)
+            when (tidligerePerioder) {
+                is Vurdering.Uavklart -> Vurdering.Uavklart(årsak = tidligerePerioder.årsak, begrunnelse = tidligerePerioder.begrunnelse, grunnlag = null)
+                is Vurdering.Avklart -> {
+                    val grunnlag = Grunnlagsdata(
+                            førsteFraværsdag = startSyketilfelle,
+                            førsteSykepengedag = førsteSykepengedag,
+                            personensAlder = alder.fastsattVerdi,
+                            yrkesstatus = yrkesstatus,
+                            tidligerePerioder = tidligerePerioder.fastsattVerdi
+                    )
+                    val beregnetMaksdato = maksdato(grunnlag)
 
-            Vurdering.Avklart(
-                    fastsattVerdi = beregnetMaksdato.dato,
-                    fastsattAv = "SPA",
-                    grunnlag = grunnlag,
-                    begrunnelse = beregnetMaksdato.begrunnelse)
+                    Vurdering.Avklart(
+                            fastsattVerdi = beregnetMaksdato.dato,
+                            fastsattAv = "SPA",
+                            grunnlag = grunnlag,
+                            begrunnelse = beregnetMaksdato.begrunnelse)
+                }
+            }
         }
     }
+}
+
+fun finnTidligerePerioder(sykepengeliste : List<PeriodeYtelse>) : Vurdering<List<Tidsperiode>, List<PeriodeYtelse>> {
+    val tidligerePerioder = sykepengeliste.flatMap {
+        it.vedtakListe.filter { it.utbetalingsgrad > 0 }
+                .map {
+                    if (it.anvistPeriode.fom == null || it.anvistPeriode.tom == null) {
+                        return Vurdering.Uavklart(Vurdering.Uavklart.Årsak.FORSTÅR_IKKE_DATA, "det finnes en anvist periode hvor fom eller tom er NULL", sykepengeliste)
+                    }
+                    if (it.anvistPeriode.fom.isAfter(it.anvistPeriode.tom)) {
+                        return Vurdering.Uavklart(Vurdering.Uavklart.Årsak.FORSTÅR_IKKE_DATA, "det finnes en anvist periode hvor fom er etter tom", sykepengeliste)
+                    }
+                    Tidsperiode(fom = it.anvistPeriode.fom, tom = it.anvistPeriode.tom)
+                }
+    }
+    return Vurdering.Avklart(tidligerePerioder, "infotrygdBeregningsgrunnlag", sykepengeliste, "SPA")
 }
