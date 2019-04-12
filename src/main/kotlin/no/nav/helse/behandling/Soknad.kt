@@ -34,22 +34,22 @@ data class SykepengesøknadV2DTO(
         val soknadsperioder: List<Soknadsperiode>
 )
 
-fun mapToSykepengesøknad(dto: SykepengesøknadV2DTO): Either<Behandlingsfeil, Sykepengesøknad> {
-    return if (dto.sendtNav == null) {
-        Either.Left(Behandlingsfeil.ukjentDeserialiseringsfeil(dto.id, defaultObjectMapper.valueToTree(dto), Exception("sendtNav er null")))
+fun SykepengesøknadV2DTO.mapToSykepengesøknad(): Either<Behandlingsfeil, Sykepengesøknad> {
+    return if (sendtNav == null) {
+        Either.Left(Behandlingsfeil.ukjentDeserialiseringsfeil(id, defaultObjectMapper.valueToTree(this), Exception("sendtNav er null")))
     } else {
         Either.Right(Sykepengesøknad(
-                id = dto.id,
-                aktorId = dto.aktorId,
-                type = dto.type,
-                status = dto.status,
-                arbeidsgiver = ArbeidsgiverFraSøknad(dto.arbeidsgiver.navn, dto.arbeidsgiver.orgnummer),
-                soktUtenlandsopphold = dto.soktUtenlandsopphold,
-                fom = dto.fom,
-                tom = dto.tom,
-                startSyketilfelle = dto.startSyketilfelle,
-                sendtNav = dto.sendtNav,
-                soknadsperioder = dto.soknadsperioder
+                id = id,
+                aktorId = aktorId,
+                type = type,
+                status = status,
+                arbeidsgiver = ArbeidsgiverFraSøknad(arbeidsgiver.navn, arbeidsgiver.orgnummer),
+                soktUtenlandsopphold = soktUtenlandsopphold,
+                fom = fom,
+                tom = tom,
+                startSyketilfelle = startSyketilfelle,
+                sendtNav = sendtNav,
+                soknadsperioder = soknadsperioder
         ))
     }
 }
