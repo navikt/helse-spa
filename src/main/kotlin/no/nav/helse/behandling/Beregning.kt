@@ -6,7 +6,7 @@ import no.nav.helse.oppslag.getGrunnbeløpForDato
 import no.nav.helse.sykepenger.beregning.Beregningsgrunnlag
 import no.nav.helse.sykepenger.beregning.beregn
 
-fun sykepengeBeregning(vilkårsprøving: Vilkårsprøving): Either<Behandlingsfeil, Sykepengeberegning> =
+fun sykepengeBeregning(vilkårsprøving: Behandlingsgrunnlag): Either<Behandlingsfeil, Sykepengeberegning> =
         try {
             val beregningsresultat = beregn(lagBeregninggrunnlag(vilkårsprøving))
             Either.Right(Sykepengeberegning(
@@ -19,7 +19,7 @@ fun sykepengeBeregning(vilkårsprøving: Vilkårsprøving): Either<Behandlingsfe
             Either.Left(Behandlingsfeil.beregningsfeil(vilkårsprøving, e))
         }
 
-private fun lagBeregninggrunnlag(vilkårsprøving: Vilkårsprøving) : Beregningsgrunnlag =
+private fun lagBeregninggrunnlag(vilkårsprøving: Behandlingsgrunnlag) : Beregningsgrunnlag =
         Beregningsgrunnlag(
                 fom = vilkårsprøving.originalSøknad.fom, // er dette første dag etter arbeidsgiverperiode ?
                 ferie = null,

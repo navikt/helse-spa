@@ -57,6 +57,7 @@ class SaksbehandlingProbe(val env: Environment) {
     fun mottattSøknadSendtNAV(value: JsonNode) = mottattCounter.labels("SENDT_NAV", value.get("type").asText(), "v2").inc()
 
     fun gjennomførtVilkårsprøving(value: Evaluering) {
+
             influxMetricReporter.sendDataPoints(toDatapoints(value))
     }
 

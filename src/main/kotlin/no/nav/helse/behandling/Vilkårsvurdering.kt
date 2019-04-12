@@ -3,26 +3,12 @@ package no.nav.helse.behandling
 import no.nav.helse.Behandlingsfeil
 import no.nav.helse.Either
 import no.nav.helse.oppslag.getGrunnbeløpForDato
-import no.nav.helse.probe
+import no.nav.helse.probe.SaksbehandlingProbe
 import no.nav.helse.sykepenger.vilkar.Vilkårsgrunnlag
 import no.nav.helse.sykepenger.vilkar.sykepengevilkår
-import no.nav.nare.core.evaluations.Evaluering
 import no.nav.nare.core.evaluations.Resultat
 
-fun vilkårsprøving(avklarteFakta: AvklarteFakta): Either<Behandlingsfeil, Vilkårsprøving> {
-    val vilkår = Vilkårsprøving(
-            originalSøknad = avklarteFakta.originalSøknad,
-            faktagrunnlag = avklarteFakta.faktagrunnlag,
-            avklarteVerdier = avklarteFakta.avklarteVerdier,
-            vilkårsprøving = gjennomførVilkårsvurdering(avklarteFakta))
-
-    return when (vilkår.vilkårsprøving.resultat) {
-        Resultat.JA -> Either.Right(vilkår)
-        else -> Either.Left(Behandlingsfeil.vilkårErIkkeOppfylt(vilkår))
-    }
-}
-
-private fun gjennomførVilkårsvurdering(avklarteFakta: AvklarteFakta): Evaluering {
+fun vilkårsprøving(avklarteFakta: AvklarteFakta, probe: SaksbehandlingProbe): Either<Behandlingsfeil, Behandlingsgrunnlag> {
     val grunnlag = Vilkårsgrunnlag(
             opptjeningstid = avklarteFakta.avklarteVerdier.opptjeningstid.fastsattVerdi.toInt(),
             alder = avklarteFakta.avklarteVerdier.alder.fastsattVerdi,
@@ -33,8 +19,21 @@ private fun gjennomførVilkårsvurdering(avklarteFakta: AvklarteFakta): Evalueri
             fastsattÅrsinntekt = avklarteFakta.avklarteVerdier.sykepengegrunnlag.fastsattVerdi.sykepengegrunnlagNårTrygdenYter.fastsattVerdi,
             grunnbeløp = getGrunnbeløpForDato(avklarteFakta.originalSøknad.fom)
     )
-    val evaluering = sykepengevilkår.evaluer(grunnlag)
-    probe.gjennomførtVilkårsprøving(evaluering)
-    return evaluering;
 
+    val vilkårsprøving = sykepengevilkår.evaluer(grunnlag)
+
+    probe.gjennomførtVilkårsprøving(vilkårsprøving)
+
+    val behandlingsgrunnlag = Behandlingsgrunnlag(
+            originalSøknad = avklarteFakta.originalSøknad,
+            faktagrunnlag = avklarteFakta.faktagrunnlag,
+            avklarteVerdier = avklarteFakta.avklarteVerdier,
+            vilkårsprøving = vilkårsprøving
+    )
+
+    return when (behandlingsgrunnlag.vilkårsprøving.resultat) {
+        Resultat.JA -> Either.Right(behandlingsgrunnlag)
+        else -> Either.Left(Behandlingsfeil.vilkårErIkkeOppfylt(behandlingsgrunnlag))
+    }
 }
+

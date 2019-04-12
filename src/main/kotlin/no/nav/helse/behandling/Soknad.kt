@@ -116,7 +116,7 @@ data class UavklarteVerdier(
     )
 }
 
-data class Vilkårsprøving(
+data class Behandlingsgrunnlag(
         val originalSøknad: Sykepengesøknad,
         val faktagrunnlag: Faktagrunnlag,
         val avklarteVerdier: AvklarteVerdier,

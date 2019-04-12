@@ -7,6 +7,7 @@ import no.nav.NarePrometheus
 import no.nav.helse.behandling.*
 import no.nav.helse.fastsetting.vurderFakta
 import no.nav.helse.oppslag.StsRestClient
+import no.nav.helse.probe.SaksbehandlingProbe
 import no.nav.helse.streams.*
 import no.nav.helse.streams.Topics.SYKEPENGEBEHANDLINGSFEIL
 import no.nav.helse.streams.Topics.VEDTAK_SYKEPENGER
@@ -23,6 +24,8 @@ import java.util.*
 class SaksbehandlingStream(val env: Environment) {
 
     private val stsClient = StsRestClient(baseUrl = env.stsRestUrl, username = env.username, password = env.password)
+
+    private val probe = SaksbehandlingProbe(env)
 
     private val appId = "spa-behandling-1"
 
@@ -130,8 +133,8 @@ class SaksbehandlingStream(val env: Environment) {
 
     private fun hentRegisterData(søknad: Sykepengesøknad): Either<Behandlingsfeil, FaktagrunnlagResultat> = Oppslag(env.sparkelBaseUrl, stsClient).hentRegisterData(søknad)
     private fun fastsettFakta(fakta: FaktagrunnlagResultat): Either<Behandlingsfeil, AvklarteFakta> = vurderFakta(fakta)
-    private fun prøvVilkår(fakta: AvklarteFakta): Either<Behandlingsfeil, Vilkårsprøving> = vilkårsprøving(fakta)
-    private fun beregnSykepenger(vilkårsprøving: Vilkårsprøving): Either<Behandlingsfeil, Sykepengeberegning> = sykepengeBeregning(vilkårsprøving)
+    private fun prøvVilkår(fakta: AvklarteFakta): Either<Behandlingsfeil, Behandlingsgrunnlag> = vilkårsprøving(fakta, probe)
+    private fun beregnSykepenger(vilkårsprøving: Behandlingsgrunnlag): Either<Behandlingsfeil, Sykepengeberegning> = sykepengeBeregning(vilkårsprøving)
     private fun fattVedtak(beregning: Sykepengeberegning): Either<Behandlingsfeil, SykepengeVedtak> = vedtak(beregning)
 }
 

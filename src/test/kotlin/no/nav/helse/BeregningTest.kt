@@ -3,7 +3,7 @@ package no.nav.helse
 import no.nav.helse.behandling.AvklarteVerdier
 import no.nav.helse.behandling.Soknadsperiode
 import no.nav.helse.behandling.Sykepengesøknad
-import no.nav.helse.behandling.Vilkårsprøving
+import no.nav.helse.behandling.Behandlingsgrunnlag
 import no.nav.helse.behandling.sykepengeBeregning
 import no.nav.helse.domain.ArbeidsgiverFraSøknad
 import no.nav.helse.fastsetting.*
@@ -54,7 +54,7 @@ class BeregningTest {
     }
 
     fun vilkårsprøvdSøknad(fom: LocalDate, tom: LocalDate, årslønn: Long, sykmeldingsgrad: Int) =
-            Vilkårsprøving(
+            Behandlingsgrunnlag(
                     originalSøknad = Sykepengesøknad(
                             id = "1",
                             aktorId = "123123",

@@ -20,6 +20,7 @@ import no.nav.helse.domain.ArbeidsforholdWrapper
 import no.nav.helse.domain.Arbeidsgiver
 import no.nav.helse.fastsetting.*
 import no.nav.helse.oppslag.*
+import no.nav.helse.probe.SaksbehandlingProbe
 import no.nav.helse.streams.JsonSerializer
 import no.nav.helse.streams.Topics.SYKEPENGEBEHANDLINGSFEIL
 import no.nav.helse.streams.Topics.SYKEPENGESØKNADER_INN
@@ -103,6 +104,9 @@ class EndToEndTest {
 
             app = SaksbehandlingStream(env)
             app.start()
+            val probe = SaksbehandlingProbe(env)
+
+
         }
 
         private fun stopSpa() {

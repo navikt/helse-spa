@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException
 import no.nav.helse.behandling.Sykepengesøknad
 import no.nav.helse.behandling.UavklarteFakta
-import no.nav.helse.behandling.Vilkårsprøving
+import no.nav.helse.behandling.Behandlingsgrunnlag
 
 interface Behandlingsfeil {
     val feilmelding: String
@@ -15,9 +15,9 @@ interface Behandlingsfeil {
 
     data class Avklaringsfeil(val uavklarteFakta: UavklarteFakta, override val feilmelding: String): Behandlingsfeil
 
-    data class Vilkårsprøvingsfeil(val vilkårsprøving: Vilkårsprøving, override val feilmelding: String): Behandlingsfeil
+    data class Vilkårsprøvingsfeil(val vilkårsprøving: Behandlingsgrunnlag, override val feilmelding: String): Behandlingsfeil
 
-    data class Beregningsfeil(val vilkårsprøving: Vilkårsprøving, override val feilmelding: String): Behandlingsfeil
+    data class Beregningsfeil(val vilkårsprøving: Behandlingsgrunnlag, override val feilmelding: String): Behandlingsfeil
 
 
     companion object {
@@ -32,10 +32,10 @@ interface Behandlingsfeil {
         fun avklaringsfeil(uavklarteFakta: UavklarteFakta) = Avklaringsfeil(uavklarteFakta, "Kunne ikke fastsette alle fakta.")
 
         // vi klarte ikke vilkårsprøve, eller vilkårsprøving feilet
-        fun vilkårErIkkeOppfylt(vilkårsprøving: Vilkårsprøving) = Vilkårsprøvingsfeil(vilkårsprøving, "Vilkår er ikke oppfylt.")
+        fun vilkårErIkkeOppfylt(vilkårsprøving: Behandlingsgrunnlag) = Vilkårsprøvingsfeil(vilkårsprøving, "Vilkår er ikke oppfylt.")
 
         // her feilet noe under _beregning, men vi har ikke del-resultat, bare exception
-        fun beregningsfeil(vilkårsprøving: Vilkårsprøving, exception: Exception) = Beregningsfeil(vilkårsprøving, "Beregning feilet: ${exception.javaClass.simpleName}: ${exception.message}.")
+        fun beregningsfeil(vilkårsprøving: Behandlingsgrunnlag, exception: Exception) = Beregningsfeil(vilkårsprøving, "Beregning feilet: ${exception.javaClass.simpleName}: ${exception.message}.")
 
         fun registerFeil(exception: Exception, søknad: Sykepengesøknad):RegisterFeil = RegisterFeil("Feil i opphenting av register-data: ${exception.javaClass.simpleName} : ${exception.message}\"", søknad)
 
