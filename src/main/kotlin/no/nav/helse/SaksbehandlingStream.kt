@@ -26,6 +26,7 @@ class SaksbehandlingStream(val env: Environment) {
     private val stsClient = StsRestClient(baseUrl = env.stsRestUrl, username = env.username, password = env.password)
 
     private val probe = SaksbehandlingProbe(env)
+    private val oppslag = Oppslag(env.sparkelBaseUrl, stsClient)
 
     private val appId = "spa-behandling-1"
 
@@ -85,13 +86,8 @@ class SaksbehandlingStream(val env: Environment) {
                 .peek { _, value -> probe.mottattArbeidstakerSøknad(value) }
                 .filter { _, value -> value.get("status").asText() == "SENDT" && value.has("sendtNav") && !value.get("sendtNav").isNull }
                 .peek { _, value -> probe.mottattSøknadSendtNAV(value) }
-                .mapValues { soknadId, jsonNode -> deserializeSykepengesøknadV2(soknadId, jsonNode) }
-                .mapValues { either -> either.flatMap(::mapToSykepengesøknad) }
-                .mapValues { _, søknad -> søknad.flatMap { hentRegisterData(it) } }
-                .mapValues { _, faktagrunnlag -> faktagrunnlag.flatMap { fastsettFakta(it) } }
-                .mapValues { _, avklarteFakta -> avklarteFakta.flatMap { prøvVilkår(it) } }
-                .mapValues { _, vilkårsprøving -> vilkårsprøving.flatMap { beregnSykepenger(it) } }
-                .mapValues { _, sykepengeberegning -> sykepengeberegning.flatMap { fattVedtak(it) } }
+                .mapValues { soknadId, jsonNode -> jsonNode.deserializeSykepengesøknadV2(soknadId) }
+                .mapValues { _, either -> either.flatMap { it.behandle(oppslag, probe)} }
                 .branch(
                         Predicate { _, søknad -> søknad is Either.Left },
                         Predicate { _, søknad -> søknad is Either.Right }
@@ -111,16 +107,15 @@ class SaksbehandlingStream(val env: Environment) {
         return SplitByType(arbeidstakersøknader = arbeidstakersøknader, frilanssøknader = frilanssøknader, alleAndreSøknader = alleAndreSøknader)
     }
 
-
-    private fun deserializeSykepengesøknadV2(soknadId: String, soknad: JsonNode): Either<Behandlingsfeil, SykepengesøknadV2DTO> =
+    private fun JsonNode.deserializeSykepengesøknadV2(soknadId: String): Either<Behandlingsfeil, SykepengesøknadV2DTO> =
             try {
-                Either.Right(defaultObjectMapper.treeToValue(soknad, SykepengesøknadV2DTO::class.java))
+                Either.Right(defaultObjectMapper.treeToValue(this, SykepengesøknadV2DTO::class.java))
             } catch (e: MissingKotlinParameterException) {
                 probe.missingNonNullablefield(e)
-                Either.Left(Behandlingsfeil.manglendeFeilDeserialiseringsfeil(soknadId, soknad, e))
+                Either.Left(Behandlingsfeil.manglendeFeilDeserialiseringsfeil(soknadId, this, e))
             } catch (e: Exception) {
                 probe.failedToDeserialize(e)
-                Either.Left(Behandlingsfeil.ukjentDeserialiseringsfeil(soknadId, soknad, e))
+                Either.Left(Behandlingsfeil.ukjentDeserialiseringsfeil(soknadId, this, e))
             }
 
     fun start() {
@@ -131,11 +126,6 @@ class SaksbehandlingStream(val env: Environment) {
         consumer.stop()
     }
 
-    private fun hentRegisterData(søknad: Sykepengesøknad): Either<Behandlingsfeil, FaktagrunnlagResultat> = Oppslag(env.sparkelBaseUrl, stsClient).hentRegisterData(søknad)
-    private fun fastsettFakta(fakta: FaktagrunnlagResultat): Either<Behandlingsfeil, AvklarteFakta> = vurderFakta(fakta)
-    private fun prøvVilkår(fakta: AvklarteFakta): Either<Behandlingsfeil, Behandlingsgrunnlag> = vilkårsprøving(fakta, probe)
-    private fun beregnSykepenger(vilkårsprøving: Behandlingsgrunnlag): Either<Behandlingsfeil, Sykepengeberegning> = sykepengeBeregning(vilkårsprøving)
-    private fun fattVedtak(beregning: Sykepengeberegning): Either<Behandlingsfeil, SykepengeVedtak> = vedtak(beregning)
 }
 
 fun serialize(vedtak: SykepengeVedtak): JsonNode = defaultObjectMapper.valueToTree(vedtak)

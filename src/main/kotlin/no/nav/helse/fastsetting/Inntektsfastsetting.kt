@@ -68,14 +68,14 @@ fun fastsettingAvSykepengegrunnlagetIArbeidsgiverperioden(førsteSykdomsdag: Loc
         return Uavklart(HAR_IKKE_DATA, "Kan ikke avklare sykepengegrunnlaget fordi det finnes ikke inntekter fra aktuell arbeidsgiver", beregningsperiode)
     }
 
-    val inntekter = beregningsperiode.inntekter.getValue(arbeidsgiver.orgnummer)
+    val inntekterForArbeidsgiver = beregningsperiode.inntekter.getValue(arbeidsgiver.orgnummer)
 
-    if (inntekter.size != 3) {
+    if (inntekterForArbeidsgiver.size != 3) {
         return Uavklart(FALLER_UTENFOR_MVP, "Kan ikke avklare sykepengegrunnlaget fordi vi forventer inntekter fra tre måneder", beregningsperiode)
     } else {
-        val inntekterFraTreMånederFør = inntekter[treMånederFør]
-        val inntekterFraToMånederFør = inntekter[treMånederFør.plusMonths(1)]
-        val inntekterFraEnMånedFør = inntekter[treMånederFør.plusMonths(2)]
+        val inntekterFraTreMånederFør = inntekterForArbeidsgiver[treMånederFør]
+        val inntekterFraToMånederFør = inntekterForArbeidsgiver[treMånederFør.plusMonths(1)]
+        val inntekterFraEnMånedFør = inntekterForArbeidsgiver[treMånederFør.plusMonths(2)]
 
         if (inntekterFraTreMånederFør == null || inntekterFraToMånederFør == null || inntekterFraEnMånedFør == null) {
             return Uavklart(HAR_IKKE_DATA, "Kan ikke avklare sykepengegrunnlaget fordi vi forventer inntekter fra tre måneder før", beregningsperiode)

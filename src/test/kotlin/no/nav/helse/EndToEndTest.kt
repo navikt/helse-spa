@@ -104,9 +104,6 @@ class EndToEndTest {
 
             app = SaksbehandlingStream(env)
             app.start()
-            val probe = SaksbehandlingProbe(env)
-
-
         }
 
         private fun stopSpa() {
