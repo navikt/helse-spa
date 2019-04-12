@@ -124,6 +124,7 @@ fun vurderFakta(fakta: FaktagrunnlagResultat): Either<Behandlingsfeil, AvklarteF
         )))
 
     } else {
+        @Suppress("UNCHECKED_CAST")
         Either.Right(AvklarteFakta(
                 originalSøknad = fakta.originalSøknad,
                 faktagrunnlag = fakta.faktagrunnlag,
