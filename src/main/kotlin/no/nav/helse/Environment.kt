@@ -13,7 +13,7 @@ data class Environment(
         val stsRestUrl: String = getEnvVar("SECURITY_TOKEN_SERVICE_REST_URL"),
         val plainTextKafka: String? = getEnvVarOptional("PLAIN_TEXT_KAFKA"),
 
-        val sensuHostname: String = getEnvVar("SENSU_HOSTNAME", "probe.nais"),
+        val sensuHostname: String = getEnvVar("SENSU_HOSTNAME", "sensu.nais"),
         val sensuPort: Int = getEnvVar("SENSU_PORT", "3030").toInt()
 )
 
