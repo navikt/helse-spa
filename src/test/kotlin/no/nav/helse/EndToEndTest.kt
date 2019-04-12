@@ -20,7 +20,6 @@ import no.nav.helse.domain.ArbeidsforholdWrapper
 import no.nav.helse.domain.Arbeidsgiver
 import no.nav.helse.fastsetting.*
 import no.nav.helse.oppslag.*
-import no.nav.helse.probe.SaksbehandlingProbe
 import no.nav.helse.streams.JsonSerializer
 import no.nav.helse.streams.Topics.SYKEPENGEBEHANDLINGSFEIL
 import no.nav.helse.streams.Topics.SYKEPENGESØKNADER_INN
@@ -44,7 +43,6 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.slf4j.LoggerFactory
-import java.lang.RuntimeException
 import java.math.BigDecimal
 import java.time.*
 import java.time.LocalDate.parse
@@ -414,13 +412,16 @@ class EndToEndTest {
                 ))))
     }
 
-    val stubbet_person = Person(
-            id = AktørId("1078277661159"),
+    val stubbet_person = PersonDTO(
+            aktørId = "1078277661159",
             fdato = parse("1970-09-01"),
             fornavn = "MAX",
             etternavn = "SMEKKER",
             kjønn = Kjønn.MANN,
-            bostedsland = "NOR"
+            bostedsland = "NOR",
+            statsborgerskap = "NOR",
+            status = "BOSA",
+            diskresjonskode = null
     )
 
     val stubbet_arbeidsforhold = Arbeidsforhold(

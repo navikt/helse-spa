@@ -36,7 +36,21 @@ class PersonOppslag(val sparkelUrl: String, val stsRestClient: StsRestClient) {
             log.error("Error in person lookup", it)
             Either.Left(it)
         } ?: try {
-            Either.Right(defaultObjectMapper.readValue(result.component1(), Person::class.java))
+            Either.Right(defaultObjectMapper.readValue(result.component1(), PersonDTO::class.java)).map { person ->
+                Person(
+                        id = AktørId(person.aktørId),
+                        fornavn = person.fornavn,
+                        mellomnavn = person.mellomnavn,
+                        etternavn = person.etternavn,
+                        fdato = person.fdato,
+                        kjønn = person.kjønn,
+                        statsborgerskap = person.statsborgerskap,
+                        status = person.status,
+                        bostedsland = person.bostedsland,
+                        diskresjonskode = person.diskresjonskode
+
+                )
+            }
         } catch (err: Exception) {
             Either.Left(err)
         }
@@ -48,6 +62,19 @@ enum class Kjønn {
     MANN, KVINNE, UKJENN
 }
 
+data class PersonDTO(
+        val aktørId: String,
+        val fornavn: String,
+        val mellomnavn: String? = null,
+        val etternavn: String,
+        val fdato: LocalDate,
+        val kjønn: Kjønn,
+        val statsborgerskap: String,
+        val status: String,
+        val bostedsland: String?,
+        val diskresjonskode: String?
+)
+
 data class Person(
         val id: AktørId,
         val fornavn: String,
@@ -55,7 +82,10 @@ data class Person(
         val etternavn: String,
         val fdato: LocalDate,
         val kjønn: Kjønn,
-        val bostedsland: String = ""
+        val statsborgerskap: String,
+        val status: String,
+        val bostedsland: String? = null,
+        val diskresjonskode: String? = null
 )
 
 data class AktørId(val aktor: String) {

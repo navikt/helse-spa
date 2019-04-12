@@ -23,7 +23,7 @@ val landskodeNORGE = "NOR"
 val søkerErBosattINorge = "Søker er bosatt i Norge."
 val søkerIkkeBosattINorge = "Søker er ikke bostatt i Norge."
 
-fun søkerBorINorge(bostedland: String): Evaluering {
+fun søkerBorINorge(bostedland: String?): Evaluering {
     return if (bostedland == landskodeNORGE) {
         Evaluering.ja(søkerErBosattINorge)
     } else {
@@ -31,7 +31,7 @@ fun søkerBorINorge(bostedland: String): Evaluering {
     }
 }
 
-data class Medlemsskapgrunnlag(val bostedsland: String)
+data class Medlemsskapgrunnlag(val bostedsland: String?)
 
 fun vurderMedlemskap(fakta: FaktagrunnlagResultat): Vurdering<Boolean, Medlemsskapgrunnlag> {
     val grunnlag = Medlemsskapgrunnlag(fakta.faktagrunnlag.tps.bostedland)

@@ -162,7 +162,7 @@ data class Faktagrunnlag(val tps: Tpsfakta,
                          val sykepengeliste: List<PeriodeYtelse>,
                          val arbeidsforhold: List<Arbeidsforhold>)
 
-data class Tpsfakta(val fodselsdato: LocalDate, val bostedland: String)
+data class Tpsfakta(val fodselsdato: LocalDate, val bostedland: String?)
 
 fun asNewPeriode(it: SykepengesøknadV1Periode): Soknadsperiode = Soknadsperiode(
         fom = it.fom,
