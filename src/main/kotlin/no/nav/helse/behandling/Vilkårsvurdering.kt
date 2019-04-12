@@ -16,6 +16,8 @@ fun vilkårsprøving(avklarteFakta: AvklarteFakta, probe: SaksbehandlingProbe): 
             ytelser = emptyList(),
             søknadSendt = avklarteFakta.originalSøknad.sendtNav.toLocalDate(),
             førsteDagSøknadGjelderFor = avklarteFakta.originalSøknad.fom,
+            sisteDagSøknadenGjelderFor = avklarteFakta.originalSøknad.tom,
+            sisteMuligeSykepengedag = avklarteFakta.avklarteVerdier.maksdato.fastsattVerdi,
             fastsattÅrsinntekt = avklarteFakta.avklarteVerdier.sykepengegrunnlag.fastsattVerdi.sykepengegrunnlagNårTrygdenYter.fastsattVerdi,
             grunnbeløp = getGrunnbeløpForDato(avklarteFakta.originalSøknad.fom)
     )
