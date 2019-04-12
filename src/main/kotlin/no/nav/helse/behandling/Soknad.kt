@@ -82,7 +82,7 @@ data class AvklarteFakta(
 ) : AvklaringsResultat()
 
 data class AvklarteVerdier(
-        val medlemsskap: Vurdering.Avklart<Boolean, Medlemsskapgrunnlag>,
+        val medlemsskap: Vurdering.Avklart<Boolean, Tpsfakta>,
         val alder: Vurdering.Avklart<Alder, Aldersgrunnlag>,
         val maksdato: Vurdering.Avklart<LocalDate, Grunnlagsdata>,
         val sykepengeliste: List<PeriodeYtelse>,
@@ -98,7 +98,7 @@ data class UavklarteFakta(
 ) : AvklaringsResultat()
 
 data class UavklarteVerdier(
-        val medlemsskap: Vurdering<Boolean, Medlemsskapgrunnlag>,
+        val medlemsskap: Vurdering<Boolean, Tpsfakta>,
         val alder: Vurdering<Alder, Aldersgrunnlag>,
         val maksdato: Vurdering<LocalDate, Grunnlagsdata?>,
         val sykepengeliste: List<PeriodeYtelse>,
@@ -162,7 +162,11 @@ data class Faktagrunnlag(val tps: Tpsfakta,
                          val sykepengeliste: List<PeriodeYtelse>,
                          val arbeidsforhold: List<Arbeidsforhold>)
 
-data class Tpsfakta(val fodselsdato: LocalDate, val bostedland: String?)
+data class Tpsfakta(val fodselsdato: LocalDate,
+                    val bostedland: String?,
+                    val statsborgerskap: String,
+                    val status: String,
+                    val diskresjonskode: String?)
 
 fun asNewPeriode(it: SykepengesøknadV1Periode): Soknadsperiode = Soknadsperiode(
         fom = it.fom,

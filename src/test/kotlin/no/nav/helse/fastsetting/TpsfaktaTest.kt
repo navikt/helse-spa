@@ -10,7 +10,7 @@ class TpsfaktaTest {
     @Test
     fun `alder er riktig når bursdag er i dag`() {
         val iFjor = LocalDate.now().minusYears(1)
-        val fakta = Tpsfakta(iFjor, "")
+        val fakta = Tpsfakta(iFjor, "", "NOR", "BOSA", null)
 
         assertEquals(1, fakta.alder())
     }
@@ -18,7 +18,7 @@ class TpsfaktaTest {
     @Test
     fun `alder er riktig når bursdag var i går`() {
         val iFjor = LocalDate.now().minusYears(1).minusDays(1)
-        val fakta = Tpsfakta(iFjor, "")
+        val fakta = Tpsfakta(iFjor, "", "NOR", "BOSA", null)
 
         assertEquals(1, fakta.alder())
     }
@@ -26,7 +26,7 @@ class TpsfaktaTest {
     @Test
     fun `alder er riktig når bursdag er i morgen`() {
         val iFjor = LocalDate.now().minusYears(1).plusDays(1)
-        val fakta = Tpsfakta(iFjor, "")
+        val fakta = Tpsfakta(iFjor, "", "NOR", "BOSA", null)
 
         assertEquals(0, fakta.alder())
     }

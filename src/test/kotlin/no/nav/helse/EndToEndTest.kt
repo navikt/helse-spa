@@ -199,13 +199,16 @@ class EndToEndTest {
         assert(grunnlag.tidligerePerioder).isEqualTo(sykepengeListe)
     }
 
-    private fun checkMedlemsskap(medlemsskap: Vurdering.Avklart<Boolean, Medlemsskapgrunnlag>) {
+    private fun checkMedlemsskap(medlemsskap: Vurdering.Avklart<Boolean, Tpsfakta>) {
         assert(medlemsskap.fastsattVerdi).isTrue()
-        assert(medlemsskap.begrunnelse).contains(søkerErBosattINorge)
+        assert(medlemsskap.begrunnelse).contains(søkerOppfyllerKravOmMedlemskap)
         assert(medlemsskap.vurderingstidspunkt).isBetween(LocalDateTime.now().minusHours(1), LocalDateTime.now().plusHours(1))
         assert(medlemsskap.fastsattAv).isEqualTo("SPA")
 
-        assert(medlemsskap.grunnlag.bostedsland).isEqualTo(landskodeNORGE)
+        assert(medlemsskap.grunnlag.bostedland).isEqualTo(landskodeNORGE)
+        assert(medlemsskap.grunnlag.statsborgerskap).isEqualTo(landskodeNORGE)
+        assert(medlemsskap.grunnlag.status).isEqualTo(bosattstatus)
+        assert(medlemsskap.grunnlag.diskresjonskode).isNull()
     }
 
     private fun checkSykepengegrunnlag(sykepengegrunnlagVurdering: Vurdering.Avklart<Sykepengegrunnlag, Beregningsperiode>) {

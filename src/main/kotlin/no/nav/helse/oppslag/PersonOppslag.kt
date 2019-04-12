@@ -15,7 +15,13 @@ class PersonOppslag(val sparkelUrl: String, val stsRestClient: StsRestClient) {
 
     fun hentTPSData(input: Sykepengesøknad): Either<Exception, Tpsfakta> {
         return hentPerson(AktørId(input.aktorId)).map { person ->
-            Tpsfakta(fodselsdato = person.fdato, bostedland = person.bostedsland)
+            Tpsfakta(
+                    fodselsdato = person.fdato,
+                    bostedland = person.bostedsland,
+                    statsborgerskap = person.statsborgerskap,
+                    status = person.status,
+                    diskresjonskode = person.diskresjonskode
+            )
         }
     }
 

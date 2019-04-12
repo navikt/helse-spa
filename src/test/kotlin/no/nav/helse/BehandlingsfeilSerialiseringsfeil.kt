@@ -44,7 +44,9 @@ val uavklarteJson= """{
     "faktagrunnlag" : {
       "tps" : {
         "fodselsdato" : "1981-07-12",
-        "bostedland" : "SWE"
+        "bostedland" : "SWE",
+        "statsborgerskap": "NOR",
+        "status": "BOSA"
       },
       "beregningsperiode" : [ {
         "arbeidsgiver" : {
@@ -167,10 +169,13 @@ val uavklarteJson= """{
     "uavklarteVerdier" : {
       "medlemsskap" : {
         "type" : "Uavklart",
-        "årsak" : "KREVER_SKJØNNSMESSIG_VURDERING",
-        "begrunnelse" : "(Søker er ikke bostatt i Norge. ELLER Vi har ikke nok informasjon til å kunne gi et entydig svar.)",
+        "årsak" : "FALLER_UTENFOR_MVP",
+        "begrunnelse" : "Søker må være bosatt i Norge",
         "grunnlag" : {
-          "bostedsland" : "SWE"
+          "fodselsdato": "1980-01-01",
+          "bostedland" : "SWE",
+          "statsborgerskap": "NOR",
+          "status": "BOSA"
         },
         "vurderingstidspunkt" : "2019-03-11T13:07:47.954472"
       },

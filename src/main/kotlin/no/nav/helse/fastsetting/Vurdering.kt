@@ -5,13 +5,9 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
 import io.prometheus.client.Counter
 import no.nav.helse.Behandlingsfeil
 import no.nav.helse.Either
-import no.nav.helse.Yrkesstatus
 import no.nav.helse.Grunnlagsdata
-import no.nav.helse.behandling.AvklarteFakta
-import no.nav.helse.behandling.AvklarteVerdier
-import no.nav.helse.behandling.FaktagrunnlagResultat
-import no.nav.helse.behandling.UavklarteFakta
-import no.nav.helse.behandling.UavklarteVerdier
+import no.nav.helse.Yrkesstatus
+import no.nav.helse.behandling.*
 import no.nav.helse.domain.Arbeidsforhold
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -61,7 +57,7 @@ sealed class Vurdering<out V, out G>(val begrunnelse: String, val grunnlag: G, v
 
 
 fun vurderFakta(fakta: FaktagrunnlagResultat): Either<Behandlingsfeil, AvklarteFakta> {
-    val medlemsskap = vurderMedlemskap(fakta).also {
+    val medlemsskap = vurderMedlemskap(fakta.faktagrunnlag.tps).also {
         if (it is Vurdering.Uavklart) {
             vurderingerCounter.labels("medlemsskap", "uavklart").inc()
         } else {
@@ -129,7 +125,7 @@ fun vurderFakta(fakta: FaktagrunnlagResultat): Either<Behandlingsfeil, AvklarteF
                 originalSøknad = fakta.originalSøknad,
                 faktagrunnlag = fakta.faktagrunnlag,
                 avklarteVerdier = AvklarteVerdier(
-                        medlemsskap = medlemsskap as Vurdering.Avklart<Boolean, Medlemsskapgrunnlag>,
+                        medlemsskap = medlemsskap as Vurdering.Avklart<Boolean, Tpsfakta>,
                         alder = alder as Vurdering.Avklart<Alder, Aldersgrunnlag>,
                         arbeidsforhold = arbeidsforhold as Vurdering.Avklart<Boolean, List<Arbeidsforhold>>,
                         opptjeningstid = opptjeningstid as Vurdering.Avklart<Opptjeningstid, Opptjeningsgrunnlag>,

@@ -1,12 +1,11 @@
 package no.nav.helse
 
-import no.nav.helse.behandling.AvklarteVerdier
-import no.nav.helse.behandling.Soknadsperiode
-import no.nav.helse.behandling.Sykepengesøknad
-import no.nav.helse.behandling.Behandlingsgrunnlag
-import no.nav.helse.behandling.sykepengeBeregning
+import no.nav.helse.behandling.*
 import no.nav.helse.domain.ArbeidsgiverFraSøknad
-import no.nav.helse.fastsetting.*
+import no.nav.helse.fastsetting.Aldersgrunnlag
+import no.nav.helse.fastsetting.Beregningsperiode
+import no.nav.helse.fastsetting.Opptjeningsgrunnlag
+import no.nav.helse.fastsetting.Sykepengegrunnlag
 import no.nav.helse.fastsetting.Vurdering.Avklart
 import no.nav.helse.oppslag.getGrunnbeløpForDato
 import no.nav.nare.core.evaluations.Evaluering
@@ -69,7 +68,7 @@ class BeregningTest {
                             status = "SENDT"),
                     faktagrunnlag = faktagrunnlagUtenVerdi,
                     avklarteVerdier = AvklarteVerdier(
-                            medlemsskap = Avklart(fastsattVerdi = true, begrunnelse = "derfor", fastsattAv = "test", grunnlag = Medlemsskapgrunnlag("NO")),
+                            medlemsskap = Avklart(fastsattVerdi = true, begrunnelse = "derfor", fastsattAv = "test", grunnlag = Tpsfakta(LocalDate.parse("1980-01-01"), "NOR", "NOR", "BOSA", null)),
                             sykepengegrunnlag = Avklart(fastsattVerdi =
                             Sykepengegrunnlag(
                                     sykepengegrunnlagNårTrygdenYter = Avklart(fastsattVerdi = årslønn, grunnlag = Beregningsperiode(emptyMap(), "derfor"), begrunnelse = "derfor", fastsattAv = "test"),

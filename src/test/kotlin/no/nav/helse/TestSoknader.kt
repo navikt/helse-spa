@@ -12,7 +12,10 @@ import java.time.LocalDateTime
 
 val tpsFaktaUtenVerdi = Tpsfakta(
         fodselsdato = LocalDate.now(),
-        bostedland = "bytt ut dette i tester"
+        bostedland = "bytt ut dette i tester",
+        statsborgerskap = "bytt ut dette i tester",
+        status = "bytt ut dette i tester",
+        diskresjonskode = "bytt ut dette i tester"
 )
 
 val arbeidsforholdUtenVerdi = emptyList<Arbeidsforhold>()
@@ -46,7 +49,7 @@ val soknadUtenVerdi = FaktagrunnlagResultat(
 
 val enkleAvklarteVerdier = AvklarteVerdier(
         alder = Vurdering.Avklart(fastsattVerdi = 50, fastsattAv = "test", begrunnelse = "whatevs", grunnlag = Aldersgrunnlag(fodselsdato = LocalDate.now().minusYears(50))),
-        medlemsskap = Vurdering.Avklart(fastsattVerdi = true, fastsattAv = "test", begrunnelse = "whatevs", grunnlag = Medlemsskapgrunnlag("NOR")),
+        medlemsskap = Vurdering.Avklart(fastsattVerdi = true, fastsattAv = "test", begrunnelse = "whatevs", grunnlag = Tpsfakta(LocalDate.now().minusYears(50), "NOR", "NOR", "BOSA", null)),
         arbeidsforhold = Vurdering.Avklart(fastsattVerdi = true, fastsattAv = "test", begrunnelse = "whatevs", grunnlag = emptyList()),
         opptjeningstid = Vurdering.Avklart(fastsattVerdi = 25L, fastsattAv = "test", begrunnelse = "whatevs", grunnlag = Opptjeningsgrunnlag(førsteSykdomsdag = LocalDate.now(), arbeidsforhold = emptyList())),
         sykepengegrunnlag = Vurdering.Avklart(
