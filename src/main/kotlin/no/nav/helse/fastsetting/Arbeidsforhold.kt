@@ -14,6 +14,6 @@ fun vurderArbeidsforhold(fakta : FaktagrunnlagResultat) : Vurdering<Boolean, Lis
             it.arbeidsgiver.identifikator == fakta.originalSøknad.arbeidsgiver.orgnummer
                     && it.sluttdato == null
         } -> Vurdering.Avklart(true, "Søker har et aktivt arbeidsforhold hos ${fakta.originalSøknad.arbeidsgiver.navn}", arbeidsforholdFakta, "SPA")
-        else -> Vurdering.Uavklart(Vurdering.Uavklart.Årsak.FALLER_UTENFOR_MVP, "Søker har ikke aktivt arbeidsforhold hos ${fakta.originalSøknad.arbeidsgiver.navn}", arbeidsforholdFakta)
+        else -> Vurdering.Uavklart(Vurdering.Uavklart.Årsak.FORSTÅR_IKKE_DATA, "Søker har ikke aktivt arbeidsforhold hos ${fakta.originalSøknad.arbeidsgiver.navn}", arbeidsforholdFakta)
     }
 }

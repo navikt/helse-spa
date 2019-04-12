@@ -62,8 +62,10 @@ fun fastsettingAvSykepengegrunnlagetIArbeidsgiverperioden(førsteSykdomsdag: Loc
         return if (beregningsperiode.inntekter.keys.firstOrNull { it == arbeidsgiver.orgnummer } == null) {
             Uavklart(HAR_IKKE_DATA, "Kan ikke avklare sykepengegrunnlaget fordi det finnes ikke inntekter fra aktuell arbeidsgiver", beregningsperiode)
         } else {
-            Uavklart(KREVER_SKJØNNSMESSIG_VURDERING, "Kan ikke avklare sykepengegrunnlaget fordi det andre inntekter i arbeidsgiverperioden i tillegg til aktuell arbeidsgiver", beregningsperiode)
+            Uavklart(FORSTÅR_IKKE_DATA, "Kan ikke avklare sykepengegrunnlaget fordi det andre inntekter i arbeidsgiverperioden i tillegg til aktuell arbeidsgiver", beregningsperiode)
         }
+    } else if (beregningsperiode.inntekter.keys.firstOrNull { it == arbeidsgiver.orgnummer } == null) {
+        return Uavklart(HAR_IKKE_DATA, "Kan ikke avklare sykepengegrunnlaget fordi det finnes ikke inntekter fra aktuell arbeidsgiver", beregningsperiode)
     }
 
     val inntekter = beregningsperiode.inntekter.getValue(arbeidsgiver.orgnummer)
