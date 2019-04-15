@@ -4,8 +4,9 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException
 import io.prometheus.client.CollectorRegistry
 import no.nav.NarePrometheus
-import no.nav.helse.behandling.*
-import no.nav.helse.fastsetting.vurderFakta
+import no.nav.helse.behandling.Oppslag
+import no.nav.helse.behandling.SykepengeVedtak
+import no.nav.helse.behandling.SykepengesøknadV2DTO
 import no.nav.helse.oppslag.StsRestClient
 import no.nav.helse.probe.SaksbehandlingProbe
 import no.nav.helse.streams.*
@@ -19,6 +20,7 @@ import org.apache.kafka.streams.Topology
 import org.apache.kafka.streams.errors.LogAndFailExceptionHandler
 import org.apache.kafka.streams.kstream.KStream
 import org.apache.kafka.streams.kstream.Predicate
+import org.slf4j.MDC
 import java.util.*
 
 class SaksbehandlingStream(val env: Environment) {
@@ -67,18 +69,30 @@ class SaksbehandlingStream(val env: Environment) {
         vedtak
                 .peek { _, _ -> probe.behandlingOk() }
                 .mapValues { _, sykepengevedtak -> (sykepengevedtak as Either.Right).right }
-                .peek { _, sykepengevedtak -> probe.vedtakBehandlet(sykepengevedtak) }
-                .mapValues { _, sykepengevedtak -> serialize(sykepengevedtak) }
-                .toTopic(VEDTAK_SYKEPENGER)
+                .peek { _, sykepengevedtak ->
+                    loggMedSøknadId(sykepengevedtak.originalSøknad.id) {
+                        probe.vedtakBehandlet(sykepengevedtak)
+                    }
+                }.mapValues { _, sykepengevedtak ->
+                    loggMedSøknadId(sykepengevedtak.originalSøknad.id) {
+                        serialize(sykepengevedtak)
+                    }
+                }.toTopic(VEDTAK_SYKEPENGER)
     }
 
     private fun sendTilFeilkø(feilendeSøknader: KStream<String, Either<Behandlingsfeil, SykepengeVedtak>>) {
         feilendeSøknader
                 .peek { _, _ -> probe.behandlingFeil() }
                 .mapValues { _, behandlingsfeil -> (behandlingsfeil as Either.Left).left }
-                .peek { _, behandlingsfeil -> probe.behandlingsFeilMedType(behandlingsfeil) }
-                .mapValues { _, behandlingsfeil -> serializeBehandlingsfeil(behandlingsfeil) }
-                .toTopic(SYKEPENGEBEHANDLINGSFEIL)
+                .peek { _, behandlingsfeil ->
+                    loggMedSøknadId(behandlingsfeil.soknadId) {
+                        probe.behandlingsFeilMedType(behandlingsfeil)
+                    }
+                }.mapValues { _, behandlingsfeil ->
+                    loggMedSøknadId(behandlingsfeil.soknadId) {
+                        serializeBehandlingsfeil(behandlingsfeil)
+                    }
+                }.toTopic(SYKEPENGEBEHANDLINGSFEIL)
     }
 
     private fun prøvArbeidstaker(arbeidstakersøknader: KStream<String, JsonNode>): VedtakEllerFeil {
@@ -86,8 +100,16 @@ class SaksbehandlingStream(val env: Environment) {
                 .peek { _, value -> probe.mottattArbeidstakerSøknad(value) }
                 .filter { _, value -> value.get("status").asText() == "SENDT" && value.has("sendtNav") && !value.get("sendtNav").isNull }
                 .peek { _, value -> probe.mottattSøknadSendtNAV(value) }
-                .mapValues { soknadId, jsonNode -> jsonNode.deserializeSykepengesøknadV2(soknadId) }
-                .mapValues { _, either -> either.flatMap { it.behandle(oppslag, probe)} }
+                .mapValues { soknadId, jsonNode ->
+                    loggMedSøknadId(soknadId) {
+                        jsonNode.deserializeSykepengesøknadV2(soknadId)
+                    }
+                }
+                .mapValues { _, either -> either.flatMap {
+                    loggMedSøknadId(it.id) {
+                        it.behandle(oppslag, probe)
+                    }
+                } }
                 .branch(
                         Predicate { _, søknad -> søknad is Either.Left },
                         Predicate { _, søknad -> søknad is Either.Right }
@@ -126,6 +148,15 @@ class SaksbehandlingStream(val env: Environment) {
         consumer.stop()
     }
 
+}
+
+private fun <T> loggMedSøknadId(soknadId: String, block: () -> T): T {
+    try {
+        MDC.put("soknadId", soknadId)
+        return block()
+    } finally {
+        MDC.remove("soknadId")
+    }
 }
 
 fun serialize(vedtak: SykepengeVedtak): JsonNode = defaultObjectMapper.valueToTree(vedtak)

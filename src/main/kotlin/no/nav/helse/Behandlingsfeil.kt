@@ -2,22 +2,23 @@ package no.nav.helse
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException
+import no.nav.helse.behandling.Behandlingsgrunnlag
 import no.nav.helse.behandling.Sykepengesøknad
 import no.nav.helse.behandling.UavklarteFakta
-import no.nav.helse.behandling.Behandlingsgrunnlag
 
 interface Behandlingsfeil {
+    val soknadId: String
     val feilmelding: String
 
-    data class Deserialiseringsfeil(val soknadId: String, val json: JsonNode, override val feilmelding: String): Behandlingsfeil
+    data class Deserialiseringsfeil(override val soknadId: String, val json: JsonNode, override val feilmelding: String): Behandlingsfeil
 
-    data class RegisterFeil(override val feilmelding: String, val søknad: Sykepengesøknad): Behandlingsfeil
+    data class RegisterFeil(override val feilmelding: String, val søknad: Sykepengesøknad, override val soknadId: String = søknad.id): Behandlingsfeil
 
-    data class Avklaringsfeil(val uavklarteFakta: UavklarteFakta, override val feilmelding: String): Behandlingsfeil
+    data class Avklaringsfeil(val uavklarteFakta: UavklarteFakta, override val feilmelding: String, override val soknadId: String = uavklarteFakta.originalSøknad.id): Behandlingsfeil
 
-    data class Vilkårsprøvingsfeil(val vilkårsprøving: Behandlingsgrunnlag, override val feilmelding: String): Behandlingsfeil
+    data class Vilkårsprøvingsfeil(val vilkårsprøving: Behandlingsgrunnlag, override val feilmelding: String, override val soknadId: String = vilkårsprøving.originalSøknad.id): Behandlingsfeil
 
-    data class Beregningsfeil(val vilkårsprøving: Behandlingsgrunnlag, override val feilmelding: String): Behandlingsfeil
+    data class Beregningsfeil(val vilkårsprøving: Behandlingsgrunnlag, override val feilmelding: String, override val soknadId: String = vilkårsprøving.originalSøknad.id): Behandlingsfeil
 
 
     companion object {
