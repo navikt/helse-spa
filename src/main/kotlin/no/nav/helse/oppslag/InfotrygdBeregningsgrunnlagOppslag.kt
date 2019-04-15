@@ -58,7 +58,7 @@ data class InfotrygdVedtak(
         val utbetalingsgrad : Int)
 
 enum class InntektsPeriodeVerdi {
-    Å, M, F, U, D
+    Å, M, F, U, D, X
 }
 
 @JsonIgnoreProperties(ignoreUnknown = true)
