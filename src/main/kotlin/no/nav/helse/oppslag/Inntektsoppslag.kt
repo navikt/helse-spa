@@ -18,8 +18,8 @@ class Inntektsoppslag(val sparkelUrl: String, val stsRestClient: StsRestClient) 
     private fun hentInntekter(aktorId: String, fom: LocalDate, tom: LocalDate, type: String): Either<Exception, List<Inntekt>> {
         val bearer = stsRestClient.token()
 
-        val dyFom = fom.format(DateTimeFormatter.ofPattern("yyyy-MM"));
-        val dyTom = tom.format(DateTimeFormatter.ofPattern("yyyy-MM"));
+        val dyFom = fom.format(DateTimeFormatter.ofPattern("yyyy-MM"))
+        val dyTom = tom.format(DateTimeFormatter.ofPattern("yyyy-MM"))
 
         val (_, _, result) = "$sparkelUrl/api/inntekt/$aktorId/$type?fom=$dyFom&tom=$dyTom".httpGet()
                 .header(mapOf(
@@ -41,7 +41,7 @@ class Inntektsoppslag(val sparkelUrl: String, val stsRestClient: StsRestClient) 
         }
     }
 
-    fun hentBeregningsgrunnlag(aktorId: String, fom: LocalDate, tom: LocalDate) = hentInntekter(aktorId, fom, tom, "beregningsgrunnlag")
+    fun hentBeregningsgrunnlag(aktorId: String, virksomhetsnummer: String, fom: LocalDate, tom: LocalDate) = hentInntekter(aktorId, fom, tom, "beregningsgrunnlag/$virksomhetsnummer")
     fun hentSammenligningsgrunnlag(aktorId: String, fom: LocalDate, tom: LocalDate) = hentInntekter(aktorId, fom, tom, "sammenligningsgrunnlag")
 }
 

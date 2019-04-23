@@ -461,7 +461,7 @@ class EndToEndTest {
     }
 
     private fun inntektStub(aktørId: String) {
-        stubFor(any(urlPathEqualTo("/api/inntekt/$aktørId/beregningsgrunnlag"))
+        stubFor(any(urlPathEqualTo("/api/inntekt/$aktørId/beregningsgrunnlag/${stubbet_arbeidsforhold.arbeidsgiver.identifikator}"))
                 .willReturn(okJson(defaultObjectMapper.writeValueAsString(
                         InntektsoppslagResultat(stubbet_inntekt_beregningsgrunnlag)
                 ))))

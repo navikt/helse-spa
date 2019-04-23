@@ -12,7 +12,7 @@ class Oppslag(val sparkelBaseUrl: String, val stsClient: StsRestClient) {
             PersonOppslag(sparkelBaseUrl, stsClient).hentTPSData(søknad).mapLeft {
                 Behandlingsfeil.registerFeil(it, søknad)
             }.flatMap { tpsfakta ->
-                Inntektsoppslag(sparkelBaseUrl, stsClient).hentBeregningsgrunnlag(søknad.aktorId, søknad.startSyketilfelle.minusMonths(3), søknad.startSyketilfelle.minusMonths(1)).mapLeft {
+                Inntektsoppslag(sparkelBaseUrl, stsClient).hentBeregningsgrunnlag(søknad.aktorId, søknad.arbeidsgiver.orgnummer, søknad.startSyketilfelle.minusMonths(3), søknad.startSyketilfelle.minusMonths(1)).mapLeft {
                     Behandlingsfeil.registerFeil(it, søknad)
                 }.flatMap { beregningsperiode ->
                     Inntektsoppslag(sparkelBaseUrl, stsClient).hentSammenligningsgrunnlag(søknad.aktorId, søknad.startSyketilfelle.minusYears(1), søknad.startSyketilfelle.minusMonths(1)).mapLeft {
