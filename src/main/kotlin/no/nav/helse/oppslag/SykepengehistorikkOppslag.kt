@@ -9,7 +9,7 @@ import java.time.LocalDate
 import java.util.*
 
 class SykepengehistorikkOppslag(val sparkelUrl: String, val stsRestClient: StsRestClient) {
-    private val log = LoggerFactory.getLogger(InfotrygdBeregningsgrunnlagOppslag::class.java.name)
+    private val log = LoggerFactory.getLogger(SykepengehistorikkOppslag::class.java.name)
 
     fun hentSykepengehistorikk(aktorId: String, tom: LocalDate): Either<Exception, List<AnvistPeriode>> {
         val bearer = stsRestClient.token()
