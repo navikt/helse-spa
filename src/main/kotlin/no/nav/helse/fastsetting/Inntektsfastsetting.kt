@@ -1,5 +1,6 @@
 package no.nav.helse.fastsetting
 
+import no.nav.helse.behandling.Soknadsperiode
 import no.nav.helse.domain.ArbeidsgiverFraSøknad
 import no.nav.helse.fastsetting.Vurdering.Uavklart
 import no.nav.helse.fastsetting.Vurdering.Uavklart.Årsak.*
@@ -12,7 +13,14 @@ import java.time.YearMonth
 
 fun LocalDate.yearMonth() = YearMonth.of(year, month.value)
 
-fun fastsettingAvSykepengegrunnlaget(førsteSykdomsdag: LocalDate, arbeidsgiver: ArbeidsgiverFraSøknad, beregningsgrunnlag: List<Inntekt>, sammenligningsgrunnlag: List<Inntekt>): Vurdering<*, *> {
+fun fastsettingAvSykepengegrunnlaget(førsteSykdomsdag: LocalDate, perioder: List<Soknadsperiode>, arbeidsgiver: ArbeidsgiverFraSøknad, beregningsgrunnlag: List<Inntekt>, sammenligningsgrunnlag: List<Inntekt>): Vurdering<*, *> {
+    if (perioder.size > 1) {
+        return Uavklart<Long, List<Beregningsperiode>>(FALLER_UTENFOR_MVP, "Søknaden inneholder mer enn én sykdomsperiode", emptyList())
+    }
+    if (perioder[0].fom != førsteSykdomsdag) {
+        return Uavklart<Long, List<Beregningsperiode>>(FALLER_UTENFOR_MVP, "Første dag i perioden er ikke den samme som første sykdomsdag", emptyList())
+    }
+
     val sykepengegrunnlagIArbeidsgiverperioden = fastsettingAvSykepengegrunnlagetIArbeidsgiverperioden(førsteSykdomsdag,
             arbeidsgiver, beregningsgrunnlag)
 
