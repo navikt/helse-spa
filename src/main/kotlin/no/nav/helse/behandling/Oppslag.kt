@@ -7,34 +7,31 @@ class Oppslag(val sparkelBaseUrl: String, val stsClient: StsRestClient) {
 
     fun hentRegisterData(søknad: Sykepengesøknad): Either<Behandlingsfeil, FaktagrunnlagResultat> =
             with(søknad) {
-                hentPerson().ellerDø(this) { tpsfakta ->
-                    hentBeregningsgrunnlag().ellerDø(this) { beregningsperiode ->
-                        hentSammenligningsgrunnlag().ellerDø(this) { sammenligningsperiode ->
-                            hentArbeidsforhold().ellerDø(this) { arbeidsforhold ->
-                                hentSykepengehistorikk().ellerDø(this) { sykepengehistorikk ->
-                                    try {
-                                        Either.Right(FaktagrunnlagResultat(
-                                                originalSøknad = søknad,
-                                                faktagrunnlag = Faktagrunnlag(
-                                                        tps = tpsfakta,
-                                                        beregningsperiode = beregningsperiode,
-                                                        sammenligningsperiode = sammenligningsperiode,
+                prøv(hentPerson())                      deretter { tpsfakta ->
+                prøv(hentBeregningsgrunnlag())          deretter { beregningsperiode ->
+                prøv(hentSammenligningsgrunnlag())      deretter { sammenligningsperiode ->
+                prøv(hentArbeidsforhold())              deretter { arbeidsforhold ->
+                prøv(hentSykepengehistorikk())          deretter { sykepengehistorikk ->
+                    try {
+                        Either.Right(FaktagrunnlagResultat(
+                                originalSøknad = søknad,
+                                faktagrunnlag = Faktagrunnlag(
+                                        tps = tpsfakta,
+                                        beregningsperiode = beregningsperiode,
+                                        sammenligningsperiode = sammenligningsperiode,
                                                         sykepengehistorikk = sykepengehistorikk,
-                                                        arbeidsforhold = arbeidsforhold
-                                                )))
-                                    } catch (e: Exception) {
-                                        Either.Left(Behandlingsfeil.registerFeil(e, søknad))
-                                    }
-                                }
-                            }
-                        }
+                                        arbeidsforhold = arbeidsforhold
+                                )))
+                    } catch (e: Exception) {
+                        Either.Left(Behandlingsfeil.registerFeil(e, søknad))
                     }
-                }
+                }}}}}
             }
 
-    private fun <T, U> Either<Exception, T>.ellerDø(søknad: Sykepengesøknad, hentMer: (t: T) -> Either<Behandlingsfeil, U>) = mapLeft {
-        søknad.markerFeil(it)
-    }.flatMap { hentMer(it) }
+
+    private infix fun <T> Sykepengesøknad.prøv(either: Either<Exception, T>) = object {
+        infix fun <U> deretter(hentMer: (t: T) -> Either<Behandlingsfeil, U>) = either.mapLeft { markerFeil(it) }.flatMap(hentMer)
+    }
 
     private fun Sykepengesøknad.markerFeil(ex: Exception) = Behandlingsfeil.registerFeil(ex, this)
     private fun Sykepengesøknad.hentPerson() = PersonOppslag(sparkelBaseUrl, stsClient).hentTPSData(this)
