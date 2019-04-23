@@ -99,7 +99,7 @@ class SaksbehandlingProbe(val env: Environment) {
         behandlingsfeilCounter.labels("avklaring").inc()
         feil.uavklarteFakta.uavklarteVerdier.asNamedList().forEach { (name, fakta) ->
             if (fakta is Vurdering.Uavklart) {
-                log.info("$name er uavklart: ${fakta.begrunnelse}")
+                log.info("$name er uavklart fordi ${fakta.årsak}: ${fakta.begrunnelse}")
 
                 avklaringsfeilCounter.labels(name).inc()
                 influxMetricReporter.sendDataPoint(DataPoint(
