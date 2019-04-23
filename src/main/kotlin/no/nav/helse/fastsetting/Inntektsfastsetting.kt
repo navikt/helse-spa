@@ -18,7 +18,7 @@ fun fastsettingAvSykepengegrunnlaget(førsteSykdomsdag: LocalDate, perioder: Lis
         return Uavklart<Long, List<Beregningsperiode>>(FALLER_UTENFOR_MVP, "Søknaden inneholder mer enn én sykdomsperiode", emptyList())
     }
     if (perioder[0].fom != førsteSykdomsdag) {
-        return Uavklart<Long, List<Beregningsperiode>>(FALLER_UTENFOR_MVP, "Første dag i perioden er ikke den samme som første sykdomsdag", emptyList())
+        return Uavklart<Long, List<Beregningsperiode>>(FALLER_UTENFOR_MVP, "Første dag i perioden (${perioder[0].fom}) er ikke den samme som første sykdomsdag ($førsteSykdomsdag)", emptyList())
     }
 
     val sykepengegrunnlagIArbeidsgiverperioden = fastsettingAvSykepengegrunnlagetIArbeidsgiverperioden(førsteSykdomsdag,
