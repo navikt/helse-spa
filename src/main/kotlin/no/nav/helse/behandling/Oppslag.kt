@@ -7,25 +7,29 @@ class Oppslag(val sparkelBaseUrl: String, val stsClient: StsRestClient) {
 
     fun hentRegisterData(søknad: Sykepengesøknad): Either<Behandlingsfeil, FaktagrunnlagResultat> =
             with(søknad) {
-                prøv(hentPerson())                      deretter { tpsfakta ->
-                prøv(hentBeregningsgrunnlag())          deretter { beregningsperiode ->
-                prøv(hentSammenligningsgrunnlag())      deretter { sammenligningsperiode ->
-                prøv(hentArbeidsforhold())              deretter { arbeidsforhold ->
-                prøv(hentSykepengehistorikk())          deretter { sykepengehistorikk ->
-                    try {
-                        Either.Right(FaktagrunnlagResultat(
-                                originalSøknad = søknad,
-                                faktagrunnlag = Faktagrunnlag(
-                                        tps = tpsfakta,
-                                        beregningsperiode = beregningsperiode,
-                                        sammenligningsperiode = sammenligningsperiode,
+                prøv(hentPerson()) deretter { tpsfakta ->
+                    prøv(hentBeregningsgrunnlag()) deretter { beregningsperiode ->
+                        prøv(hentSammenligningsgrunnlag()) deretter { sammenligningsperiode ->
+                            prøv(hentArbeidsforhold()) deretter { arbeidsforhold ->
+                                prøv(hentSykepengehistorikk()) deretter { sykepengehistorikk ->
+                                    try {
+                                        Either.Right(FaktagrunnlagResultat(
+                                                originalSøknad = søknad,
+                                                faktagrunnlag = Faktagrunnlag(
+                                                        tps = tpsfakta,
+                                                        beregningsperiode = beregningsperiode,
+                                                        sammenligningsperiode = sammenligningsperiode,
                                                         sykepengehistorikk = sykepengehistorikk,
-                                        arbeidsforhold = arbeidsforhold
-                                )))
-                    } catch (e: Exception) {
-                        Either.Left(Behandlingsfeil.registerFeil(e, søknad))
+                                                        arbeidsforhold = arbeidsforhold
+                                                )))
+                                    } catch (e: Exception) {
+                                        Either.Left(Behandlingsfeil.registerFeil(e, søknad))
+                                    }
+                                }
+                            }
+                        }
                     }
-                }}}}}
+                }
             }
 
 
