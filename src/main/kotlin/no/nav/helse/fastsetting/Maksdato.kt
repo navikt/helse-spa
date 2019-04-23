@@ -42,8 +42,8 @@ fun vurderMaksdato(
 }
 
 fun finnTidligerePerioder(sykepengeliste : List<PeriodeYtelse>) : Vurdering<List<Tidsperiode>, List<PeriodeYtelse>> {
-    val tidligerePerioder = sykepengeliste.flatMap {
-        it.vedtakListe.filter { it.utbetalingsgrad > 0 }
+    val tidligerePerioder = sykepengeliste.flatMap { periodeYtelse ->
+        periodeYtelse.vedtakListe.filter { it.utbetalingsgrad > 0 }
                 .map {
                     if (it.anvistPeriode.fom == null || it.anvistPeriode.tom == null) {
                         return Vurdering.Uavklart(Vurdering.Uavklart.Årsak.FORSTÅR_IKKE_DATA, "det finnes en anvist periode hvor fom eller tom er NULL", sykepengeliste)

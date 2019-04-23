@@ -57,21 +57,6 @@ data class InfotrygdVedtak(
         val anvistPeriode : Periode,
         val utbetalingsgrad : Int)
 
-enum class InntektsPeriodeVerdi {
-    Å, M, F, U, D, X
-}
-
-@JsonIgnoreProperties(ignoreUnknown = true)
-data class Inntektsperiode(
-        val value: InntektsPeriodeVerdi
-)
-
-data class Arbeidsforhold(
-        val inntektForPerioden : Int,
-        val inntektsPeriode : Inntektsperiode,
-        val orgnr : String
-)
-
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class Grunnlag(
         val identdato : LocalDate,
@@ -86,8 +71,5 @@ data class PeriodeYtelse(
         val identdato : LocalDate,
         val behandlingstema: Behandlingstema, // skal være "SP" for sykepenger
         val periode: Periode,
-        val vedtakListe: List<InfotrygdVedtak>,
-        /////////////////
-        //val arbeidskategori : Arbeidskategori,
-        val arbeidsforholdListe : List<Arbeidsforhold>
+        val vedtakListe: List<InfotrygdVedtak>
 )
