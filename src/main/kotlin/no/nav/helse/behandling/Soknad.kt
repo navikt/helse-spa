@@ -7,8 +7,8 @@ import no.nav.helse.Grunnlagsdata
 import no.nav.helse.domain.Arbeidsforhold
 import no.nav.helse.domain.ArbeidsgiverFraSøknad
 import no.nav.helse.fastsetting.*
+import no.nav.helse.oppslag.AnvistPeriode
 import no.nav.helse.oppslag.Inntekt
-import no.nav.helse.oppslag.PeriodeYtelse
 import no.nav.helse.streams.defaultObjectMapper
 import no.nav.helse.sykepenger.beregning.Beregningsresultat
 import no.nav.nare.core.evaluations.Evaluering
@@ -85,7 +85,7 @@ data class AvklarteVerdier(
         val medlemsskap: Vurdering.Avklart<Boolean, Tpsfakta>,
         val alder: Vurdering.Avklart<Alder, Aldersgrunnlag>,
         val maksdato: Vurdering.Avklart<LocalDate, Grunnlagsdata>,
-        val sykepengeliste: List<PeriodeYtelse>,
+        val sykepengehistorikk: List<AnvistPeriode>,
         val arbeidsforhold: Vurdering.Avklart<Boolean, List<Arbeidsforhold>>,
         val opptjeningstid: Vurdering.Avklart<Opptjeningstid, Opptjeningsgrunnlag>,
         val sykepengegrunnlag: Vurdering.Avklart<Sykepengegrunnlag, Beregningsperiode>
@@ -101,7 +101,7 @@ data class UavklarteVerdier(
         val medlemsskap: Vurdering<Boolean, Tpsfakta>,
         val alder: Vurdering<Alder, Aldersgrunnlag>,
         val maksdato: Vurdering<LocalDate, Grunnlagsdata?>,
-        val sykepengeliste: List<PeriodeYtelse>,
+        val sykepengehistorikk: List<AnvistPeriode>,
         val arbeidsforhold: Vurdering<Boolean, List<Arbeidsforhold>>,
         val opptjeningstid: Vurdering<Opptjeningstid, Opptjeningsgrunnlag>,
         val sykepengegrunnlag: Vurdering<*, *>
@@ -159,7 +159,7 @@ data class Soknadsperiode(val fom: LocalDate,
 data class Faktagrunnlag(val tps: Tpsfakta,
                          val beregningsperiode: List<Inntekt>,
                          val sammenligningsperiode: List<Inntekt>,
-                         val sykepengeliste: List<PeriodeYtelse>,
+                         val sykepengehistorikk: List<AnvistPeriode>,
                          val arbeidsforhold: List<Arbeidsforhold>)
 
 data class Tpsfakta(val fodselsdato: LocalDate,

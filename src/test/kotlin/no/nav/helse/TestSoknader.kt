@@ -24,7 +24,7 @@ val faktagrunnlagUtenVerdi = Faktagrunnlag(
         tps = tpsFaktaUtenVerdi,
         beregningsperiode = emptyList(),
         sammenligningsperiode = emptyList(),
-        sykepengeliste = emptyList(),
+        sykepengehistorikk = emptyList(),
         arbeidsforhold = arbeidsforholdUtenVerdi
 )
 
@@ -72,7 +72,7 @@ val enkleAvklarteVerdier = AvklarteVerdier(
                 begrunnelse = "whatevs",
                 grunnlag = Beregningsperiode(inntekter = emptyMap(), begrunnelse = "whatevs")),
         maksdato = Vurdering.Avklart(fastsattVerdi = LocalDate.now().plusDays(248), fastsattAv = "test", begrunnelse = "whatevs", grunnlag = Grunnlagsdata(førsteFraværsdag = LocalDate.now(), førsteSykepengedag = LocalDate.now(), tidligerePerioder = emptyList(), yrkesstatus = Yrkesstatus.ARBEIDSTAKER, personensAlder = 50)),
-        sykepengeliste = emptyList())
+        sykepengehistorikk = emptyList())
 
 val enkelSykepengeberegning: Sykepengeberegning =
         Sykepengeberegning(

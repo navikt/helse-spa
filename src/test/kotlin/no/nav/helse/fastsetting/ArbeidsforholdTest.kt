@@ -31,7 +31,7 @@ class ArbeidsforholdTest {
     fun `vurder arbeidsforhold med en arbeidsgiver`() {
         val arbeidsforhold = listOf(Arbeidsforhold("Arbeidstaker", Arbeidsgiver("1111", "Organisasjon"), LocalDate.now(), null))
         val faktagrunnlag = Faktagrunnlag(tps = tpsFaktaUtenVerdi, beregningsperiode = emptyList(), sammenligningsperiode = emptyList(), arbeidsforhold = arbeidsforhold,
-                sykepengeliste = emptyList())
+                sykepengehistorikk = emptyList())
         val vurdering = vurderArbeidsforhold(FaktagrunnlagResultat(originalSoknad, faktagrunnlag))
         if (vurdering is Vurdering.Avklart) assertThat(vurdering.fastsattVerdi).isTrue() else fail("Feil vurdering!")
 
@@ -41,7 +41,7 @@ class ArbeidsforholdTest {
     fun `vurder arbeidsforhold med feil arbeidsgiver`() {
         val arbeidsforhold = listOf(Arbeidsforhold("Arbeidstaker", Arbeidsgiver("2222", "Organisasjon"), LocalDate.now(), null))
         val faktagrunnlag = Faktagrunnlag(tps = tpsFaktaUtenVerdi, beregningsperiode = emptyList(), sammenligningsperiode = emptyList(), arbeidsforhold = arbeidsforhold,
-                sykepengeliste = emptyList())
+                sykepengehistorikk = emptyList())
         val vurdering = vurderArbeidsforhold(FaktagrunnlagResultat(originalSoknad, faktagrunnlag))
         if (vurdering is Vurdering.Uavklart) assertThat(vurdering.årsak== Vurdering.Uavklart.Årsak.HAR_IKKE_DATA).isTrue() else fail("Feil vurdering!")
 
@@ -52,7 +52,7 @@ class ArbeidsforholdTest {
         val arbeidsforhold = listOf(Arbeidsforhold("Arbeidstaker", Arbeidsgiver("1111", "Organisasjon"), LocalDate.now(), null),
                 Arbeidsforhold("Arbeidstaker", Arbeidsgiver("2222", "Organisasjon"), LocalDate.now(), null))
         val faktagrunnlag = Faktagrunnlag(tps = tpsFaktaUtenVerdi, beregningsperiode = emptyList(), sammenligningsperiode = emptyList(), arbeidsforhold = arbeidsforhold,
-                sykepengeliste = emptyList())
+                sykepengehistorikk = emptyList())
         val vurdering = vurderArbeidsforhold(FaktagrunnlagResultat(originalSoknad, faktagrunnlag))
         if (vurdering is Vurdering.Avklart) assertThat(vurdering.fastsattVerdi).isTrue() else fail("Feil vurdering!")
 

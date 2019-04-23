@@ -155,7 +155,7 @@ val uavklarteJson= """{
        "utbetalingsperiode": "2018-12",
         "beløp" : 25000.0
       } ],
-      "sykepengeliste" : [ ],
+      "sykepengehistorikk" : [ ],
       "arbeidsforhold" : [ {
         "type": "Arbeidstaker",
         "arbeidsgiver" : {
@@ -203,7 +203,7 @@ val uavklarteJson= """{
         "fastsattAv" : "SPA",
         "vurderingstidspunkt" : "2019-03-11T13:07:47.96384"
       },
-      "sykepengeliste" : [ ],
+      "sykepengehistorikk" : [ ],
       "arbeidsforhold" : {
         "type" : "Avklart",
         "fastsattVerdi" : true,

@@ -47,6 +47,7 @@ import java.math.BigDecimal
 import java.time.*
 import java.time.LocalDate.parse
 import java.time.temporal.ChronoUnit
+import java.time.temporal.TemporalAdjusters
 import java.time.temporal.TemporalAdjusters.lastDayOfMonth
 
 class EndToEndTest {
@@ -125,7 +126,7 @@ class EndToEndTest {
         personStub(aktørId)
         inntektStub(aktørId)
         arbeidsforholdStub(aktørId)
-        infotrygdBeregningsgrunnlagStub(aktørId)
+        sykepengehistorikkStub(aktørId)
 
         val innsendtSøknad = produserSykepengesøknadV2(aktørId)
 
@@ -155,7 +156,7 @@ class EndToEndTest {
         checkTpsFakta(faktagrunnlag.tps)
         checkInntekt(faktagrunnlag.beregningsperiode, beregningsgrunnlagStart, beregningsgrunnlagStart.plusMonths(2).with(lastDayOfMonth()))
         checkInntekt(faktagrunnlag.sammenligningsperiode, sammenligningsgrunnlagStart, sammenligningsgrunnlagStart.plusMonths(11).with(lastDayOfMonth()))
-        checkSykepengeliste(faktagrunnlag.sykepengeliste)
+        checkSykepengeliste(faktagrunnlag.sykepengehistorikk)
         checkArbeidsforhold(faktagrunnlag.arbeidsforhold)
     }
 
@@ -166,12 +167,12 @@ class EndToEndTest {
 
     private fun checkAvklarteVerdier(faktagrunnlag: Faktagrunnlag, avklarteVerdier: AvklarteVerdier) {
         checkAlder(avklarteVerdier.alder)
-        checkMaksdato(avklarteVerdier.alder.fastsattVerdi, faktagrunnlag.sykepengeliste, avklarteVerdier.maksdato)
+        checkMaksdato(avklarteVerdier.alder.fastsattVerdi, faktagrunnlag.sykepengehistorikk, avklarteVerdier.maksdato)
         checkMedlemsskap(avklarteVerdier.medlemsskap)
         checkSykepengegrunnlag(avklarteVerdier.sykepengegrunnlag)
         checkArbeidsforholdVurdering(avklarteVerdier.arbeidsforhold)
         checkOpptjeningstid(avklarteVerdier.opptjeningstid)
-        checkSykepengeliste(avklarteVerdier.sykepengeliste)
+        checkSykepengeliste(avklarteVerdier.sykepengehistorikk)
     }
 
     private fun checkAlder(aldersVurdering: Vurdering.Avklart<Alder, Aldersgrunnlag>) {
@@ -183,11 +184,11 @@ class EndToEndTest {
         assert(aldersVurdering.grunnlag.fodselsdato).isEqualTo(stubbet_person.fdato)
     }
 
-    private fun checkMaksdato(alder: Alder, sykepengeListe: List<PeriodeYtelse>, maksdato: Vurdering.Avklart<LocalDate, Grunnlagsdata>) {
-        val forventetMaksdato = LocalDate.of(2019, 12, 12)
+    private fun checkMaksdato(alder: Alder, sykepengehistorikk: List<AnvistPeriode>, maksdato: Vurdering.Avklart<LocalDate, Grunnlagsdata>) {
+        val forventetMaksdato = LocalDate.of(2019, 11, 28)
 
         assert(maksdato.fastsattVerdi).isEqualTo(forventetMaksdato)
-        assert(maksdato.begrunnelse).isEqualTo("§ 8-12: ARBEIDSTAKER på 48 år gir maks 248 dager. 0 av disse er forbrukt")
+        assert(maksdato.begrunnelse).isEqualTo("§ 8-12: ARBEIDSTAKER på 48 år gir maks 248 dager. 10 av disse er forbrukt")
         assert(maksdato.vurderingstidspunkt).isBetween(LocalDateTime.now().minusHours(1), LocalDateTime.now().plusHours(1))
         assert(maksdato.fastsattAv).isEqualTo("SPA")
 
@@ -196,7 +197,7 @@ class EndToEndTest {
         assert(grunnlag.førsteSykepengedag).isEqualTo(første_dag_i_syketilfelle)
         assert(grunnlag.personensAlder).isEqualTo(alder)
         assert(grunnlag.yrkesstatus).isEqualTo(Yrkesstatus.ARBEIDSTAKER)
-        assert(grunnlag.tidligerePerioder).isEqualTo(sykepengeListe)
+        assert(grunnlag.tidligerePerioder).isEqualTo(sykepengehistorikk.map { Tidsperiode(it.fom, it.tom) })
     }
 
     private fun checkMedlemsskap(medlemsskap: Vurdering.Avklart<Boolean, Tpsfakta>) {
@@ -285,8 +286,8 @@ class EndToEndTest {
         checkArbeidsforhold(opptjeningsgrunnlag.arbeidsforhold)
     }
 
-    private fun checkSykepengeliste(sykepengeliste: List<PeriodeYtelse>) {
-        assert(sykepengeliste).isEmpty()
+    private fun checkSykepengeliste(sykepengeliste: List<AnvistPeriode>) {
+        assert(sykepengeliste).isEqualTo(tiDagerSykepengeHistorikk())
     }
 
     private fun checkVilkårsprøving(vilkårsprøving: Evaluering) {
@@ -472,16 +473,16 @@ class EndToEndTest {
                 ))))
     }
 
-    private fun infotrygdBeregningsgrunnlagStub(aktørId: String) {
-        stubFor(any(urlPathEqualTo("/api/infotrygdberegningsgrunnlag/$aktørId"))
+    private fun sykepengehistorikkStub(aktørId: String) {
+        stubFor(any(urlPathEqualTo("/api/sykepengehistorikk/$aktørId"))
                 .willReturn(okJson(defaultObjectMapper.writeValueAsString(
-                        InfotrygdBeregningsgrunnlag(
-                            paaroerendeSykdomListe = emptyList(),
-                            engangstoenadListe = emptyList(),
-                            sykepengerListe = emptyList(),
-                            foreldrepengerListe = emptyList()
-                        )
+                        tiDagerSykepengeHistorikk()
                 ))))
+    }
+
+    private fun tiDagerSykepengeHistorikk() : List<AnvistPeriode> {
+        val someMonday = første_dag_i_syketilfelle.minusMonths(1).with(TemporalAdjusters.next(DayOfWeek.MONDAY))
+        return listOf(AnvistPeriode(someMonday, someMonday.plusDays(13)))
     }
 
     private fun arbeidsforholdStub(aktørId: String) {

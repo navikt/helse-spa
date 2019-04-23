@@ -88,7 +88,7 @@ class BeregningTest {
                                     ),
                                     begrunnelse = "derfor",
                                     fastsattAv = "test"),
-                            sykepengeliste = emptyList(),
+                            sykepengehistorikk = emptyList(),
                             opptjeningstid = Avklart(fastsattVerdi = 20, grunnlag = Opptjeningsgrunnlag(førsteSykdomsdag = parse("2018-12-01"), arbeidsforhold = emptyList()), begrunnelse = "defor", fastsattAv = "test")),
                     vilkårsprøving = Evaluering.ja("claro"))
 

@@ -11,7 +11,7 @@ class Oppslag(val sparkelBaseUrl: String, val stsClient: StsRestClient) {
                     hentBeregningsgrunnlag().ellerDø(this) { beregningsperiode ->
                         hentSammenligningsgrunnlag().ellerDø(this) { sammenligningsperiode ->
                             hentArbeidsforhold().ellerDø(this) { arbeidsforhold ->
-                                hentInfotrygdBeregningsgrunnlag().ellerDø(this) { infotrygdBeregningsgrunnlag ->
+                                hentSykepengehistorikk().ellerDø(this) { sykepengehistorikk ->
                                     try {
                                         Either.Right(FaktagrunnlagResultat(
                                                 originalSøknad = søknad,
@@ -19,7 +19,7 @@ class Oppslag(val sparkelBaseUrl: String, val stsClient: StsRestClient) {
                                                         tps = tpsfakta,
                                                         beregningsperiode = beregningsperiode,
                                                         sammenligningsperiode = sammenligningsperiode,
-                                                        sykepengeliste = infotrygdBeregningsgrunnlag.sykepengerListe,
+                                                        sykepengehistorikk = sykepengehistorikk,
                                                         arbeidsforhold = arbeidsforhold
                                                 )))
                                     } catch (e: Exception) {
@@ -41,5 +41,5 @@ class Oppslag(val sparkelBaseUrl: String, val stsClient: StsRestClient) {
     private fun Sykepengesøknad.hentBeregningsgrunnlag() = Inntektsoppslag(sparkelBaseUrl, stsClient).hentBeregningsgrunnlag(aktorId, arbeidsgiver.orgnummer, startSyketilfelle.minusMonths(3), startSyketilfelle.minusMonths(1))
     private fun Sykepengesøknad.hentSammenligningsgrunnlag() = Inntektsoppslag(sparkelBaseUrl, stsClient).hentSammenligningsgrunnlag(aktorId, startSyketilfelle.minusYears(1), startSyketilfelle.minusMonths(1))
     private fun Sykepengesøknad.hentArbeidsforhold() = ArbeidsforholdOppslag(sparkelBaseUrl, stsClient).hentArbeidsforhold(this)
-    private fun Sykepengesøknad.hentInfotrygdBeregningsgrunnlag() = InfotrygdBeregningsgrunnlagOppslag(sparkelBaseUrl, stsClient).hentInfotrygdBeregningsgrunnlag(aktorId, startSyketilfelle)
+    private fun Sykepengesøknad.hentSykepengehistorikk() = SykepengehistorikkOppslag(sparkelBaseUrl, stsClient).hentSykepengehistorikk(aktorId, startSyketilfelle)
 }

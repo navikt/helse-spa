@@ -96,7 +96,7 @@ fun vurderFakta(fakta: FaktagrunnlagResultat): Either<Behandlingsfeil, AvklarteF
             fakta.originalSøknad.startSyketilfelle,
             fakta.originalSøknad.fom,
             Yrkesstatus.ARBEIDSTAKER,
-            fakta.faktagrunnlag.sykepengeliste).also {
+            fakta.faktagrunnlag.sykepengehistorikk).also {
         if (it is Vurdering.Uavklart) {
             vurderingerCounter.labels("maksdato", "uavklart").inc()
         } else {
@@ -114,7 +114,7 @@ fun vurderFakta(fakta: FaktagrunnlagResultat): Either<Behandlingsfeil, AvklarteF
                         arbeidsforhold = arbeidsforhold,
                         opptjeningstid = opptjeningstid,
                         sykepengegrunnlag = sykepengegrunnlag,
-                        sykepengeliste = fakta.faktagrunnlag.sykepengeliste,
+                        sykepengehistorikk = fakta.faktagrunnlag.sykepengehistorikk,
                         maksdato = maksdato
                 )
         )))
@@ -130,7 +130,7 @@ fun vurderFakta(fakta: FaktagrunnlagResultat): Either<Behandlingsfeil, AvklarteF
                         arbeidsforhold = arbeidsforhold as Vurdering.Avklart<Boolean, List<Arbeidsforhold>>,
                         opptjeningstid = opptjeningstid as Vurdering.Avklart<Opptjeningstid, Opptjeningsgrunnlag>,
                         sykepengegrunnlag = sykepengegrunnlag as Vurdering.Avklart<Sykepengegrunnlag, Beregningsperiode>,
-                        sykepengeliste = fakta.faktagrunnlag.sykepengeliste,
+                        sykepengehistorikk = fakta.faktagrunnlag.sykepengehistorikk,
                         maksdato = maksdato as Vurdering.Avklart<LocalDate, Grunnlagsdata>
                 )
         ))
