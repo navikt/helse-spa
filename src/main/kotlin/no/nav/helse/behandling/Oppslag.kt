@@ -1,30 +1,17 @@
 package no.nav.helse.behandling
 
-import no.nav.helse.Behandlingsfeil
-import no.nav.helse.Either
-import no.nav.helse.flatMap
-import no.nav.helse.mapLeft
+import no.nav.helse.*
 import no.nav.helse.oppslag.*
 
 class Oppslag(val sparkelBaseUrl: String, val stsClient: StsRestClient) {
 
     fun hentRegisterData(søknad: Sykepengesøknad): Either<Behandlingsfeil, FaktagrunnlagResultat> =
             with(søknad) {
-                hentPerson().mapLeft {
-                    markerFeil(it)
-                }.flatMap { tpsfakta ->
-                    hentBeregningsgrunnlag().mapLeft {
-                        markerFeil(it)
-                    }.flatMap { beregningsperiode ->
-                        hentSammenligningsgrunnlag().mapLeft {
-                            markerFeil(it)
-                        }.flatMap { sammenligningsperiode ->
-                            hentArbeidsforhold().mapLeft {
-                                markerFeil(it)
-                            }.flatMap { arbeidsforhold ->
-                                hentInfotrygdBeregningsgrunnlag().mapLeft {
-                                    markerFeil(it)
-                                }.flatMap { infotrygdBeregningsgrunnlag ->
+                hentPerson().ellerDø(this) { tpsfakta ->
+                    hentBeregningsgrunnlag().ellerDø(this) { beregningsperiode ->
+                        hentSammenligningsgrunnlag().ellerDø(this) { sammenligningsperiode ->
+                            hentArbeidsforhold().ellerDø(this) { arbeidsforhold ->
+                                hentInfotrygdBeregningsgrunnlag().ellerDø(this) { infotrygdBeregningsgrunnlag ->
                                     try {
                                         Either.Right(FaktagrunnlagResultat(
                                                 originalSøknad = søknad,
@@ -44,6 +31,10 @@ class Oppslag(val sparkelBaseUrl: String, val stsClient: StsRestClient) {
                     }
                 }
             }
+
+    private fun <T, U> Either<Exception, T>.ellerDø(søknad: Sykepengesøknad, hentMer: (t: T) -> Either<Behandlingsfeil, U>) = mapLeft {
+        søknad.markerFeil(it)
+    }.flatMap { hentMer(it) }
 
     private fun Sykepengesøknad.markerFeil(ex: Exception) = Behandlingsfeil.registerFeil(ex, this)
     private fun Sykepengesøknad.hentPerson() = PersonOppslag(sparkelBaseUrl, stsClient).hentTPSData(this)
