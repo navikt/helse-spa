@@ -15,10 +15,10 @@ fun LocalDate.yearMonth() = YearMonth.of(year, month.value)
 
 fun fastsettingAvSykepengegrunnlaget(førsteSykdomsdag: LocalDate, perioder: List<Soknadsperiode>, arbeidsgiver: ArbeidsgiverFraSøknad, beregningsgrunnlag: List<Inntekt>, sammenligningsgrunnlag: List<Inntekt>): Vurdering<*, *> {
     if (perioder.size > 1) {
-        return Uavklart<Long, List<Beregningsperiode>>(FALLER_UTENFOR_MVP, "Søknaden inneholder mer enn én sykdomsperiode", emptyList())
+        return Uavklart<Long, List<Beregningsperiode>>(FALLER_UTENFOR_MVP, "Mer enn én sykdomsperiode", "Søknaden inneholder mer enn én sykdomsperiode", emptyList())
     }
     if (perioder[0].fom != førsteSykdomsdag) {
-        return Uavklart<Long, List<Beregningsperiode>>(FALLER_UTENFOR_MVP, "Første dag i perioden (${perioder[0].fom}) er ikke den samme som første sykdomsdag ($førsteSykdomsdag)", emptyList())
+        return Uavklart<Long, List<Beregningsperiode>>(FALLER_UTENFOR_MVP, "Periode og sykdom har forskjellig start", "Første dag i perioden (${perioder[0].fom}) er ikke den samme som første sykdomsdag ($førsteSykdomsdag)", emptyList())
     }
 
     val sykepengegrunnlagIArbeidsgiverperioden = fastsettingAvSykepengegrunnlagetIArbeidsgiverperioden(førsteSykdomsdag,
@@ -65,32 +65,32 @@ fun fastsettingAvSykepengegrunnlagetIArbeidsgiverperioden(førsteSykdomsdag: Loc
     }
 
     if (beregningsperiode.inntekter.isEmpty()) {
-        return Uavklart(HAR_IKKE_DATA, "Kan ikke avklare sykepengegrunnlaget fordi det ikke er inntekter i beregningsperioden", beregningsperiode)
+        return Uavklart(HAR_IKKE_DATA, "Ingen inntekter i beregningsperiode", "Kan ikke avklare sykepengegrunnlaget fordi det ikke er inntekter i beregningsperioden", beregningsperiode)
     } else if (beregningsperiode.inntekter.keys.size > 1) {
         return if (beregningsperiode.inntekter.keys.firstOrNull { it == arbeidsgiver.orgnummer } == null) {
-            Uavklart(HAR_IKKE_DATA, "Kan ikke avklare sykepengegrunnlaget fordi det finnes ikke inntekter fra aktuell arbeidsgiver", beregningsperiode)
+            Uavklart(HAR_IKKE_DATA, "Ingen inntekter fra aktuell arbeidsgiver", "Kan ikke avklare sykepengegrunnlaget fordi det finnes ikke inntekter fra aktuell arbeidsgiver", beregningsperiode)
         } else {
-            Uavklart(FORSTÅR_IKKE_DATA, "Kan ikke avklare sykepengegrunnlaget fordi det andre inntekter i arbeidsgiverperioden i tillegg til aktuell arbeidsgiver", beregningsperiode)
+            Uavklart(FORSTÅR_IKKE_DATA, "Inntekter i perioden i tillegg til aktuell arbeidsgiver", "Kan ikke avklare sykepengegrunnlaget fordi det andre inntekter i arbeidsgiverperioden i tillegg til aktuell arbeidsgiver", beregningsperiode)
         }
     } else if (beregningsperiode.inntekter.keys.firstOrNull { it == arbeidsgiver.orgnummer } == null) {
-        return Uavklart(HAR_IKKE_DATA, "Kan ikke avklare sykepengegrunnlaget fordi det finnes ikke inntekter fra aktuell arbeidsgiver", beregningsperiode)
+        return Uavklart(HAR_IKKE_DATA, "Ingen inntekter fra aktuell arbeidsgiver", "Kan ikke avklare sykepengegrunnlaget fordi det finnes ikke inntekter fra aktuell arbeidsgiver", beregningsperiode)
     }
 
     val inntekterForArbeidsgiver = beregningsperiode.inntekter.getValue(arbeidsgiver.orgnummer)
 
     if (inntekterForArbeidsgiver.size != 3) {
-        return Uavklart(FALLER_UTENFOR_MVP, "Kan ikke avklare sykepengegrunnlaget fordi vi forventer inntekter fra tre måneder", beregningsperiode)
+        return Uavklart(FALLER_UTENFOR_MVP, "Ikke tre måneder med inntekter", "Kan ikke avklare sykepengegrunnlaget fordi vi forventer inntekter fra tre måneder", beregningsperiode)
     } else {
         val inntekterFraTreMånederFør = inntekterForArbeidsgiver[treMånederFør]
         val inntekterFraToMånederFør = inntekterForArbeidsgiver[treMånederFør.plusMonths(1)]
         val inntekterFraEnMånedFør = inntekterForArbeidsgiver[treMånederFør.plusMonths(2)]
 
         if (inntekterFraTreMånederFør == null || inntekterFraToMånederFør == null || inntekterFraEnMånedFør == null) {
-            return Uavklart(HAR_IKKE_DATA, "Kan ikke avklare sykepengegrunnlaget fordi vi forventer inntekter fra tre måneder før", beregningsperiode)
+            return Uavklart(HAR_IKKE_DATA, "Mangler inntekter for minst én av tre foregående måneder", "Kan ikke avklare sykepengegrunnlaget fordi vi forventer inntekter fra tre måneder før", beregningsperiode)
         }
 
         if (inntekterFraTreMånederFør.isEmpty() || inntekterFraToMånederFør.isEmpty() || inntekterFraEnMånedFør.isEmpty()) {
-            return Uavklart(HAR_IKKE_DATA, "Kan ikke avklare sykepengegrunnlaget fordi vi forventer inntekter fra tre måneder før", beregningsperiode)
+            return Uavklart(HAR_IKKE_DATA, "Mangler inntekter for minst én av tre foregående måneder", "Kan ikke avklare sykepengegrunnlaget fordi vi forventer inntekter fra tre måneder før", beregningsperiode)
         }
 
         val sumInntekterTreMånederFør = inntekterFraTreMånederFør.fold(BigDecimal.ZERO) { acc, current ->
@@ -153,6 +153,7 @@ fun fastsettingAvSykepengegrunnlagetNårTrygdenYterSykepenger(sammenligningsgrun
 
     if (avvik > 0.25) {
         return Uavklart(KREVER_SKJØNNSMESSIG_VURDERING,
+                "25% avvik",
                 "§ 8-30 andre ledd - Sykepengegrunnlaget skal fastsettes ved skjønn fordi omregner årsinntekt ($omregnetÅrsinntekt) avviker mer enn 25% (${avvik * 100}%) fra rapportert inntekt ($rapportertInntekt)",
                 sammenligningsgrunnlag.grunnlag) // FIXME: hva ønsker vi egentlig som referert grunnlag her ?
     }

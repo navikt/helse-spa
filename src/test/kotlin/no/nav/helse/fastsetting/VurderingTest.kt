@@ -14,7 +14,7 @@ class VurderingTest {
 
     @Test
     fun `uavklart should have verdi`() {
-        val vurdering: Vurdering<Int, Inntektfakta> = Vurdering.Uavklart(Vurdering.Uavklart.Årsak.KREVER_SKJØNNSMESSIG_VURDERING, "Inntekt må fastsettes ved skjønn", Inntektfakta(5000))
+        val vurdering: Vurdering<Int, Inntektfakta> = Vurdering.Uavklart(Vurdering.Uavklart.Årsak.KREVER_SKJØNNSMESSIG_VURDERING, "", "Inntekt må fastsettes ved skjønn", Inntektfakta(5000))
 
         assertTrue(vurdering is Vurdering.Uavklart<Int,Inntektfakta>)
     }

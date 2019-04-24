@@ -109,7 +109,8 @@ class SaksbehandlingProbe(val env: Environment) {
                         ),
                         tags = mapOf(
                                 "datum" to name,
-                                "aarsak" to fakta.årsak.name
+                                "aarsak" to fakta.årsak.name,
+                                "beskrivelse" to fakta.underårsak
                         )
                 ))
             }

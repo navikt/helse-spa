@@ -37,8 +37,9 @@ sealed class Vurdering<out V, out G>(val begrunnelse: String, val grunnlag: G, v
 
     }
     class Uavklart<V,G>(val årsak: Årsak,
-                      begrunnelse: String,
-                      grunnlag: G): Vurdering<V, G>(begrunnelse, grunnlag) {
+                        val underårsak: String = "UKJENT",
+                        begrunnelse: String,
+                        grunnlag: G): Vurdering<V, G>(begrunnelse, grunnlag) {
 
         enum class Årsak {
             KREVER_SKJØNNSMESSIG_VURDERING,
