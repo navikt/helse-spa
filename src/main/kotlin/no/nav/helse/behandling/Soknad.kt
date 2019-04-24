@@ -144,6 +144,7 @@ data class Vedtaksperiode(
         val fom: LocalDate,
         val tom: LocalDate,
         val dagsats: BigDecimal,
+        val grad: Int = 100,
         val fordeling: List<Fordeling>
 )
 data class Fordeling(
