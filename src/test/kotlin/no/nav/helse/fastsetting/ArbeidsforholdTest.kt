@@ -77,21 +77,7 @@ val jsonFromSparkel = """
         },
         "startdato": "2009-01-15",
         "type": "Arbeidstaker"
-      },
-      "inntekter": [
-        {
-          "beløp": 2500,
-          "utbetalingsperiode": "2019-01"
-        },
-        {
-          "beløp": 3500,
-          "utbetalingsperiode": "2019-02"
-        },
-        {
-          "beløp": 2500,
-          "utbetalingsperiode": "2019-03"
-        }
-      ]
+      }
     }
   ]
 }

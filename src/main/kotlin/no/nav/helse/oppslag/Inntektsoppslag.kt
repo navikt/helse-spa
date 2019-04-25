@@ -52,4 +52,4 @@ data class InntektsoppslagResultat(val inntekter : List<Inntekt>)
 data class Inntektsarbeidsgiver(val identifikator: String, val type: String)
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-data class Inntekt(val arbeidsgiver: Inntektsarbeidsgiver, val utbetalingsperiode: YearMonth, val beløp: BigDecimal)
+data class Inntekt(val virksomhet: Inntektsarbeidsgiver, val utbetalingsperiode: YearMonth, val beløp: BigDecimal, val type: String, val ytelse: Boolean, val kode: String?)

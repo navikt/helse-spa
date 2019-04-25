@@ -256,7 +256,7 @@ class EndToEndTest {
         assert(inntekter).hasSize(startDate.until(endDate.plusDays(1), ChronoUnit.MONTHS).toInt())
         assert(inntekter).each {
             val inntekt = it.actual
-            assert(inntekt.arbeidsgiver.identifikator).isEqualTo(stubbet_arbeidsforhold.arbeidsgiver.identifikator)
+            assert(inntekt.virksomhet.identifikator).isEqualTo(stubbet_arbeidsforhold.arbeidsgiver.identifikator)
             assert(inntekt.beløp.toLong()).isEqualTo(25000L)
             assert(inntekt.utbetalingsperiode).isBetween(YearMonth.from(startDate), YearMonth.from(endDate))
         }
@@ -441,18 +441,24 @@ class EndToEndTest {
     val beregningsgrunnlagStart = første_dag_i_syketilfelle.minusMonths(3)
     val stubbet_inntekt_beregningsgrunnlag: List<Inntekt> = List(3, init = { index ->
         Inntekt(
-                arbeidsgiver = Inntektsarbeidsgiver(stubbet_arbeidsforhold.arbeidsgiver.identifikator, "Organisasjon"),
+                virksomhet = Inntektsarbeidsgiver(stubbet_arbeidsforhold.arbeidsgiver.identifikator, "Organisasjon"),
                 beløp = BigDecimal.valueOf(25000),
-                utbetalingsperiode = YearMonth.from(beregningsgrunnlagStart.plusMonths(index.toLong()))
+                utbetalingsperiode = YearMonth.from(beregningsgrunnlagStart.plusMonths(index.toLong())),
+                type = "Lønn",
+                ytelse = false,
+                kode = null
         )
     })
 
     val sammenligningsgrunnlagStart = første_dag_i_syketilfelle.minusMonths(12)
     val stubbet_inntekt_sammenligningsgrunnlag: List<Inntekt> = List(12, init = { index ->
         Inntekt(
-                arbeidsgiver = Inntektsarbeidsgiver(stubbet_arbeidsforhold.arbeidsgiver.identifikator, "Organisasjon"),
+                virksomhet = Inntektsarbeidsgiver(stubbet_arbeidsforhold.arbeidsgiver.identifikator, "Organisasjon"),
                 beløp = BigDecimal.valueOf(25000),
-                utbetalingsperiode = YearMonth.from(sammenligningsgrunnlagStart.plusMonths(index.toLong()))
+                utbetalingsperiode = YearMonth.from(sammenligningsgrunnlagStart.plusMonths(index.toLong())),
+                type = "Lønn",
+                ytelse = false,
+                kode = null
         )
     })
 

@@ -20,14 +20,14 @@ class InntektsFastsettingTest {
     fun `gjennomsnittet av de tre siste kalendermånedene før arbeidsuførhet skal legges til grunn`() {
         val førsteSykdomsdag = LocalDate.parse("2019-01-01")
         val inntekter = listOf(
-                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), YearMonth.parse("2018-12"), BigDecimal.valueOf(1)),
-                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), YearMonth.parse("2018-11"), BigDecimal.valueOf(21)),
-                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), YearMonth.parse("2018-10"), BigDecimal.valueOf(29)),
-                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), YearMonth.parse("2018-09"), BigDecimal.valueOf(30)),
-                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), YearMonth.parse("2018-08"), BigDecimal.valueOf(30)),
-                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), YearMonth.parse("2018-07"), BigDecimal.valueOf(30)),
-                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), YearMonth.parse("2018-06"), BigDecimal.valueOf(30)),
-                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), YearMonth.parse("2018-05"), BigDecimal.valueOf(30))
+                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), YearMonth.parse("2018-12"), BigDecimal.valueOf(1), "Lønn", false, null),
+                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), YearMonth.parse("2018-11"), BigDecimal.valueOf(21), "Lønn", false, null),
+                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), YearMonth.parse("2018-10"), BigDecimal.valueOf(29), "Lønn", false, null),
+                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), YearMonth.parse("2018-09"), BigDecimal.valueOf(30), "Lønn", false, null),
+                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), YearMonth.parse("2018-08"), BigDecimal.valueOf(30), "Lønn", false, null),
+                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), YearMonth.parse("2018-07"), BigDecimal.valueOf(30), "Lønn", false, null),
+                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), YearMonth.parse("2018-06"), BigDecimal.valueOf(30), "Lønn", false, null),
+                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), YearMonth.parse("2018-05"), BigDecimal.valueOf(30), "Lønn", false, null)
         )
         val fastsattSykepengegrunnlag = fastsettingAvSykepengegrunnlagetIArbeidsgiverperioden(førsteSykdomsdag, ArbeidsgiverFraSøknad("NAV OSLO", orgnummer), inntekter)
 
@@ -42,8 +42,8 @@ class InntektsFastsettingTest {
     fun `uavklart ved inntekt fra andre arbeidsgivere i arbeidsgiverperioden`() {
         val førsteSykdomsdag = LocalDate.parse("2019-03-01")
         val inntekter = listOf(
-                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), YearMonth.parse("2019-02"), BigDecimal.valueOf(30)),
-                Inntekt(Inntektsarbeidsgiver(annetOrgnummer, "Organisasjon"), YearMonth.parse("2019-01"), BigDecimal.valueOf(12))
+                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), YearMonth.parse("2019-02"), BigDecimal.valueOf(30), "Lønn", false, null),
+                Inntekt(Inntektsarbeidsgiver(annetOrgnummer, "Organisasjon"), YearMonth.parse("2019-01"), BigDecimal.valueOf(12), "Lønn", false, null)
         )
         val fastsattSykepengegrunnlag = fastsettingAvSykepengegrunnlagetIArbeidsgiverperioden(førsteSykdomsdag, ArbeidsgiverFraSøknad("NAV OSLO", orgnummer), inntekter)
 
@@ -58,19 +58,19 @@ class InntektsFastsettingTest {
     fun `sammenligningsgrunnlaget er summen av inntekter de siste 12 måneder`() {
         val førsteSykdomsdag = LocalDate.parse("2019-03-01")
         val inntekter = listOf(
-                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), YearMonth.parse("2019-02"), BigDecimal.valueOf(30)),
-                Inntekt(Inntektsarbeidsgiver(annetOrgnummer, "Organisasjon"), YearMonth.parse("2019-01"), BigDecimal.valueOf(12)),
-                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), YearMonth.parse("2019-01"), BigDecimal.valueOf(30)),
-                Inntekt(Inntektsarbeidsgiver(annetOrgnummer, "Organisasjon"), YearMonth.parse("2018-12"), BigDecimal.valueOf(12)),
-                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), YearMonth.parse("2018-12"), BigDecimal.valueOf(30)),
-                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), YearMonth.parse("2018-11"), BigDecimal.valueOf(25)),
-                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), YearMonth.parse("2018-10"), BigDecimal.valueOf(25)),
-                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), YearMonth.parse("2018-09"), BigDecimal.valueOf(17)),
-                Inntekt(Inntektsarbeidsgiver(annetOrgnummer, "Organisasjon"), YearMonth.parse("2018-05"), BigDecimal.valueOf(16)),
-                Inntekt(Inntektsarbeidsgiver(annetOrgnummer, "Organisasjon"), YearMonth.parse("2018-03"), BigDecimal.valueOf(15)),
-                Inntekt(Inntektsarbeidsgiver(annetOrgnummer, "Organisasjon"), YearMonth.parse("2018-02"), BigDecimal.valueOf(14)),
-                Inntekt(Inntektsarbeidsgiver(annetOrgnummer, "Organisasjon"), YearMonth.parse("2018-01"), BigDecimal.valueOf(13)),
-                Inntekt(Inntektsarbeidsgiver(annetOrgnummer, "Organisasjon"), YearMonth.parse("2017-12"), BigDecimal.valueOf(12))
+                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), YearMonth.parse("2019-02"), BigDecimal.valueOf(30), "Lønn", false, null),
+                Inntekt(Inntektsarbeidsgiver(annetOrgnummer, "Organisasjon"), YearMonth.parse("2019-01"), BigDecimal.valueOf(12), "Lønn", false, null),
+                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), YearMonth.parse("2019-01"), BigDecimal.valueOf(30), "Lønn", false, null),
+                Inntekt(Inntektsarbeidsgiver(annetOrgnummer, "Organisasjon"), YearMonth.parse("2018-12"), BigDecimal.valueOf(12), "Lønn", false, null),
+                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), YearMonth.parse("2018-12"), BigDecimal.valueOf(30), "Lønn", false, null),
+                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), YearMonth.parse("2018-11"), BigDecimal.valueOf(25), "Lønn", false, null),
+                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), YearMonth.parse("2018-10"), BigDecimal.valueOf(25), "Lønn", false, null),
+                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), YearMonth.parse("2018-09"), BigDecimal.valueOf(17), "Lønn", false, null),
+                Inntekt(Inntektsarbeidsgiver(annetOrgnummer, "Organisasjon"), YearMonth.parse("2018-05"), BigDecimal.valueOf(16), "Lønn", false, null),
+                Inntekt(Inntektsarbeidsgiver(annetOrgnummer, "Organisasjon"), YearMonth.parse("2018-03"), BigDecimal.valueOf(15), "Lønn", false, null),
+                Inntekt(Inntektsarbeidsgiver(annetOrgnummer, "Organisasjon"), YearMonth.parse("2018-02"), BigDecimal.valueOf(14), "Lønn", false, null),
+                Inntekt(Inntektsarbeidsgiver(annetOrgnummer, "Organisasjon"), YearMonth.parse("2018-01"), BigDecimal.valueOf(13), "Lønn", false, null),
+                Inntekt(Inntektsarbeidsgiver(annetOrgnummer, "Organisasjon"), YearMonth.parse("2017-12"), BigDecimal.valueOf(12), "Lønn", false, null)
         )
         val fastsattSammenligningsgrunnlag = fastsettSammenligningsgrunnlag(førsteSykdomsdag, inntekter)
 
@@ -85,18 +85,18 @@ class InntektsFastsettingTest {
     fun `sykepengegrunnlag baseres på arbeidsgiverperioden dersom mindre enn 25% avvik fra sammenlikningsgrunnlaget`() {
         val førsteSykdomsdag = LocalDate.parse("2019-03-01")
         val inntekter = listOf(
-                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), YearMonth.parse("2019-02"), BigDecimal.valueOf(30)),
-                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), YearMonth.parse("2019-01"), BigDecimal.valueOf(30)),
-                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), YearMonth.parse("2018-12"), BigDecimal.valueOf(30)),
-                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), YearMonth.parse("2018-11"), BigDecimal.valueOf(29)),
-                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), YearMonth.parse("2018-10"), BigDecimal.valueOf(29)),
-                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), YearMonth.parse("2018-09"), BigDecimal.valueOf(29)),
-                Inntekt(Inntektsarbeidsgiver(annetOrgnummer, "Organisasjon"), YearMonth.parse("2018-08"), BigDecimal.valueOf(29)),
-                Inntekt(Inntektsarbeidsgiver(annetOrgnummer, "Organisasjon"), YearMonth.parse("2018-07"), BigDecimal.valueOf(29)),
-                Inntekt(Inntektsarbeidsgiver(annetOrgnummer, "Organisasjon"), YearMonth.parse("2018-06"), BigDecimal.valueOf(29)),
-                Inntekt(Inntektsarbeidsgiver(annetOrgnummer, "Organisasjon"), YearMonth.parse("2018-05"), BigDecimal.valueOf(29)),
-                Inntekt(Inntektsarbeidsgiver(annetOrgnummer, "Organisasjon"), YearMonth.parse("2017-04"), BigDecimal.valueOf(29)),
-                Inntekt(Inntektsarbeidsgiver(annetOrgnummer, "Organisasjon"), YearMonth.parse("2017-03"), BigDecimal.valueOf(29))
+                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), YearMonth.parse("2019-02"), BigDecimal.valueOf(30), "Lønn", false, null),
+                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), YearMonth.parse("2019-01"), BigDecimal.valueOf(30), "Lønn", false, null),
+                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), YearMonth.parse("2018-12"), BigDecimal.valueOf(30), "Lønn", false, null),
+                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), YearMonth.parse("2018-11"), BigDecimal.valueOf(29), "Lønn", false, null),
+                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), YearMonth.parse("2018-10"), BigDecimal.valueOf(29), "Lønn", false, null),
+                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), YearMonth.parse("2018-09"), BigDecimal.valueOf(29), "Lønn", false, null),
+                Inntekt(Inntektsarbeidsgiver(annetOrgnummer, "Organisasjon"), YearMonth.parse("2018-08"), BigDecimal.valueOf(29), "Lønn", false, null),
+                Inntekt(Inntektsarbeidsgiver(annetOrgnummer, "Organisasjon"), YearMonth.parse("2018-07"), BigDecimal.valueOf(29), "Lønn", false, null),
+                Inntekt(Inntektsarbeidsgiver(annetOrgnummer, "Organisasjon"), YearMonth.parse("2018-06"), BigDecimal.valueOf(29), "Lønn", false, null),
+                Inntekt(Inntektsarbeidsgiver(annetOrgnummer, "Organisasjon"), YearMonth.parse("2018-05"), BigDecimal.valueOf(29), "Lønn", false, null),
+                Inntekt(Inntektsarbeidsgiver(annetOrgnummer, "Organisasjon"), YearMonth.parse("2017-04"), BigDecimal.valueOf(29), "Lønn", false, null),
+                Inntekt(Inntektsarbeidsgiver(annetOrgnummer, "Organisasjon"), YearMonth.parse("2017-03"), BigDecimal.valueOf(29), "Lønn", false, null)
         )
 
         val beregningsgrunnlag = fastsettingAvSykepengegrunnlagetIArbeidsgiverperioden(førsteSykdomsdag, ArbeidsgiverFraSøknad("NAV OSLO", orgnummer), inntekter)
@@ -119,18 +119,18 @@ class InntektsFastsettingTest {
     fun `sykepengegrunnlag er uavklart dersom mer enn 25% avvik fra sammenlikningsgrunnlaget`() {
         val førsteSykdomsdag = LocalDate.parse("2019-03-01")
         val inntekter = listOf(
-                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), YearMonth.parse("2019-02"), BigDecimal.valueOf(30)),
-                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), YearMonth.parse("2019-01"), BigDecimal.valueOf(30)),
-                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), YearMonth.parse("2018-12"), BigDecimal.valueOf(30)),
-                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), YearMonth.parse("2018-11"), BigDecimal.valueOf(20)),
-                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), YearMonth.parse("2018-10"), BigDecimal.valueOf(20)),
-                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), YearMonth.parse("2018-09"), BigDecimal.valueOf(20)),
-                Inntekt(Inntektsarbeidsgiver(annetOrgnummer, "Organisasjon"), YearMonth.parse("2018-08"), BigDecimal.valueOf(20)),
-                Inntekt(Inntektsarbeidsgiver(annetOrgnummer, "Organisasjon"), YearMonth.parse("2018-07"), BigDecimal.valueOf(20)),
-                Inntekt(Inntektsarbeidsgiver(annetOrgnummer, "Organisasjon"), YearMonth.parse("2018-06"), BigDecimal.valueOf(20)),
-                Inntekt(Inntektsarbeidsgiver(annetOrgnummer, "Organisasjon"), YearMonth.parse("2018-05"), BigDecimal.valueOf(20)),
-                Inntekt(Inntektsarbeidsgiver(annetOrgnummer, "Organisasjon"), YearMonth.parse("2017-04"), BigDecimal.valueOf(20)),
-                Inntekt(Inntektsarbeidsgiver(annetOrgnummer, "Organisasjon"), YearMonth.parse("2017-03"), BigDecimal.valueOf(20))
+                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), YearMonth.parse("2019-02"), BigDecimal.valueOf(30), "Lønn", false, null),
+                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), YearMonth.parse("2019-01"), BigDecimal.valueOf(30), "Lønn", false, null),
+                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), YearMonth.parse("2018-12"), BigDecimal.valueOf(30), "Lønn", false, null),
+                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), YearMonth.parse("2018-11"), BigDecimal.valueOf(20), "Lønn", false, null),
+                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), YearMonth.parse("2018-10"), BigDecimal.valueOf(20), "Lønn", false, null),
+                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), YearMonth.parse("2018-09"), BigDecimal.valueOf(20), "Lønn", false, null),
+                Inntekt(Inntektsarbeidsgiver(annetOrgnummer, "Organisasjon"), YearMonth.parse("2018-08"), BigDecimal.valueOf(20), "Lønn", false, null),
+                Inntekt(Inntektsarbeidsgiver(annetOrgnummer, "Organisasjon"), YearMonth.parse("2018-07"), BigDecimal.valueOf(20), "Lønn", false, null),
+                Inntekt(Inntektsarbeidsgiver(annetOrgnummer, "Organisasjon"), YearMonth.parse("2018-06"), BigDecimal.valueOf(20), "Lønn", false, null),
+                Inntekt(Inntektsarbeidsgiver(annetOrgnummer, "Organisasjon"), YearMonth.parse("2018-05"), BigDecimal.valueOf(20), "Lønn", false, null),
+                Inntekt(Inntektsarbeidsgiver(annetOrgnummer, "Organisasjon"), YearMonth.parse("2017-04"), BigDecimal.valueOf(20), "Lønn", false, null),
+                Inntekt(Inntektsarbeidsgiver(annetOrgnummer, "Organisasjon"), YearMonth.parse("2017-03"), BigDecimal.valueOf(20), "Lønn", false, null)
         )
 
         val beregningsgrunnlag = fastsettingAvSykepengegrunnlagetIArbeidsgiverperioden(førsteSykdomsdag, ArbeidsgiverFraSøknad("NAV OSLO", orgnummer), inntekter)
@@ -154,8 +154,8 @@ class InntektsFastsettingTest {
     fun `uavklart sykepengegrunnlag når det er færre enn tre inntekter i beregningsperioden`() {
         val førsteSykdomsdag = LocalDate.parse("2019-01-01")
         val inntekter = listOf(
-                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), YearMonth.parse("2018-12"), BigDecimal.valueOf(1)),
-                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), YearMonth.parse("2018-11"), BigDecimal.valueOf(21))
+                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), YearMonth.parse("2018-12"), BigDecimal.valueOf(1), "Lønn", false, null),
+                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), YearMonth.parse("2018-11"), BigDecimal.valueOf(21), "Lønn", false, null)
         )
         val fastsattSykepengegrunnlag = fastsettingAvSykepengegrunnlagetIArbeidsgiverperioden(førsteSykdomsdag, ArbeidsgiverFraSøknad("NAV OSLO", orgnummer), inntekter)
 
@@ -183,10 +183,10 @@ class InntektsFastsettingTest {
     fun `uavklart sykepengegrunnlag når det er flere enn tre inntekter i beregningsperioden`() {
         val førsteSykdomsdag = LocalDate.parse("2019-01-01")
         val inntekter = listOf(
-                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), YearMonth.parse("2018-12"), BigDecimal.valueOf(1)),
-                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), YearMonth.parse("2018-12"), BigDecimal.valueOf(10)),
-                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), YearMonth.parse("2018-11"), BigDecimal.valueOf(21)),
-                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), YearMonth.parse("2018-11"), BigDecimal.valueOf(31))
+                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), YearMonth.parse("2018-12"), BigDecimal.valueOf(1), "Lønn", false, null),
+                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), YearMonth.parse("2018-12"), BigDecimal.valueOf(10), "Lønn", false, null),
+                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), YearMonth.parse("2018-11"), BigDecimal.valueOf(21), "Lønn", false, null),
+                Inntekt(Inntektsarbeidsgiver(orgnummer, "Organisasjon"), YearMonth.parse("2018-11"), BigDecimal.valueOf(31), "Lønn", false, null)
         )
         val fastsattSykepengegrunnlag = fastsettingAvSykepengegrunnlagetIArbeidsgiverperioden(førsteSykdomsdag, ArbeidsgiverFraSøknad("NAV OSLO", orgnummer), inntekter)
 

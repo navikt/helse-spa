@@ -49,111 +49,141 @@ val uavklarteJson= """{
         "status": "BOSA"
       },
       "beregningsperiode" : [ {
-        "arbeidsgiver" : {
+        "virksomhet" : {
           "identifikator" : "995816598",
           "type": "Organisasjon"
         },
         "utbetalingsperiode": "2018-10",
-        "beløp" : 25000.0
+        "beløp" : 25000.0,
+        "type": "Lønn",
+        "ytelse": false
       }, {
-        "arbeidsgiver" : {
+        "virksomhet" : {
           "identifikator" : "995816598",
           "type": "Organisasjon"
         },
         "utbetalingsperiode": "2018-11",
-        "beløp" : 25000.0
+        "beløp" : 25000.0,
+        "type": "Lønn",
+        "ytelse": false
       }, {
-        "arbeidsgiver" : {
+        "virksomhet" : {
           "identifikator" : "995816598",
           "type": "Organisasjon"
         },
         "utbetalingsperiode": "2018-12",
-        "beløp" : 25000.0
+        "beløp" : 25000.0,
+        "type": "Lønn",
+        "ytelse": false
       } ],
       "sammenligningsperiode" : [ {
-        "arbeidsgiver" : {
+        "virksomhet" : {
           "identifikator" : "995816598",
           "type": "Organisasjon"
         },
         "utbetalingsperiode": "2018-01",
-        "beløp" : 25000.0
+        "beløp" : 25000.0,
+        "type": "Lønn",
+        "ytelse": false
       }, {
-        "arbeidsgiver" : {
+        "virksomhet" : {
           "identifikator" : "995816598",
           "type": "Organisasjon"
         },
         "utbetalingsperiode": "2018-02",
-        "beløp" : 25000.0
+        "beløp" : 25000.0,
+        "type": "Lønn",
+        "ytelse": false
       }, {
-        "arbeidsgiver" : {
+        "virksomhet" : {
           "identifikator" : "995816598",
           "type": "Organisasjon"
         },
         "utbetalingsperiode": "2018-03",
-        "beløp" : 25000.0
+        "beløp" : 25000.0,
+        "type": "Lønn",
+        "ytelse": false
       }, {
-        "arbeidsgiver" : {
+        "virksomhet" : {
           "identifikator" : "995816598",
           "type": "Organisasjon"
         },
         "utbetalingsperiode": "2018-04",
-        "beløp" : 25000.0
+        "beløp" : 25000.0,
+        "type": "Lønn",
+        "ytelse": false
       }, {
-        "arbeidsgiver" : {
+        "virksomhet" : {
           "identifikator" : "995816598",
           "type": "Organisasjon"
         },
         "utbetalingsperiode": "2018-05",
-        "beløp" : 25000.0
+        "beløp" : 25000.0,
+        "type": "Lønn",
+        "ytelse": false
       }, {
-        "arbeidsgiver" : {
+        "virksomhet" : {
           "identifikator" : "995816598",
           "type": "Organisasjon"
         },
         "utbetalingsperiode": "2018-06",
-        "beløp" : 25000.0
+        "beløp" : 25000.0,
+        "type": "Lønn",
+        "ytelse": false
       }, {
-        "arbeidsgiver" : {
+        "virksomhet" : {
           "identifikator" : "995816598",
           "type": "Organisasjon"
         },
         "utbetalingsperiode": "2018-07",
-        "beløp" : 25000.0
+        "beløp" : 25000.0,
+        "type": "Lønn",
+        "ytelse": false
       }, {
-        "arbeidsgiver" : {
+        "virksomhet" : {
           "identifikator" : "995816598",
           "type": "Organisasjon"
         },
         "utbetalingsperiode": "2018-08",
-        "beløp" : 25000.0
+        "beløp" : 25000.0,
+        "type": "Lønn",
+        "ytelse": false
       }, {
-        "arbeidsgiver" : {
+        "virksomhet" : {
           "identifikator" : "995816598",
           "type": "Organisasjon"
         },
         "utbetalingsperiode": "2018-09",
-        "beløp" : 25000.0
+        "beløp" : 25000.0,
+        "type": "Lønn",
+        "ytelse": false
       }, {
-        "arbeidsgiver" : {
+        "virksomhet" : {
           "identifikator" : "995816598",
           "type": "Organisasjon"
         },
         "utbetalingsperiode": "2018-10",
-        "beløp" : 25000.0
+        "beløp" : 25000.0,
+        "type": "Lønn",
+        "ytelse": false
       }, {
-        "arbeidsgiver" : {
+        "virksomhet" : {
           "identifikator" : "995816598",
           "type": "Organisasjon"
         },
         "utbetalingsperiode": "2018-11",
-        "beløp" : 25000.0
+        "beløp" : 25000.0,
+        "type": "Lønn",
+        "ytelse": false
       }, {
-        "arbeidsgiver" : {
+        "virksomhet" : {
           "identifikator" : "995816598",
           "type": "Organisasjon"
         },
        "utbetalingsperiode": "2018-12",
-        "beløp" : 25000.0
+        "beløp" : 25000.0,
+        "type": "Lønn",
+        "ytelse": false
       } ],
       "sykepengehistorikk" : [ ],
       "arbeidsforhold" : [ {
@@ -248,26 +278,32 @@ val uavklarteJson= """{
             "begrunnelse" : "§ 8-30 første ledd",
             "grunnlag" : {
               "inntekter" : [ {
-                "arbeidsgiver" : {
+                "virksomhet" : {
                   "identifikator" : "995816598",
                   "type": "Organisasjon"
                 },
                 "utbetalingsperiode": "2018-10",
-                "beløp" : 25000.0
+                "beløp" : 25000.0,
+                "type": "Lønn",
+                "ytelse": false
               }, {
-                "arbeidsgiver" : {
+                "virksomhet" : {
                   "identifikator" : "995816598",
                   "type": "Organisasjon"
                 },
                 "utbetalingsperiode": "2018-11",
-                "beløp" : 25000.0
+                "beløp" : 25000.0,
+                "type": "Lønn",
+                "ytelse": false
               }, {
-                "arbeidsgiver" : {
+                "virksomhet" : {
                   "identifikator" : "995816598",
                   "type": "Organisasjon"
                 },
                 "utbetalingsperiode": "2018-12",
-                "beløp" : 25000.0
+                "beløp" : 25000.0,
+                "type": "Lønn",
+                "ytelse": false
               } ],
               "begrunnelse" : "§ 8-28 tredje ledd bokstav a) - De tre siste kalendermånedene før arbeidstakeren ble arbeidsufør (2019-01-11) legges til grunn."
             },
@@ -280,26 +316,32 @@ val uavklarteJson= """{
             "begrunnelse" : "§ 8-28 andre ledd",
             "grunnlag" : {
               "inntekter" : [ {
-                "arbeidsgiver" : {
+                "virksomhet" : {
                   "identifikator" : "995816598",
                   "type": "Organisasjon"
                 },
                 "utbetalingsperiode": "2018-10",
-                "beløp" : 25000.0
+                "beløp" : 25000.0,
+                "type": "Lønn",
+                "ytelse": false
               }, {
-                "arbeidsgiver" : {
+                "virksomhet" : {
                   "identifikator" : "995816598",
                   "type": "Organisasjon"
                 },
                 "utbetalingsperiode": "2018-11",
-                "beløp" : 25000.0
+                "beløp" : 25000.0,
+                "type": "Lønn",
+                "ytelse": false
               }, {
-                "arbeidsgiver" : {
+                "virksomhet" : {
                   "identifikator" : "995816598",
                   "type": "Organisasjon"
                 },
                 "utbetalingsperiode": "2018-12",
-                "beløp" : 25000.0
+                "beløp" : 25000.0,
+                "type": "Lønn",
+                "ytelse": false
               } ],
               "begrunnelse" : "§ 8-28 tredje ledd bokstav a) - De tre siste kalendermånedene før arbeidstakeren ble arbeidsufør (2019-01-11) legges til grunn."
             },
@@ -310,89 +352,113 @@ val uavklarteJson= """{
         "begrunnelse" : "",
         "grunnlag" : {
           "inntekter" : [ {
-            "arbeidsgiver" : {
+            "virksomhet" : {
               "identifikator" : "995816598",
               "type": "Organisasjon"
             },
             "utbetalingsperiode": "2018-01",
-            "beløp" : 25000.0
+            "beløp" : 25000.0,
+            "type": "Lønn",
+            "ytelse": false
           }, {
-            "arbeidsgiver" : {
+            "virksomhet" : {
               "identifikator" : "995816598",
               "type": "Organisasjon"
             },
             "utbetalingsperiode": "2018-02",
-            "beløp" : 25000.0
+            "beløp" : 25000.0,
+            "type": "Lønn",
+            "ytelse": false
           }, {
-            "arbeidsgiver" : {
+            "virksomhet" : {
               "identifikator" : "995816598",
               "type": "Organisasjon"
             },
             "utbetalingsperiode": "2018-03",
-            "beløp" : 25000.0
+            "beløp" : 25000.0,
+            "type": "Lønn",
+            "ytelse": false
           }, {
-            "arbeidsgiver" : {
+            "virksomhet" : {
               "identifikator" : "995816598",
               "type": "Organisasjon"
             },
             "utbetalingsperiode": "2018-04",
-            "beløp" : 25000.0
+            "beløp" : 25000.0,
+            "type": "Lønn",
+            "ytelse": false
           }, {
-            "arbeidsgiver" : {
+            "virksomhet" : {
               "identifikator" : "995816598",
               "type": "Organisasjon"
             },
             "utbetalingsperiode": "2018-05",
-            "beløp" : 25000.0
+            "beløp" : 25000.0,
+            "type": "Lønn",
+            "ytelse": false
           }, {
-            "arbeidsgiver" : {
+            "virksomhet" : {
               "identifikator" : "995816598",
               "type": "Organisasjon"
             },
             "utbetalingsperiode": "2018-06",
-            "beløp" : 25000.0
+            "beløp" : 25000.0,
+            "type": "Lønn",
+            "ytelse": false
           }, {
-            "arbeidsgiver" : {
+            "virksomhet" : {
               "identifikator" : "995816598",
               "type": "Organisasjon"
             },
             "utbetalingsperiode": "2018-07",
-            "beløp" : 25000.0
+            "beløp" : 25000.0,
+            "type": "Lønn",
+            "ytelse": false
           }, {
-            "arbeidsgiver" : {
+            "virksomhet" : {
               "identifikator" : "995816598",
               "type": "Organisasjon"
             },
             "utbetalingsperiode": "2018-08",
-            "beløp" : 25000.0
+            "beløp" : 25000.0,
+            "type": "Lønn",
+            "ytelse": false
           }, {
-            "arbeidsgiver" : {
+            "virksomhet" : {
               "identifikator" : "995816598",
               "type": "Organisasjon"
             },
             "utbetalingsperiode": "2018-09",
-            "beløp" : 25000.0
+            "beløp" : 25000.0,
+            "type": "Lønn",
+            "ytelse": false
           }, {
-            "arbeidsgiver" : {
+            "virksomhet" : {
               "identifikator" : "995816598",
               "type": "Organisasjon"
             },
             "utbetalingsperiode": "2018-10",
-            "beløp" : 25000.0
+            "beløp" : 25000.0,
+            "type": "Lønn",
+            "ytelse": false
           }, {
-            "arbeidsgiver" : {
+            "virksomhet" : {
               "identifikator" : "995816598",
               "type": "Organisasjon"
             },
             "utbetalingsperiode": "2018-11",
-            "beløp" : 25000.0
+            "beløp" : 25000.0,
+            "type": "Lønn",
+            "ytelse": false
           }, {
-            "arbeidsgiver" : {
+            "virksomhet" : {
               "identifikator" : "995816598",
               "type": "Organisasjon"
             },
             "utbetalingsperiode": "2018-12",
-            "beløp" : 25000.0
+            "beløp" : 25000.0,
+            "type": "Lønn",
+            "ytelse": false
           } ],
           "begrunnelse" : "§ 8-30 andre ledd - rapportert inntekt (se § 8-29) til a-ordningen etter reglene i a-opplysningsloven de siste tolv kalendermånedene før arbeidsuførheten inntraff (2019-01-11) legges til grunn."
         },
@@ -407,116 +473,144 @@ val uavklarteJson= """{
 val failJson = """{
     "inntekter": [
         {
-            "arbeidsgiver": {
+            "virksomhet": {
                 "identifikator": "97114455",
                 "type": "Organisasjon"
             },
             "beløp": 25000,
-            "utbetalingsperiode": "2019-01"
+            "utbetalingsperiode": "2019-01",
+            "type": "Lønn",
+            "ytelse": false
         },
         {
-            "arbeidsgiver": {
+            "virksomhet": {
                 "identifikator": "97114455",
                 "type": "Organisasjon"
             },
             "beløp": 25000,
-            "utbetalingsperiode": "2018-12"
+            "utbetalingsperiode": "2018-12",
+            "type": "Lønn",
+            "ytelse": false
         },
         {
-            "arbeidsgiver": {
+            "virksomhet": {
                 "identifikator": "97114455",
                 "type": "Organisasjon"
             },
             "beløp": 25000,
-            "utbetalingsperiode": "2018-11"
+            "utbetalingsperiode": "2018-11",
+            "type": "Lønn",
+            "ytelse": false
         },
         {
-            "arbeidsgiver": {
+            "virksomhet": {
                 "identifikator": "97114455",
                 "type": "Organisasjon"
             },
             "beløp": 25000,
-            "utbetalingsperiode": "2018-10"
+            "utbetalingsperiode": "2018-10",
+            "type": "Lønn",
+            "ytelse": false
         },
         {
-            "arbeidsgiver": {
+            "virksomhet": {
                 "identifikator": "97114455",
                 "type": "Organisasjon"
             },
             "beløp": 25000,
-            "utbetalingsperiode": "2018-09"
+            "utbetalingsperiode": "2018-09",
+            "type": "Lønn",
+            "ytelse": false
         },
         {
-            "arbeidsgiver": {
+            "virksomhet": {
                 "identifikator": "97114455",
                 "type": "Organisasjon"
             },
             "beløp": 25000,
-            "utbetalingsperiode": "2018-08"
+            "utbetalingsperiode": "2018-08",
+            "type": "Lønn",
+            "ytelse": false
         },
         {
-            "arbeidsgiver": {
+            "virksomhet": {
                 "identifikator": "97114455",
                 "type": "Organisasjon"
             },
             "beløp": 25000,
-            "utbetalingsperiode": "2018-07"
+            "utbetalingsperiode": "2018-07",
+            "type": "Lønn",
+            "ytelse": false
         },
         {
-            "arbeidsgiver": {
+            "virksomhet": {
                 "identifikator": "97114455",
                 "type": "Organisasjon"
             },
             "beløp": 25000,
-            "utbetalingsperiode": "2018-06"
+            "utbetalingsperiode": "2018-06",
+            "type": "Lønn",
+            "ytelse": false
         },
         {
-            "arbeidsgiver": {
+            "virksomhet": {
                 "identifikator": "97114455",
                 "type": "Organisasjon"
             },
             "beløp": 25000,
-            "utbetalingsperiode": "2018-05"
+            "utbetalingsperiode": "2018-05",
+            "type": "Lønn",
+            "ytelse": false
         },
         {
-            "arbeidsgiver": {
+            "virksomhet": {
                 "identifikator": "97114455",
                 "type": "Organisasjon"
             },
             "beløp": 25000,
-            "utbetalingsperiode": "2018-04"
+            "utbetalingsperiode": "2018-04",
+            "type": "Lønn",
+            "ytelse": false
         },
         {
-            "arbeidsgiver": {
+            "virksomhet": {
                 "identifikator": "97114455",
                 "type": "Organisasjon"
             },
             "beløp": 25000,
-            "utbetalingsperiode": "2018-03"
+            "utbetalingsperiode": "2018-03",
+            "type": "Lønn",
+            "ytelse": false
         },
         {
-            "arbeidsgiver": {
+            "virksomhet": {
                 "identifikator": "97114455",
                 "type": "Organisasjon"
             },
             "beløp": 25000,
-            "utbetalingsperiode": "2018-02"
+            "utbetalingsperiode": "2018-02",
+            "type": "Lønn",
+            "ytelse": false
         },
         {
-            "arbeidsgiver": {
+            "virksomhet": {
                 "identifikator": "97114455",
                 "type": "Organisasjon"
             },
             "beløp": 25000,
-            "utbetalingsperiode": "2018-01"
+            "utbetalingsperiode": "2018-01",
+            "type": "Lønn",
+            "ytelse": false
         },
         {
-            "arbeidsgiver": {
+            "virksomhet": {
                 "identifikator": "97114455",
                 "type": "Organisasjon"
             },
             "beløp": 25000,
-            "utbetalingsperiode": "2017-12"
+            "utbetalingsperiode": "2017-12",
+            "type": "Lønn",
+            "ytelse": false
         }
     ]
 }"""

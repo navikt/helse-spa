@@ -55,7 +55,7 @@ fun fastsettingAvSykepengegrunnlagetIArbeidsgiverperioden(førsteSykdomsdag: Loc
     val beregningsperiode = inntekter.filter { inntekt ->
         inntekt.utbetalingsperiode in treMånederFør..enMånedFør
     }.groupBy { inntekt ->
-        inntekt.arbeidsgiver.identifikator
+        inntekt.virksomhet.identifikator
     }.mapValues { entry ->
         entry.value.groupBy {  inntekt ->
             inntekt.utbetalingsperiode
@@ -123,7 +123,7 @@ fun fastsettSammenligningsgrunnlag(førsteSykdomsdag: LocalDate, sammenligningsg
     val beregningsperiode = sammenligningsgrunnlag.filter { inntekt ->
         inntekt.utbetalingsperiode in tolvMånederFør..enMånedFør
     }.groupBy { inntekt ->
-        inntekt.arbeidsgiver.identifikator
+        inntekt.virksomhet.identifikator
     }.mapValues { entry ->
         entry.value.groupBy {  inntekt ->
             inntekt.utbetalingsperiode
