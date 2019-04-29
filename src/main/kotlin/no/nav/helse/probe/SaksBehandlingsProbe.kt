@@ -66,6 +66,7 @@ class SaksbehandlingProbe(val env: Environment) {
         log.warn(behandlingsfeil.feilmelding)
         when (behandlingsfeil) {
             is Behandlingsfeil.Deserialiseringsfeil -> serialiseringsFeil(behandlingsfeil)
+            is Behandlingsfeil.MVPFilterFeil -> mvpFilter(behandlingsfeil)
             is Behandlingsfeil.RegisterFeil -> registerFeil(behandlingsfeil)
             is Behandlingsfeil.Avklaringsfeil -> avklaringsFeil(behandlingsfeil)
             is Behandlingsfeil.Vilkårsprøvingsfeil -> vilkårsPrøvingsFeil(behandlingsfeil)
@@ -82,6 +83,17 @@ class SaksbehandlingProbe(val env: Environment) {
                 mapOf(
                         "steg" to "deserialisering",
                         "type" to feil.json.get("type").asText()
+                ))
+    }
+
+    fun mvpFilter(feil: Behandlingsfeil.MVPFilterFeil) {
+        behandlingsfeilCounter.labels("mvpFilter").inc()
+        influxMetricReporter.sendDataPoint("behandlingsfeil.event",
+                mapOf(
+                        "soknadId" to feil.soknadId,
+                        "feilmelding" to feil.feilmelding),
+                mapOf(
+                        "steg" to "mvpFilter"
                 ))
     }
 

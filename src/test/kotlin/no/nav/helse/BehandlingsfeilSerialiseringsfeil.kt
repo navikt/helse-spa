@@ -39,7 +39,8 @@ val uavklarteJson= """{
         "fom" : "2019-01-11",
         "tom" : "2019-02-11",
         "sykmeldingsgrad" : 100
-      } ]
+      } ],
+      "andreInntektskilder" : []
     },
     "faktagrunnlag" : {
       "tps" : {

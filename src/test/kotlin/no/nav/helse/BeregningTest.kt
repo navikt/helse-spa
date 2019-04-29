@@ -65,7 +65,8 @@ class BeregningTest {
                             soknadsperioder = listOf(Soknadsperiode(parse("2019-01-05"), parse("2019-01-31"), sykmeldingsgrad = sykmeldingsgrad)),
                             soktUtenlandsopphold = false,
                             startSyketilfelle = parse("2018-12-01"),
-                            status = "SENDT"),
+                            status = "SENDT",
+                            andreInntektskilder = emptyList()),
                     faktagrunnlag = faktagrunnlagUtenVerdi,
                     avklarteVerdier = AvklarteVerdier(
                             medlemsskap = Avklart(fastsattVerdi = true, begrunnelse = "derfor", fastsattAv = "test", grunnlag = Tpsfakta(LocalDate.parse("1980-01-01"), "NOR", "NOR", "BOSA", null)),

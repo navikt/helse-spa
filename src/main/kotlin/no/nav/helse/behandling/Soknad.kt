@@ -31,7 +31,14 @@ data class SykepengesøknadV2DTO(
         val tom: LocalDate,
         val startSyketilfelle: LocalDate,
         val sendtNav: LocalDateTime?,
-        val soknadsperioder: List<Soknadsperiode>
+        val soknadsperioder: List<Soknadsperiode>,
+        val andreInntektskilder: List<Inntektskilde>
+)
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class Inntektskilde(
+        val type: String,
+        val sykemeldt: Boolean
 )
 
 fun SykepengesøknadV2DTO.mapToSykepengesøknad(): Either<Behandlingsfeil, Sykepengesøknad> {
@@ -49,7 +56,8 @@ fun SykepengesøknadV2DTO.mapToSykepengesøknad(): Either<Behandlingsfeil, Sykep
                 tom = tom,
                 startSyketilfelle = startSyketilfelle,
                 sendtNav = sendtNav,
-                soknadsperioder = soknadsperioder
+                soknadsperioder = soknadsperioder,
+                andreInntektskilder = andreInntektskilder
         ))
     }
 }
@@ -65,7 +73,8 @@ data class Sykepengesøknad(
         val tom: LocalDate,
         val startSyketilfelle: LocalDate,
         val sendtNav: LocalDateTime,
-        val soknadsperioder: List<Soknadsperiode>
+        val soknadsperioder: List<Soknadsperiode>,
+        val andreInntektskilder: List<Inntektskilde>
 )
 
 data class FaktagrunnlagResultat(

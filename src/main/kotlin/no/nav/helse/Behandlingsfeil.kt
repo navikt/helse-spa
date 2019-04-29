@@ -3,12 +3,15 @@ package no.nav.helse
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException
 import no.nav.helse.behandling.Behandlingsgrunnlag
+import no.nav.helse.behandling.MVPFilterType
 import no.nav.helse.behandling.Sykepengesøknad
 import no.nav.helse.behandling.UavklarteFakta
 
 interface Behandlingsfeil {
     val soknadId: String
     val feilmelding: String
+
+    data class MVPFilterFeil(override val soknadId: String, override val feilmelding: String): Behandlingsfeil
 
     data class Deserialiseringsfeil(override val soknadId: String, val json: JsonNode, override val feilmelding: String): Behandlingsfeil
 
@@ -22,6 +25,8 @@ interface Behandlingsfeil {
 
 
     companion object {
+
+        fun mvpFiler(soknadId: String, mvpFilterType: MVPFilterType) = MVPFilterFeil(soknadId, "${mvpFilterType.name}")
 
         // deserializering feilet pga null-verdi som ikke kan være null
         fun manglendeFeilDeserialiseringsfeil(soknadId: String, json: JsonNode, exception: MissingKotlinParameterException) = Deserialiseringsfeil(soknadId, json, "Det mangler felt ${exception.parameter} i søknad med id $soknadId.")

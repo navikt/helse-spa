@@ -332,7 +332,8 @@ class EndToEndTest {
                                 sykmeldingsgrad = 100
                         )
                 ),
-                soktUtenlandsopphold = false
+                soktUtenlandsopphold = false,
+                andreInntektskilder = emptyList()
         )
         produceOneMessage(søknad)
         return søknad
