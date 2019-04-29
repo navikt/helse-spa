@@ -1,6 +1,8 @@
 SPA
 ===================
 
+[![CircleCI](https://circleci.com/gh/navikt/helse-spa.svg?style=svg)](https://circleci.com/gh/navikt/helse-spa)
+
 Behandler sykepengesøknader.
 
 # Henvendelser
