@@ -6,6 +6,6 @@ import java.time.LocalDate
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class FravarDTO(
         val fom: LocalDate,
-        val tom: LocalDate,
+        val tom: LocalDate?,
         val type: FravarstypeDTO
 )
