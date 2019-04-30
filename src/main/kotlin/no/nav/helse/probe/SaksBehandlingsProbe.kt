@@ -88,10 +88,10 @@ class SaksbehandlingProbe(val env: Environment) {
 
     fun mvpFilter(feil: Behandlingsfeil.MVPFilterFeil) {
         behandlingsfeilCounter.labels("mvpFilter").inc()
-        influxMetricReporter.sendDataPoint("behandlingsfeil.event",
+        influxMetricReporter.sendDataPoint("mvpfilter.event",
                 mapOf(
                         "soknadId" to feil.soknadId,
-                        "feilmelding" to feil.feilmelding),
+                        "filter" to feil.feilmelding),
                 mapOf(
                         "steg" to "mvpFilter"
                 ))
