@@ -92,7 +92,6 @@ class SaksbehandlingProbe(val env: Environment) {
                 mapOf(
                         "soknadId" to feil.soknadId),
                 mapOf(
-                        "steg" to "mvpFilter",
                         "filter" to feil.feilmelding
                 ))
     }
