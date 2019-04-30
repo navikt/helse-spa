@@ -26,6 +26,7 @@ data class SykepengesøknadV2DTO(
         val type: String,
         val status: String,
         val arbeidsgiver: ArbeidsgiverDTO,
+        val arbeidsgiverForskutterer: String, // kan være JA, NEI, VET_IKKE
         val soktUtenlandsopphold: Boolean,
         val fom: LocalDate,
         val tom: LocalDate,
@@ -51,6 +52,7 @@ fun SykepengesøknadV2DTO.mapToSykepengesøknad(): Either<Behandlingsfeil, Sykep
                 type = type,
                 status = status,
                 arbeidsgiver = ArbeidsgiverFraSøknad(arbeidsgiver.navn, arbeidsgiver.orgnummer),
+                arbeidsgiverForskutterer = "JA" == arbeidsgiverForskutterer,
                 soktUtenlandsopphold = soktUtenlandsopphold,
                 fom = fom,
                 tom = tom,
@@ -68,6 +70,7 @@ data class Sykepengesøknad(
         val type: String,
         val status: String,
         val arbeidsgiver: ArbeidsgiverFraSøknad,
+        val arbeidsgiverForskutterer: Boolean,
         val soktUtenlandsopphold: Boolean,
         val fom: LocalDate,
         val tom: LocalDate,

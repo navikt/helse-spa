@@ -321,6 +321,7 @@ class EndToEndTest {
                 type = "ARBEIDSTAKERE",
                 status = "SENDT",
                 arbeidsgiver = ArbeidsgiverDTO(navn = "MATBUTIKKEN", orgnummer = stubbet_arbeidsforhold.arbeidsgiver.identifikator),
+                arbeidsgiverForskutterer = "JA",
                 fom = første_dag_i_syketilfelle,
                 tom = siste_dag_i_syketilfelle,
                 startSyketilfelle = første_dag_i_syketilfelle,

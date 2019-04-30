@@ -33,6 +33,7 @@ val originalSoknad = Sykepengesøknad(
         aktorId = "1",
         type = "ARBEIDSTAKERE",
         arbeidsgiver = ArbeidsgiverFraSøknad("Test 1", "1111"),
+        arbeidsgiverForskutterer = true,
         startSyketilfelle = LocalDate.now(),
         soktUtenlandsopphold = true,
         soknadsperioder = emptyList(),

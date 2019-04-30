@@ -2,15 +2,19 @@ package no.nav.helse.behandling
 
 import no.nav.helse.Behandlingsfeil
 import no.nav.helse.Either
+import no.nav.helse.Either.*
 
 fun Sykepengesøknad.mvpFilter(): Either<Behandlingsfeil, Sykepengesøknad> {
     return if (andreInntektskilder.isNotEmpty()) {
-        Either.Left(Behandlingsfeil.mvpFiler(id, MVPFilterType.ANDRE_INNTEKTER_I_SØKNADEN))
+        Left(Behandlingsfeil.mvpFiler(id, MVPFilterType.ANDRE_INNTEKTER_I_SØKNADEN))
+    } else if (!arbeidsgiverForskutterer){
+        Left(Behandlingsfeil.mvpFiler(id, MVPFilterType.ARBEIDSGIVER_FORSKUTTERER_IKKE))
     } else {
-        Either.Right(this)
+        Right(this)
     }
 }
 
 enum class MVPFilterType {
-    ANDRE_INNTEKTER_I_SØKNADEN
+    ANDRE_INNTEKTER_I_SØKNADEN,
+    ARBEIDSGIVER_FORSKUTTERER_IKKE
 }

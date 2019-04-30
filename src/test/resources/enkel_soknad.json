@@ -12,7 +12,7 @@
   "korrigerer": null,
   "korrigertAv": null,
   "soktUtenlandsopphold": null,
-  "arbeidsgiverForskutterer": null,
+  "arbeidsgiverForskutterer": "JA",
   "fom": "2018-11-15",
   "tom": "2018-12-14",
   "startSyketilfelle": "2018-10-16",
