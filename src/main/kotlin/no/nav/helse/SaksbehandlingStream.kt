@@ -6,7 +6,7 @@ import io.prometheus.client.CollectorRegistry
 import no.nav.NarePrometheus
 import no.nav.helse.behandling.Oppslag
 import no.nav.helse.behandling.SykepengeVedtak
-import no.nav.helse.behandling.SykepengesøknadV2DTO
+import no.nav.helse.dto.SykepengesøknadV2DTO
 import no.nav.helse.oppslag.StsRestClient
 import no.nav.helse.probe.SaksbehandlingProbe
 import no.nav.helse.streams.*

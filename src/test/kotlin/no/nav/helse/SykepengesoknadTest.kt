@@ -1,7 +1,7 @@
 package no.nav.helse
 
 import com.fasterxml.jackson.module.kotlin.readValue
-import no.nav.helse.behandling.SykepengesøknadV2DTO
+import no.nav.helse.dto.SykepengesøknadV2DTO
 import no.nav.helse.streams.defaultObjectMapper
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test

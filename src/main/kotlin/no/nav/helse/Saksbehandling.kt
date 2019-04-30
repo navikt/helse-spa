@@ -1,6 +1,7 @@
 package no.nav.helse
 
 import no.nav.helse.behandling.*
+import no.nav.helse.dto.SykepengesøknadV2DTO
 import no.nav.helse.fastsetting.vurderFakta
 import no.nav.helse.probe.SaksbehandlingProbe
 

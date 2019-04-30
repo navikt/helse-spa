@@ -63,7 +63,7 @@ class BeregningTest {
                             arbeidsgiver = ArbeidsgiverFraSøknad("TheWorkplace", "999888777"),
                             arbeidsgiverForskutterer = true,
                             sendtNav = LocalDateTime.ofEpochSecond(parse("2019-01-31").toEpochSecond(LocalTime.NOON, ZoneOffset.UTC), 0, ZoneOffset.UTC),
-                            soknadsperioder = listOf(Soknadsperiode(parse("2019-01-05"), parse("2019-01-31"), sykmeldingsgrad = sykmeldingsgrad)),
+                            soknadsperioder = listOf(Søknadsperiode(parse("2019-01-05"), parse("2019-01-31"), sykmeldingsgrad = sykmeldingsgrad)),
                             soktUtenlandsopphold = false,
                             startSyketilfelle = parse("2018-12-01"),
                             status = "SENDT",

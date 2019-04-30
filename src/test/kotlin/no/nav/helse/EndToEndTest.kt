@@ -18,6 +18,7 @@ import no.nav.helse.domain.Arbeidsforhold
 import no.nav.helse.domain.ArbeidsforholdMedInntekter
 import no.nav.helse.domain.ArbeidsforholdWrapper
 import no.nav.helse.domain.Arbeidsgiver
+import no.nav.helse.dto.*
 import no.nav.helse.fastsetting.*
 import no.nav.helse.oppslag.*
 import no.nav.helse.streams.JsonSerializer
@@ -142,14 +143,19 @@ class EndToEndTest {
 
     private fun checkSøknad(innsendtSøknad: SykepengesøknadV2DTO, faktiskSøknad: Sykepengesøknad) {
         assert(innsendtSøknad.aktorId).isEqualTo(faktiskSøknad.aktorId)
-        assert(innsendtSøknad.status).isEqualTo(faktiskSøknad.status)
+        assert(innsendtSøknad.status.name).isEqualTo(faktiskSøknad.status)
         assert(innsendtSøknad.arbeidsgiver.orgnummer).isEqualTo(faktiskSøknad.arbeidsgiver.orgnummer)
         assert(innsendtSøknad.soktUtenlandsopphold).isEqualTo(faktiskSøknad.soktUtenlandsopphold)
         assert(innsendtSøknad.fom).isEqualTo(første_dag_i_syketilfelle)
         assert(innsendtSøknad.tom).isEqualTo(faktiskSøknad.tom)
         assert(innsendtSøknad.startSyketilfelle).isEqualTo(første_dag_i_syketilfelle)
         assert(innsendtSøknad.sendtNav).isEqualTo(faktiskSøknad.sendtNav)
-        assert(innsendtSøknad.soknadsperioder).isEqualTo(faktiskSøknad.soknadsperioder)
+
+        innsendtSøknad.soknadsperioder.forEachIndexed { index, soknadsperiodeDTO ->
+            assert(soknadsperiodeDTO.fom).isEqualTo(faktiskSøknad.soknadsperioder[index].fom)
+            assert(soknadsperiodeDTO.tom).isEqualTo(faktiskSøknad.soknadsperioder[index].tom)
+            assert(soknadsperiodeDTO.sykmeldingsgrad).isEqualTo(faktiskSøknad.soknadsperioder[index].sykmeldingsgrad)
+        }
     }
 
     private fun checkFaktagrunnlag(faktagrunnlag: Faktagrunnlag) {
@@ -318,16 +324,16 @@ class EndToEndTest {
         val søknad = SykepengesøknadV2DTO(
                 id = "1",
                 aktorId = aktørId,
-                type = "ARBEIDSTAKERE",
-                status = "SENDT",
+                type = SoknadstypeDTO.ARBEIDSTAKERE,
+                status = SoknadsstatusDTO.SENDT,
                 arbeidsgiver = ArbeidsgiverDTO(navn = "MATBUTIKKEN", orgnummer = stubbet_arbeidsforhold.arbeidsgiver.identifikator),
-                arbeidsgiverForskutterer = "JA",
+                arbeidsgiverForskutterer = ArbeidsgiverForskuttererDTO.JA,
                 fom = første_dag_i_syketilfelle,
                 tom = siste_dag_i_syketilfelle,
                 startSyketilfelle = første_dag_i_syketilfelle,
                 sendtNav = parse("2019-01-17").atStartOfDay(),
                 soknadsperioder = listOf(
-                        Soknadsperiode(
+                        SoknadsperiodeDTO(
                                 fom = første_dag_i_syketilfelle,
                                 tom = siste_dag_i_syketilfelle,
                                 sykmeldingsgrad = 100

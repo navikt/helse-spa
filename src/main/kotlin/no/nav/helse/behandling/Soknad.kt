@@ -1,89 +1,18 @@
 package no.nav.helse.behandling
 
-import com.fasterxml.jackson.annotation.JsonEnumDefaultValue
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-import no.nav.helse.Behandlingsfeil
-import no.nav.helse.Either
 import no.nav.helse.Grunnlagsdata
 import no.nav.helse.domain.Arbeidsforhold
 import no.nav.helse.domain.ArbeidsgiverFraSøknad
+import no.nav.helse.dto.SoknadsperiodeDTO
 import no.nav.helse.fastsetting.*
 import no.nav.helse.oppslag.AnvistPeriode
 import no.nav.helse.oppslag.Inntekt
-import no.nav.helse.streams.defaultObjectMapper
 import no.nav.helse.sykepenger.beregning.Beregningsresultat
-import no.nav.helse.sykepenger.beregning.Fravær
 import no.nav.nare.core.evaluations.Evaluering
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.LocalDateTime
-
-@JsonIgnoreProperties(ignoreUnknown = true)
-data class ArbeidsgiverDTO(val navn: String, val orgnummer: String)
-
-@JsonIgnoreProperties(ignoreUnknown = true)
-data class SykepengesøknadV2DTO(
-        val id: String,
-        val aktorId: String,
-        val type: String,
-        val status: String,
-        val arbeidsgiver: ArbeidsgiverDTO,
-        val arbeidsgiverForskutterer: String, // kan være JA, NEI, VET_IKKE
-        val soktUtenlandsopphold: Boolean,
-        val fom: LocalDate,
-        val tom: LocalDate,
-        val startSyketilfelle: LocalDate,
-        val sendtNav: LocalDateTime?,
-        val soknadsperioder: List<Soknadsperiode>,
-        val fravar: List<Fravar>,
-        val andreInntektskilder: List<Inntektskilde>
-)
-
-@JsonIgnoreProperties(ignoreUnknown = true)
-data class Inntektskilde(
-        val type: String,
-        val sykemeldt: Boolean
-)
-
-@JsonIgnoreProperties(ignoreUnknown = true)
-data class Fravar(
-        val fom: LocalDate,
-        val tom: LocalDate,
-        val type: Fravarstype
-)
-
-enum class Fravarstype {
-    FERIE,
-    PERMISJON,
-    UTLANDSOPPHOLD,
-    UTDANNING_FULLTID,
-    UTDANNING_DELTID,
-    @JsonEnumDefaultValue
-    UKJENT
-}
-
-fun SykepengesøknadV2DTO.mapToSykepengesøknad(): Either<Behandlingsfeil, Sykepengesøknad> {
-    return if (sendtNav == null) {
-        Either.Left(Behandlingsfeil.ukjentDeserialiseringsfeil(id, defaultObjectMapper.valueToTree(this), Exception("sendtNav er null")))
-    } else {
-        Either.Right(Sykepengesøknad(
-                id = id,
-                aktorId = aktorId,
-                type = type,
-                status = status,
-                arbeidsgiver = ArbeidsgiverFraSøknad(arbeidsgiver.navn, arbeidsgiver.orgnummer),
-                arbeidsgiverForskutterer = "JA" == arbeidsgiverForskutterer,
-                soktUtenlandsopphold = soktUtenlandsopphold,
-                fom = fom,
-                tom = tom,
-                startSyketilfelle = startSyketilfelle,
-                sendtNav = sendtNav,
-                soknadsperioder = soknadsperioder,
-                fravær = fravar,
-                andreInntektskilder = andreInntektskilder
-        ))
-    }
-}
 
 data class Sykepengesøknad(
         val id: String,
@@ -97,8 +26,8 @@ data class Sykepengesøknad(
         val tom: LocalDate,
         val startSyketilfelle: LocalDate,
         val sendtNav: LocalDateTime,
-        val soknadsperioder: List<Soknadsperiode>,
-        val fravær: List<Fravar>,
+        val soknadsperioder: List<Søknadsperiode>,
+        val fravær: List<Fravær>,
         val andreInntektskilder: List<Inntektskilde>
 )
 
@@ -186,11 +115,6 @@ data class Fordeling(
         val andel: Int
 )
 
-@JsonIgnoreProperties(ignoreUnknown = true)
-data class Soknadsperiode(val fom: LocalDate,
-                          val tom: LocalDate,
-                          val sykmeldingsgrad: Int)
-
 data class Faktagrunnlag(val tps: Tpsfakta,
                          val beregningsperiode: List<Inntekt>,
                          val sammenligningsperiode: List<Inntekt>,
@@ -203,7 +127,7 @@ data class Tpsfakta(val fodselsdato: LocalDate,
                     val status: String,
                     val diskresjonskode: String?)
 
-fun asNewPeriode(it: SykepengesøknadV1Periode): Soknadsperiode = Soknadsperiode(
+fun asNewPeriode(it: SykepengesøknadV1Periode): SoknadsperiodeDTO = SoknadsperiodeDTO(
         fom = it.fom,
         tom = it.tom,
         sykmeldingsgrad = it.grad
