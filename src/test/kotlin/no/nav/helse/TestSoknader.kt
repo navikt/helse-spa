@@ -41,7 +41,8 @@ val originalSoknad = Sykepengesøknad(
         tom = LocalDate.now(),
         fom = LocalDate.now(),
         status = "SENDT",
-        andreInntektskilder = emptyList()
+        andreInntektskilder = emptyList(),
+        fravær = emptyList()
 )
 
 val soknadUtenVerdi = FaktagrunnlagResultat(

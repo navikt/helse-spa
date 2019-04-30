@@ -334,7 +334,8 @@ class EndToEndTest {
                         )
                 ),
                 soktUtenlandsopphold = false,
-                andreInntektskilder = emptyList()
+                andreInntektskilder = emptyList(),
+                fravar = emptyList()
         )
         produceOneMessage(søknad)
         return søknad

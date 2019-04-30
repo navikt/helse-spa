@@ -1,5 +1,6 @@
 package no.nav.helse.behandling
 
+import com.fasterxml.jackson.annotation.JsonEnumDefaultValue
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import no.nav.helse.Behandlingsfeil
 import no.nav.helse.Either
@@ -11,6 +12,7 @@ import no.nav.helse.oppslag.AnvistPeriode
 import no.nav.helse.oppslag.Inntekt
 import no.nav.helse.streams.defaultObjectMapper
 import no.nav.helse.sykepenger.beregning.Beregningsresultat
+import no.nav.helse.sykepenger.beregning.Fravær
 import no.nav.nare.core.evaluations.Evaluering
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -33,6 +35,7 @@ data class SykepengesøknadV2DTO(
         val startSyketilfelle: LocalDate,
         val sendtNav: LocalDateTime?,
         val soknadsperioder: List<Soknadsperiode>,
+        val fravar: List<Fravar>,
         val andreInntektskilder: List<Inntektskilde>
 )
 
@@ -41,6 +44,23 @@ data class Inntektskilde(
         val type: String,
         val sykemeldt: Boolean
 )
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class Fravar(
+        val fom: LocalDate,
+        val tom: LocalDate,
+        val type: Fravarstype
+)
+
+enum class Fravarstype {
+    FERIE,
+    PERMISJON,
+    UTLANDSOPPHOLD,
+    UTDANNING_FULLTID,
+    UTDANNING_DELTID,
+    @JsonEnumDefaultValue
+    UKJENT
+}
 
 fun SykepengesøknadV2DTO.mapToSykepengesøknad(): Either<Behandlingsfeil, Sykepengesøknad> {
     return if (sendtNav == null) {
@@ -59,6 +79,7 @@ fun SykepengesøknadV2DTO.mapToSykepengesøknad(): Either<Behandlingsfeil, Sykep
                 startSyketilfelle = startSyketilfelle,
                 sendtNav = sendtNav,
                 soknadsperioder = soknadsperioder,
+                fravær = fravar,
                 andreInntektskilder = andreInntektskilder
         ))
     }
@@ -77,6 +98,7 @@ data class Sykepengesøknad(
         val startSyketilfelle: LocalDate,
         val sendtNav: LocalDateTime,
         val soknadsperioder: List<Soknadsperiode>,
+        val fravær: List<Fravar>,
         val andreInntektskilder: List<Inntektskilde>
 )
 

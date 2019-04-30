@@ -67,7 +67,8 @@ class BeregningTest {
                             soktUtenlandsopphold = false,
                             startSyketilfelle = parse("2018-12-01"),
                             status = "SENDT",
-                            andreInntektskilder = emptyList()),
+                            andreInntektskilder = emptyList(),
+                            fravær = emptyList()),
                     faktagrunnlag = faktagrunnlagUtenVerdi,
                     avklarteVerdier = AvklarteVerdier(
                             medlemsskap = Avklart(fastsattVerdi = true, begrunnelse = "derfor", fastsattAv = "test", grunnlag = Tpsfakta(LocalDate.parse("1980-01-01"), "NOR", "NOR", "BOSA", null)),
