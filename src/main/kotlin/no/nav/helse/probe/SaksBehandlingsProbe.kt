@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException
 import io.prometheus.client.Counter
 import no.nav.helse.Behandlingsfeil
+import no.nav.helse.Behandlingsfeil.*
 import no.nav.helse.Environment
 import no.nav.helse.SaksbehandlingStream
 import no.nav.helse.behandling.SykepengeVedtak
@@ -64,51 +65,53 @@ class SaksbehandlingProbe(val env: Environment) {
 
     fun behandlingsFeilMedType(behandlingsfeil: Behandlingsfeil) {
         log.warn(behandlingsfeil.feilmelding)
-        when (behandlingsfeil) {
-            is Behandlingsfeil.Deserialiseringsfeil -> serialiseringsFeil(behandlingsfeil)
-            is Behandlingsfeil.MVPFilterFeil -> mvpFilter(behandlingsfeil)
-            is Behandlingsfeil.RegisterFeil -> registerFeil(behandlingsfeil)
-            is Behandlingsfeil.Avklaringsfeil -> avklaringsFeil(behandlingsfeil)
-            is Behandlingsfeil.Vilkårsprøvingsfeil -> vilkårsPrøvingsFeil(behandlingsfeil)
-            is Behandlingsfeil.Beregningsfeil -> beregningsfeil(behandlingsfeil)
+        with(behandlingsfeil) {
+            when (this) {
+                is Deserialiseringsfeil -> serialiseringsFeil()
+                is MVPFilterFeil -> mvpFilter()
+                is RegisterFeil -> registerFeil()
+                is Avklaringsfeil -> avklaringsFeil()
+                is Vilkårsprøvingsfeil -> vilkårsPrøvingsFeil()
+                is Beregningsfeil -> beregningsfeil()
+            }
         }
     }
 
-    fun serialiseringsFeil(feil: Behandlingsfeil.Deserialiseringsfeil) {
+    fun Deserialiseringsfeil.serialiseringsFeil() {
         behandlingsfeilCounter.labels("deserialisering").inc()
         influxMetricReporter.sendDataPoint("behandlingsfeil.event",
                 mapOf(
-                        "soknadId" to feil.soknadId,
-                        "feilmelding" to feil.feilmelding),
+                        "soknadId" to soknadId,
+                        "feilmelding" to feilmelding),
                 mapOf(
                         "steg" to "deserialisering",
-                        "type" to feil.json.get("type").asText()
+                        "type" to json.get("type").asText()
                 ))
     }
 
-    fun mvpFilter(feil: Behandlingsfeil.MVPFilterFeil) {
+    fun MVPFilterFeil.mvpFilter() {
         behandlingsfeilCounter.labels("mvpFilter").inc()
         influxMetricReporter.sendDataPoint("mvpfilter.event",
                 mapOf(
-                        "soknadId" to feil.soknadId),
+                        "soknadId" to soknadId),
                 mapOf(
-                        "filter" to feil.feilmelding
+                        "filter" to feilmelding
                 ))
     }
 
-    fun registerFeil(feil: Behandlingsfeil.RegisterFeil) {
+    fun RegisterFeil.registerFeil() {
         behandlingsfeilCounter.labels("register").inc()
         influxMetricReporter.sendDataPoint("behandlingsfeil.event", mapOf(
-                "soknadId" to feil.søknad.id
+                "soknadId" to søknad.id
         ), mapOf(
                 "steg" to "register",
-                "type" to feil.søknad.type
+                "type" to søknad.type
         ))
     }
 
-    fun avklaringsFeil(feil: Behandlingsfeil.Avklaringsfeil) {
+    fun Avklaringsfeil.avklaringsFeil() {
         behandlingsfeilCounter.labels("avklaring").inc()
-        feil.uavklarteFakta.uavklarteVerdier.asNamedList().forEach { (name, fakta) ->
+        uavklarteFakta.uavklarteVerdier.asNamedList().forEach { (name, fakta) ->
             if (fakta is Vurdering.Uavklart) {
                 log.info("$name er uavklart fordi ${fakta.årsak}: ${fakta.begrunnelse}")
 
@@ -116,7 +119,7 @@ class SaksbehandlingProbe(val env: Environment) {
                 influxMetricReporter.sendDataPoint(DataPoint(
                         name = "avklaringsfeil.event",
                         fields = mapOf(
-                                "soknadId" to feil.uavklarteFakta.originalSøknad.id
+                                "soknadId" to uavklarteFakta.originalSøknad.id
                         ),
                         tags = mapOf(
                                 "datum" to name,
@@ -127,32 +130,32 @@ class SaksbehandlingProbe(val env: Environment) {
             }
         }
         influxMetricReporter.sendDataPoint("behandlingsfeil.event", mapOf(
-                "soknadId" to feil.uavklarteFakta.originalSøknad.id
+                "soknadId" to uavklarteFakta.originalSøknad.id
         ), mapOf(
                 "steg" to "avklaring",
-                "type" to feil.uavklarteFakta.originalSøknad.type
+                "type" to uavklarteFakta.originalSøknad.type
         ))
-        log.info("Søknad for aktør ${feil.uavklarteFakta.originalSøknad.aktorId} med id ${feil.uavklarteFakta.originalSøknad.id} er uavklart")
+        log.info("Søknad for aktør ${uavklarteFakta.originalSøknad.aktorId} med id ${uavklarteFakta.originalSøknad.id} er uavklart")
     }
 
-    fun vilkårsPrøvingsFeil(feil: Behandlingsfeil.Vilkårsprøvingsfeil) {
+    fun Vilkårsprøvingsfeil.vilkårsPrøvingsFeil() {
         behandlingsfeilCounter.labels("vilkarsproving").inc()
         influxMetricReporter.sendDataPoint("behandlingsfeil.event", mapOf(
-                "soknadId" to feil.vilkårsprøving.originalSøknad.id
+                "soknadId" to vilkårsprøving.originalSøknad.id
         ), mapOf(
                 "steg" to "vilkarsproving",
-                "type" to feil.vilkårsprøving.originalSøknad.type
+                "type" to vilkårsprøving.originalSøknad.type
         ))
-        log.info("Søknad for aktør ${feil.vilkårsprøving.originalSøknad.aktorId} med id ${feil.vilkårsprøving.originalSøknad.id} oppfyller ikke vilkårene")
+        log.info("Søknad for aktør ${vilkårsprøving.originalSøknad.aktorId} med id ${vilkårsprøving.originalSøknad.id} oppfyller ikke vilkårene")
     }
 
-    fun beregningsfeil(feil: Behandlingsfeil.Beregningsfeil) {
+    fun Beregningsfeil.beregningsfeil() {
         behandlingsfeilCounter.labels("beregning").inc()
         influxMetricReporter.sendDataPoint("behandlingsfeil.event", mapOf(
-                "soknadId" to feil.vilkårsprøving.originalSøknad.id
+                "soknadId" to vilkårsprøving.originalSøknad.id
         ), mapOf(
                 "steg" to "beregning",
-                "type" to feil.vilkårsprøving.originalSøknad.type
+                "type" to vilkårsprøving.originalSøknad.type
         ))
     }
 
