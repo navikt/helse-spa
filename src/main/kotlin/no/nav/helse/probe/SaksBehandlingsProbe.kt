@@ -90,10 +90,10 @@ class SaksbehandlingProbe(val env: Environment) {
         behandlingsfeilCounter.labels("mvpFilter").inc()
         influxMetricReporter.sendDataPoint("mvpfilter.event",
                 mapOf(
-                        "soknadId" to feil.soknadId,
-                        "filter" to feil.feilmelding),
+                        "soknadId" to feil.soknadId),
                 mapOf(
-                        "steg" to "mvpFilter"
+                        "steg" to "mvpFilter",
+                        "filter" to feil.feilmelding
                 ))
     }
 
