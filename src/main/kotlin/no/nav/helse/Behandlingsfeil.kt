@@ -11,7 +11,7 @@ interface Behandlingsfeil {
     val soknadId: String
     val feilmelding: String
 
-    data class MVPFilterFeil(override val soknadId: String, override val feilmelding: String): Behandlingsfeil
+    data class MVPFilterFeil(val søknad: Sykepengesøknad, override val feilmelding: String, override val soknadId: String = søknad.id ): Behandlingsfeil
 
     data class Deserialiseringsfeil(override val soknadId: String, val json: JsonNode, override val feilmelding: String): Behandlingsfeil
 
@@ -26,7 +26,7 @@ interface Behandlingsfeil {
 
     companion object {
 
-        fun mvpFiler(soknadId: String, mvpFilterType: MVPFilterType) = MVPFilterFeil(soknadId, "${mvpFilterType.name}")
+        fun mvpFiler(søknad: Sykepengesøknad, mvpFilterType: MVPFilterType) = MVPFilterFeil(søknad, "${mvpFilterType.name}")
 
         // deserializering feilet pga null-verdi som ikke kan være null
         fun manglendeFeilDeserialiseringsfeil(soknadId: String, json: JsonNode, exception: MissingKotlinParameterException) = Deserialiseringsfeil(soknadId, json, "Det mangler felt ${exception.parameter} i søknad med id $soknadId.")

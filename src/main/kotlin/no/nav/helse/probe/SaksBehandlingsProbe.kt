@@ -97,6 +97,12 @@ class SaksbehandlingProbe(val env: Environment) {
                 mapOf(
                         "filter" to feilmelding
                 ))
+        influxMetricReporter.sendDataPoint("behandlingsfeil.event", mapOf(
+                "soknadId" to soknadId
+        ), mapOf(
+                "steg" to "mvpFilter",
+                "type" to søknad.type
+        ))
     }
 
     fun RegisterFeil.registerFeil() {

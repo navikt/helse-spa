@@ -7,12 +7,12 @@ import no.nav.helse.Either.Right
 
 fun Sykepengesøknad.mvpFilter(): Either<Behandlingsfeil, Sykepengesøknad> =
         when {
-            andreInntektskilder.isNotEmpty() -> Left(Behandlingsfeil.mvpFiler(id, MVPFilterType.ANDRE_INNTEKTER_I_SOKNADEN))
-            !arbeidsgiverForskutterer -> Left(Behandlingsfeil.mvpFiler(id, MVPFilterType.ARBEIDSGIVER_FORSKUTTERER_IKKE))
-            fravær.any { it.type == Fraværstype.PERMISJON } -> Left(Behandlingsfeil.mvpFiler(id, MVPFilterType.SOKER_HAR_PERMISJON))
-            fravær.any { it.type == Fraværstype.UTDANNING_DELTID } -> Left(Behandlingsfeil.mvpFiler(id, MVPFilterType.SOKER_HAR_STUDIER))
-            fravær.any { it.type == Fraværstype.UTDANNING_FULLTID } -> Left(Behandlingsfeil.mvpFiler(id, MVPFilterType.SOKER_HAR_STUDIER))
-            fravær.any { it.type == Fraværstype.UTLANDSOPPHOLD } -> Left(Behandlingsfeil.mvpFiler(id, MVPFilterType.SOKER_HAR_UTENLANDSOPPHOLD))
+            andreInntektskilder.isNotEmpty() -> Left(Behandlingsfeil.mvpFiler(this, MVPFilterType.ANDRE_INNTEKTER_I_SOKNADEN))
+            !arbeidsgiverForskutterer -> Left(Behandlingsfeil.mvpFiler(this, MVPFilterType.ARBEIDSGIVER_FORSKUTTERER_IKKE))
+            fravær.any { it.type == Fraværstype.PERMISJON } -> Left(Behandlingsfeil.mvpFiler(this, MVPFilterType.SOKER_HAR_PERMISJON))
+            fravær.any { it.type == Fraværstype.UTDANNING_DELTID } -> Left(Behandlingsfeil.mvpFiler(this, MVPFilterType.SOKER_HAR_STUDIER))
+            fravær.any { it.type == Fraværstype.UTDANNING_FULLTID } -> Left(Behandlingsfeil.mvpFiler(this, MVPFilterType.SOKER_HAR_STUDIER))
+            fravær.any { it.type == Fraværstype.UTLANDSOPPHOLD } -> Left(Behandlingsfeil.mvpFiler(this, MVPFilterType.SOKER_HAR_UTENLANDSOPPHOLD))
             else -> Right(this)
         }
 
