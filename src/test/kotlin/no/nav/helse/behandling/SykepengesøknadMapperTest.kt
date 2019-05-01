@@ -3,6 +3,7 @@ package no.nav.helse.behandling
 import no.nav.helse.Behandlingsfeil
 import no.nav.helse.Either
 import no.nav.helse.dto.*
+import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
@@ -23,13 +24,13 @@ class SykepengesøknadMapperTest {
     }
 
     @Test
-    fun `arbeidsgiverForskutterer kan ikke være null`() {
+    fun `arbeidsgiverForskutterer kan være null, men skal tolkes som nei`() {
         val søknad = søknadMedArbeidsgiverForskuttererSomNull()
 
         val actual = søknad.mapToSykepengesøknad()
         when (actual) {
-            is Either.Right -> fail { "expected Either.Left" }
-            is Either.Left -> assertTrue(actual.left is Behandlingsfeil.Deserialiseringsfeil)
+            is Either.Left -> fail { "expected Either.Right" }
+            is Either.Right -> assertFalse(actual.right.arbeidsgiverForskutterer)
         }
     }
 

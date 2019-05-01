@@ -11,8 +11,6 @@ import no.nav.helse.streams.defaultObjectMapper
 fun SykepengesøknadV2DTO.mapToSykepengesøknad(): Either<Behandlingsfeil, Sykepengesøknad> {
     return if (sendtNav == null) {
         Either.Left(Behandlingsfeil.ukjentDeserialiseringsfeil(id, defaultObjectMapper.valueToTree(this), Exception("sendtNav er null")))
-    } else if (arbeidsgiverForskutterer == null) {
-        Either.Left(Behandlingsfeil.ukjentDeserialiseringsfeil(id, defaultObjectMapper.valueToTree(this), Exception("arbeidsgiverForskutterer er null")))
     } else {
         Either.Right(Sykepengesøknad(
                 id = id,
