@@ -11,7 +11,7 @@ data class SykepengesøknadV2DTO(
         val aktorId: String,
         val status: SoknadsstatusDTO,
         val arbeidsgiver: ArbeidsgiverDTO,
-        val arbeidsgiverForskutterer: ArbeidsgiverForskuttererDTO,
+        val arbeidsgiverForskutterer: ArbeidsgiverForskuttererDTO?,
         val soktUtenlandsopphold: Boolean,
         val fom: LocalDate,
         val tom: LocalDate,
