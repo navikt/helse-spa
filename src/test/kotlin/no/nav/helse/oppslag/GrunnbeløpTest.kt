@@ -3,10 +3,8 @@ package no.nav.helse.oppslag
 import assertk.assert
 import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
-import assertk.assertions.isGreaterThan
 import assertk.assertions.isTrue
 import org.junit.jupiter.api.Test
-import java.time.LocalDate
 import java.time.LocalDate.of
 import java.time.Month
 
@@ -20,12 +18,6 @@ class GrunnbeløpTest {
         assert(grunnbeløp2017.gjelderFor(of(2017, Month.MAY, 1))).isTrue()
         assert(grunnbeløp2017.gjelderFor(of(2018, Month.APRIL, 30))).isTrue()
         assert(grunnbeløp2017.gjelderFor(of(2018, Month.MAY, 1))).isFalse()
-    }
-
-    @Test
-    fun ` Nyeste innslag i Grunnbeløpslista må være under et år gammelt `() {
-
-        assert(grunnbeløpListe.maxBy { it.fom }!!.fom.plusYears(1)).isGreaterThan(LocalDate.now())
     }
 
     @Test
