@@ -52,10 +52,52 @@ class SaksbehandlingProbe(val env: Environment) {
     fun missingNonNullablefield(e: MissingKotlinParameterException) = log.error("Failed to deserialize søknad due to missing non-nullable parameter: ${e.parameter.name} of type ${e.parameter.type}")
     fun failedToDeserialize(e: Exception) = log.error("Failed to deserialize søknad", e)
 
-    fun mottattFrilansSøknad(value: JsonNode) = mottattCounter.labels(value.get("status").asText(), value.get("soknadstype").asText(), "v2").inc()
-    fun mottattAnnenSøknad(value: JsonNode) = mottattCounter.labels(value.get("status").asText(), value.get("UKJENT").asText(), "v2").inc()
-    fun mottattArbeidstakerSøknad(value: JsonNode) = mottattCounter.labels(value.get("status").asText(), value.get("type").asText(), "v2").inc()
-    fun mottattSøknadSendtNAV(value: JsonNode) = mottattCounter.labels("SENDT_NAV", value.get("type").asText(), "v2").inc()
+    private fun sendMottattSykepengesøknadEvent(søknadId: String, status: String, type: String) {
+        influxMetricReporter.sendDataPoint("sykepengesoknad.mottatt",
+                mapOf(
+                        "soknadId" to søknadId
+                ),
+                mapOf(
+                        "status" to status,
+                        "type" to type
+                ))
+    }
+
+    fun mottattSøknadUansettStatusOgType(søknadId: String) = sendMottattSykepengesøknadEvent(søknadId, "ALLE", "ALLE")
+
+    fun mottattSøknadUansettType(søknadId: String, status: String) = sendMottattSykepengesøknadEvent(søknadId, status, "ALLE")
+
+    fun mottattFrilansSøknad(søknadId: String, value: JsonNode) {
+        val status = value.get("status").asText()
+        val type = value.get("soknadstype").asText()
+
+        sendMottattSykepengesøknadEvent(søknadId, status, type)
+        mottattCounter.labels(status, type, "v2").inc()
+    }
+
+    fun mottattAnnenSøknad(søknadId: String, value: JsonNode) {
+        val status = value.get("status").asText()
+        val type = "UKJENT"
+
+        sendMottattSykepengesøknadEvent(søknadId, status, type)
+        mottattCounter.labels(status, type, "v2").inc()
+    }
+
+    fun mottattArbeidstakerSøknad(søknadId: String, value: JsonNode) {
+        val status = value.get("status").asText()
+        val type = value.get("type").asText()
+
+        sendMottattSykepengesøknadEvent(søknadId, status, type)
+        mottattCounter.labels(status, type, "v2").inc()
+    }
+
+    fun mottattSøknadSendtNAV(søknadId: String, value: JsonNode) {
+        val status = "SENDT_NAV"
+        val type = value.get("type").asText()
+
+        sendMottattSykepengesøknadEvent(søknadId, status, type)
+        mottattCounter.labels(status, type, "v2").inc()
+    }
 
     fun gjennomførtVilkårsprøving(value: Evaluering) {
 

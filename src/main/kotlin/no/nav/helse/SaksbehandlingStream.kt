@@ -54,8 +54,8 @@ class SaksbehandlingStream(val env: Environment) {
 
         val (arbeidstakersøknader, frilanssøknader, alleAndreSøknader) = splittPåType(builder)
 
-        frilanssøknader.peek { _, value -> probe.mottattFrilansSøknad(value) }
-        alleAndreSøknader.peek { _, value -> probe.mottattAnnenSøknad(value) }
+        frilanssøknader.peek { søknadId, value -> probe.mottattFrilansSøknad(søknadId, value) }
+        alleAndreSøknader.peek { søknadId, value -> probe.mottattAnnenSøknad(søknadId, value) }
 
         val (feilendeSøknader, vedtak) = prøvArbeidstaker(arbeidstakersøknader)
 
@@ -97,9 +97,9 @@ class SaksbehandlingStream(val env: Environment) {
 
     private fun prøvArbeidstaker(arbeidstakersøknader: KStream<String, JsonNode>): VedtakEllerFeil {
         val (feil, vedtak) = arbeidstakersøknader
-                .peek { _, value -> probe.mottattArbeidstakerSøknad(value) }
+                .peek { søknadId, value -> probe.mottattArbeidstakerSøknad(søknadId, value) }
                 .filter { _, value -> value.get("status").asText() == "SENDT" && value.has("sendtNav") && !value.get("sendtNav").isNull }
-                .peek { _, value -> probe.mottattSøknadSendtNAV(value) }
+                .peek { søknadId, value -> probe.mottattSøknadSendtNAV(søknadId, value) }
                 .mapValues { soknadId, jsonNode ->
                     loggMedSøknadId(soknadId) {
                         jsonNode.deserializeSykepengesøknadV2(soknadId)
@@ -120,7 +120,13 @@ class SaksbehandlingStream(val env: Environment) {
 
     private fun splittPåType(builder: StreamsBuilder): SplitByType {
         val (arbeidstakersøknader, frilanssøknader, alleAndreSøknader) = builder.consumeTopic(Topics.SYKEPENGESØKNADER_INN)
+                .peek { søknadId, _ ->
+                    probe.mottattSøknadUansettStatusOgType(søknadId)
+                }
                 .filter { _, value -> value.has("status") }
+                .peek { søknadId, value ->
+                    probe.mottattSøknadUansettType(søknadId, value.get("status").asText())
+                }
                 .branch(
                         Predicate { _, value -> value.has("type") },
                         Predicate { _, value -> value.has("soknadstype") },
