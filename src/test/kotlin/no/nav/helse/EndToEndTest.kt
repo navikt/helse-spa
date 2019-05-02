@@ -510,7 +510,8 @@ class EndToEndTest {
                                 ),
                                 muligeArbeidsforhold = listOf(stubbet_arbeidsforhold)
                         )
-                )
+                ),
+                ytelser = emptyList()
         )
 
         stubFor(any(urlPathEqualTo("/api/arbeidsforhold/$aktørId/inntekter"))

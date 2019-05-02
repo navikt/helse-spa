@@ -11,7 +11,8 @@ fun FaktagrunnlagResultat.mvpFilter(probe: SaksbehandlingProbe): Either<Behandli
             vurderMVPKriterierForMedlemskap(faktagrunnlag.tps),
             vurderMVPKriterierForOpptjeningstid(faktagrunnlag.arbeidInntektYtelse.arbeidsforhold),
             vurderMVPKriterierForArbeidsforhold(originalSøknad.arbeidsgiver, faktagrunnlag.arbeidInntektYtelse.arbeidsforhold),
-            vurderMVPKriterierForSykepengegrunnlaget(originalSøknad.startSyketilfelle, originalSøknad.soknadsperioder, faktagrunnlag.beregningsperiode)
+            vurderMVPKriterierForSykepengegrunnlaget(originalSøknad.startSyketilfelle, originalSøknad.soknadsperioder, faktagrunnlag.beregningsperiode),
+            vurderMVPKriterierForAndreYtelser(faktagrunnlag.arbeidInntektYtelse.ytelser)
     )
 
     val antallFeil = mvpKriterier.filterNotNull()

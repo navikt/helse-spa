@@ -28,7 +28,8 @@ class ArbeidsforholdTest {
                                 ),
                                 muligeArbeidsforhold = arbeidsforhold
                         )
-                )
+                ),
+                ytelser = emptyList()
         )
         val faktagrunnlag = Faktagrunnlag(tps = tpsFaktaUtenVerdi, beregningsperiode = emptyList(), sammenligningsperiode = emptyList(), arbeidInntektYtelse = arbeidInntektYtelse,
                 sykepengehistorikk = emptyList())
@@ -51,7 +52,8 @@ class ArbeidsforholdTest {
                                 ),
                                 muligeArbeidsforhold = arbeidsforhold
                         )
-                )
+                ),
+                ytelser = emptyList()
         )
         val faktagrunnlag = Faktagrunnlag(tps = tpsFaktaUtenVerdi, beregningsperiode = emptyList(), sammenligningsperiode = emptyList(), arbeidInntektYtelse = arbeidInntektYtelse,
                 sykepengehistorikk = emptyList())
@@ -77,7 +79,8 @@ class ArbeidsforholdTest {
                                 ),
                                 muligeArbeidsforhold = listOf(arbeidsforhold[0])
                         )
-                )
+                ),
+                ytelser = emptyList()
         )
         val faktagrunnlag = Faktagrunnlag(tps = tpsFaktaUtenVerdi, beregningsperiode = emptyList(), sammenligningsperiode = emptyList(), arbeidInntektYtelse = arbeidInntektYtelse,
                 sykepengehistorikk = emptyList())

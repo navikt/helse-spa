@@ -243,7 +243,17 @@
       "type": "Arbeidstaker"
     }
   ],
-  "ytelser": [],
+  "ytelser": [
+    {
+      "beløp": 8400,
+      "kode": "foreldrepenger",
+      "virksomhet": {
+        "identifikator": "889640782",
+        "type": "Organisasjon"
+      },
+      "utbetalingsperiode": "2019-04"
+    }
+  ],
   "pensjonEllerTrygd": [],
   "næring": []
 }

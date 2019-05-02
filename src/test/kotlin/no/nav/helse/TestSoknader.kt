@@ -28,7 +28,8 @@ val faktagrunnlagUtenVerdi = Faktagrunnlag(
         sykepengehistorikk = emptyList(),
         arbeidInntektYtelse = ArbeidInntektYtelseDTO(
                 arbeidsforhold = arbeidsforholdUtenVerdi,
-                inntekter = emptyList()
+                inntekter = emptyList(),
+                ytelser = emptyList()
         )
 )
 
