@@ -2,22 +2,33 @@ package no.nav.helse.fastsetting
 
 import no.nav.helse.behandling.Faktagrunnlag
 import no.nav.helse.behandling.FaktagrunnlagResultat
-import no.nav.helse.oppslag.arbeidinntektytelse.dto.ArbeidInntektYtelseDTO
-import no.nav.helse.oppslag.arbeidinntektytelse.dto.ArbeidsforholdDTO
-import no.nav.helse.oppslag.arbeidinntektytelse.dto.ArbeidsgiverDTO
+import no.nav.helse.oppslag.arbeidinntektytelse.dto.*
 import no.nav.helse.originalSoknad
 import no.nav.helse.tpsFaktaUtenVerdi
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.fail
 import org.junit.jupiter.api.Test
+import java.math.BigDecimal
 import java.time.LocalDate
+import java.time.YearMonth
+
 class ArbeidsforholdTest {
 
     @Test
     fun `vurder arbeidsforhold med en arbeidsgiver`() {
+        val arbeidsforhold = listOf(ArbeidsforholdDTO("Arbeidstaker", ArbeidsgiverDTO("1111", "Organisasjon"), LocalDate.now(), null))
         val arbeidInntektYtelse = ArbeidInntektYtelseDTO(
-                arbeidsforhold = listOf(ArbeidsforholdDTO("Arbeidstaker", ArbeidsgiverDTO("1111", "Organisasjon"), LocalDate.now(), null)),
-                inntekter = emptyList()
+                arbeidsforhold = arbeidsforhold,
+                inntekter = listOf(
+                        InntektMedArbeidsforholdDTO(
+                                inntekt = InntektDTO(
+                                        virksomhet = VirksomhetDTO("1111", "Organisasjon"),
+                                        utbetalingsperiode = YearMonth.now(),
+                                        beløp = BigDecimal.ONE
+                                ),
+                                muligeArbeidsforhold = arbeidsforhold
+                        )
+                )
         )
         val faktagrunnlag = Faktagrunnlag(tps = tpsFaktaUtenVerdi, beregningsperiode = emptyList(), sammenligningsperiode = emptyList(), arbeidInntektYtelse = arbeidInntektYtelse,
                 sykepengehistorikk = emptyList())
@@ -28,9 +39,19 @@ class ArbeidsforholdTest {
 
     @Test
     fun `vurder arbeidsforhold med feil arbeidsgiver`() {
+        val arbeidsforhold = listOf(ArbeidsforholdDTO("Arbeidstaker", ArbeidsgiverDTO("2222", "Organisasjon"), LocalDate.now(), null))
         val arbeidInntektYtelse = ArbeidInntektYtelseDTO(
-                arbeidsforhold = listOf(ArbeidsforholdDTO("Arbeidstaker", ArbeidsgiverDTO("2222", "Organisasjon"), LocalDate.now(), null)),
-                inntekter = emptyList()
+                arbeidsforhold = arbeidsforhold,
+                inntekter = listOf(
+                        InntektMedArbeidsforholdDTO(
+                                inntekt = InntektDTO(
+                                        virksomhet = VirksomhetDTO("2222", "Organisasjon"),
+                                        utbetalingsperiode = YearMonth.now(),
+                                        beløp = BigDecimal.ONE
+                                ),
+                                muligeArbeidsforhold = arbeidsforhold
+                        )
+                )
         )
         val faktagrunnlag = Faktagrunnlag(tps = tpsFaktaUtenVerdi, beregningsperiode = emptyList(), sammenligningsperiode = emptyList(), arbeidInntektYtelse = arbeidInntektYtelse,
                 sykepengehistorikk = emptyList())
@@ -41,12 +62,22 @@ class ArbeidsforholdTest {
 
     @Test
     fun `vurder arbeidsforhold med flere arbeidsgiverer`() {
+        val arbeidsforhold = listOf(
+                ArbeidsforholdDTO("Arbeidstaker", ArbeidsgiverDTO("1111", "Organisasjon"), LocalDate.now(), null),
+                ArbeidsforholdDTO("Arbeidstaker", ArbeidsgiverDTO("2222", "Organisasjon"), LocalDate.now(), null)
+        )
         val arbeidInntektYtelse = ArbeidInntektYtelseDTO(
-                arbeidsforhold = listOf(
-                        ArbeidsforholdDTO("Arbeidstaker", ArbeidsgiverDTO("1111", "Organisasjon"), LocalDate.now(), null),
-                        ArbeidsforholdDTO("Arbeidstaker", ArbeidsgiverDTO("2222", "Organisasjon"), LocalDate.now(), null)
-                ),
-                inntekter = emptyList()
+                arbeidsforhold = arbeidsforhold,
+                inntekter = listOf(
+                        InntektMedArbeidsforholdDTO(
+                                inntekt = InntektDTO(
+                                        virksomhet = VirksomhetDTO("1111", "Organisasjon"),
+                                        utbetalingsperiode = YearMonth.now(),
+                                        beløp = BigDecimal.ONE
+                                ),
+                                muligeArbeidsforhold = listOf(arbeidsforhold[0])
+                        )
+                )
         )
         val faktagrunnlag = Faktagrunnlag(tps = tpsFaktaUtenVerdi, beregningsperiode = emptyList(), sammenligningsperiode = emptyList(), arbeidInntektYtelse = arbeidInntektYtelse,
                 sykepengehistorikk = emptyList())

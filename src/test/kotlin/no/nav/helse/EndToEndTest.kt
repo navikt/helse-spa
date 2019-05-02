@@ -15,11 +15,10 @@ import no.nav.common.JAASCredential
 import no.nav.common.KafkaEnvironment
 import no.nav.helse.behandling.*
 import no.nav.helse.dto.*
+import no.nav.helse.dto.ArbeidsgiverDTO
 import no.nav.helse.fastsetting.*
 import no.nav.helse.oppslag.*
-import no.nav.helse.oppslag.arbeidinntektytelse.dto.ArbeidInntektYtelseDTO
-import no.nav.helse.oppslag.arbeidinntektytelse.dto.ArbeidsforholdDTO
-import no.nav.helse.oppslag.arbeidinntektytelse.dto.ArbeidsgiverDTO
+import no.nav.helse.oppslag.arbeidinntektytelse.dto.*
 import no.nav.helse.streams.JsonSerializer
 import no.nav.helse.streams.Topics.SYKEPENGEBEHANDLINGSFEIL
 import no.nav.helse.streams.Topics.SYKEPENGESØKNADER_INN
@@ -437,7 +436,7 @@ class EndToEndTest {
 
     val stubbet_arbeidsforhold = ArbeidsforholdDTO(
             type = "Arbeidstaker",
-            arbeidsgiver = ArbeidsgiverDTO(
+            arbeidsgiver = no.nav.helse.oppslag.arbeidinntektytelse.dto.ArbeidsgiverDTO(
                     type = "Organisasjon",
                     identifikator = "97114455"
             ),
@@ -502,7 +501,16 @@ class EndToEndTest {
 
         val arbeidsforholdWrapper = ArbeidInntektYtelseDTO(
                 arbeidsforhold = listOf(stubbet_arbeidsforhold),
-                inntekter = emptyList()
+                inntekter = listOf(
+                        InntektMedArbeidsforholdDTO(
+                                inntekt = InntektDTO(
+                                        virksomhet = VirksomhetDTO(stubbet_arbeidsforhold.arbeidsgiver.identifikator, stubbet_arbeidsforhold.arbeidsgiver.type),
+                                        utbetalingsperiode = YearMonth.now(),
+                                        beløp = BigDecimal.ONE
+                                ),
+                                muligeArbeidsforhold = listOf(stubbet_arbeidsforhold)
+                        )
+                )
         )
 
         stubFor(any(urlPathEqualTo("/api/arbeidsforhold/$aktørId/inntekter"))
