@@ -20,7 +20,6 @@ data class Sykepengesøknad(
         val type: String,
         val status: String,
         val arbeidsgiver: ArbeidsgiverFraSøknad,
-        val arbeidsgiverForskutterer: Boolean,
         val soktUtenlandsopphold: Boolean,
         val fom: LocalDate,
         val tom: LocalDate,

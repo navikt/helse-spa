@@ -2,8 +2,10 @@ package no.nav.helse.behandling
 
 import no.nav.helse.Behandlingsfeil
 import no.nav.helse.Either
-import no.nav.helse.dto.*
-import org.junit.jupiter.api.Assertions.assertFalse
+import no.nav.helse.dto.ArbeidsgiverDTO
+import no.nav.helse.dto.SoknadsstatusDTO
+import no.nav.helse.dto.SoknadstypeDTO
+import no.nav.helse.dto.SykepengesøknadV2DTO
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
@@ -23,17 +25,6 @@ class SykepengesøknadMapperTest {
         }
     }
 
-    @Test
-    fun `arbeidsgiverForskutterer kan være null, men skal tolkes som nei`() {
-        val søknad = søknadMedArbeidsgiverForskuttererSomNull()
-
-        val actual = søknad.mapToSykepengesøknad()
-        when (actual) {
-            is Either.Left -> fail { "expected Either.Right" }
-            is Either.Right -> assertFalse(actual.right.arbeidsgiverForskutterer)
-        }
-    }
-
     private fun søknadMedSendtNavSomNull() =
             SykepengesøknadV2DTO(
                     id = "en id",
@@ -41,7 +32,6 @@ class SykepengesøknadMapperTest {
                     aktorId = "1234",
                     status = SoknadsstatusDTO.SENDT,
                     arbeidsgiver = ArbeidsgiverDTO("MATBUTIKKEN AS", "123456789"),
-                    arbeidsgiverForskutterer = ArbeidsgiverForskuttererDTO.JA,
                     soktUtenlandsopphold = false,
                     fom = LocalDate.now().minusMonths(1),
                     tom = LocalDate.now(),
@@ -59,7 +49,6 @@ class SykepengesøknadMapperTest {
                     aktorId = "1234",
                     status = SoknadsstatusDTO.SENDT,
                     arbeidsgiver = ArbeidsgiverDTO("MATBUTIKKEN AS", "123456789"),
-                    arbeidsgiverForskutterer = null,
                     soktUtenlandsopphold = false,
                     fom = LocalDate.now().minusMonths(1),
                     tom = LocalDate.now(),

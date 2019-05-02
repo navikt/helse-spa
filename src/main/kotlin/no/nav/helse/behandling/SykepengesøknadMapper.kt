@@ -3,7 +3,6 @@ package no.nav.helse.behandling
 import no.nav.helse.Behandlingsfeil
 import no.nav.helse.Either
 import no.nav.helse.domain.ArbeidsgiverFraSøknad
-import no.nav.helse.dto.ArbeidsgiverForskuttererDTO
 import no.nav.helse.dto.FravarstypeDTO
 import no.nav.helse.dto.SykepengesøknadV2DTO
 import no.nav.helse.streams.defaultObjectMapper
@@ -18,7 +17,6 @@ fun SykepengesøknadV2DTO.mapToSykepengesøknad(): Either<Behandlingsfeil, Sykep
                 type = type.name,
                 status = status.name,
                 arbeidsgiver = ArbeidsgiverFraSøknad(arbeidsgiver.navn, arbeidsgiver.orgnummer),
-                arbeidsgiverForskutterer = ArbeidsgiverForskuttererDTO.JA == arbeidsgiverForskutterer,
                 soktUtenlandsopphold = soktUtenlandsopphold,
                 fom = fom,
                 tom = tom,
