@@ -1,9 +1,10 @@
 package no.nav.helse
 
 import no.nav.helse.behandling.*
-import no.nav.helse.domain.Arbeidsforhold
 import no.nav.helse.domain.ArbeidsgiverFraSøknad
 import no.nav.helse.fastsetting.*
+import no.nav.helse.oppslag.arbeidinntektytelse.dto.ArbeidInntektYtelseDTO
+import no.nav.helse.oppslag.arbeidinntektytelse.dto.ArbeidsforholdDTO
 import no.nav.helse.sykepenger.beregning.Beregningsresultat
 import no.nav.helse.sykepenger.beregning.Dagsats
 import no.nav.nare.core.evaluations.Evaluering
@@ -18,14 +19,17 @@ val tpsFaktaUtenVerdi = Tpsfakta(
         diskresjonskode = "bytt ut dette i tester"
 )
 
-val arbeidsforholdUtenVerdi = emptyList<Arbeidsforhold>()
+val arbeidsforholdUtenVerdi = emptyList<ArbeidsforholdDTO>()
 
 val faktagrunnlagUtenVerdi = Faktagrunnlag(
         tps = tpsFaktaUtenVerdi,
         beregningsperiode = emptyList(),
         sammenligningsperiode = emptyList(),
         sykepengehistorikk = emptyList(),
-        arbeidsforhold = arbeidsforholdUtenVerdi
+        arbeidInntektYtelse = ArbeidInntektYtelseDTO(
+                arbeidsforhold = arbeidsforholdUtenVerdi,
+                inntekter = emptyList()
+        )
 )
 
 val originalSoknad = Sykepengesøknad(

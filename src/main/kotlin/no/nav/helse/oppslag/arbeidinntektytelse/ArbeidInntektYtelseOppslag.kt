@@ -1,32 +1,30 @@
-package no.nav.helse.oppslag
+package no.nav.helse.oppslag.arbeidinntektytelse
 
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.github.kittinunf.fuel.httpGet
 import no.nav.helse.Either
 import no.nav.helse.behandling.Sykepengesøknad
-import no.nav.helse.domain.Arbeidsforhold
-import no.nav.helse.domain.ArbeidsforholdWrapper
-import no.nav.helse.map
+import no.nav.helse.oppslag.AktørId
+import no.nav.helse.oppslag.StsRestClient
+import no.nav.helse.oppslag.arbeidinntektytelse.dto.ArbeidInntektYtelseDTO
 import no.nav.helse.streams.defaultObjectMapper
 import org.slf4j.LoggerFactory
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 import java.util.*
 
-class ArbeidsforholdOppslag(val sparkelUrl: String, val stsRestClient: StsRestClient) {
-    private val log = LoggerFactory.getLogger(ArbeidsforholdOppslag::class.java.name)
+class ArbeidInntektYtelseOppslag(val sparkelUrl: String, val stsRestClient: StsRestClient) {
+    private val log = LoggerFactory.getLogger(ArbeidInntektYtelseOppslag::class.java.name)
 
-    fun hentArbeidsforhold(sykepengesøknad: Sykepengesøknad) : Either<Exception, List<Arbeidsforhold>> {
+    fun hentArbeidInntektYtelse(sykepengesøknad: Sykepengesøknad) : Either<Exception, ArbeidInntektYtelseDTO> {
         val forsteSykdomsdag = sykepengesøknad.startSyketilfelle
         // Opptjeningstid = minst 4 uker i arbeid før sykdommen
         val fireUkerForSykdomsDag = forsteSykdomsdag.minus(4, ChronoUnit.WEEKS)
 
-        return hentArbeidsforholdRest(AktørId(sykepengesøknad.aktorId), fireUkerForSykdomsDag, forsteSykdomsdag).map {
-            it.toList()
-        }
+        return hentArbeidsforholdRest(AktørId(sykepengesøknad.aktorId), fireUkerForSykdomsDag, forsteSykdomsdag)
     }
 
-    fun hentArbeidsforholdRest(aktørId: AktørId, fom: LocalDate, tom: LocalDate) : Either<Exception, List<Arbeidsforhold>> {
+    fun hentArbeidsforholdRest(aktørId: AktørId, fom: LocalDate, tom: LocalDate) : Either<Exception, ArbeidInntektYtelseDTO> {
         val bearer = stsRestClient.token()
         val (_, _, result) =
                 "$sparkelUrl/api/arbeidsforhold/${aktørId.aktor}/inntekter?fom=$fom&tom=$tom".httpGet()
@@ -44,9 +42,7 @@ class ArbeidsforholdOppslag(val sparkelUrl: String, val stsRestClient: StsRestCl
             log.error("Error in arbeidsforhold lookup", it)
             Either.Left(it)
         } ?: try {
-            Either.Right(defaultObjectMapper.readValue<ArbeidsforholdWrapper>(result.component1()!!).arbeidsforhold.map {
-                it.arbeidsforhold
-            })
+            Either.Right(defaultObjectMapper.readValue<ArbeidInntektYtelseDTO>(result.component1()!!))
         } catch (err: Exception) {
             Either.Left(err)
         }

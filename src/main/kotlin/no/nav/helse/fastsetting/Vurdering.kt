@@ -8,7 +8,7 @@ import no.nav.helse.Either
 import no.nav.helse.Grunnlagsdata
 import no.nav.helse.Yrkesstatus
 import no.nav.helse.behandling.*
-import no.nav.helse.domain.Arbeidsforhold
+import no.nav.helse.oppslag.arbeidinntektytelse.dto.ArbeidsforholdDTO
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -79,7 +79,7 @@ fun vurderFakta(fakta: FaktagrunnlagResultat): Either<Behandlingsfeil, AvklarteF
             vurderingerCounter.labels("arbeidsforhold", "avklart").inc()
         }
     }
-    val opptjeningstid = vurderOpptjeningstid(Opptjeningsgrunnlag(fakta.originalSøknad.startSyketilfelle, fakta.faktagrunnlag.arbeidsforhold)).also {
+    val opptjeningstid = vurderOpptjeningstid(Opptjeningsgrunnlag(fakta.originalSøknad.startSyketilfelle, fakta.faktagrunnlag.arbeidInntektYtelse.arbeidsforhold)).also {
         if (it is Vurdering.Uavklart) {
             vurderingerCounter.labels("opptjeningstid", "uavklart").inc()
         } else {
@@ -128,7 +128,7 @@ fun vurderFakta(fakta: FaktagrunnlagResultat): Either<Behandlingsfeil, AvklarteF
                 avklarteVerdier = AvklarteVerdier(
                         medlemsskap = medlemsskap as Vurdering.Avklart<Boolean, Tpsfakta>,
                         alder = alder as Vurdering.Avklart<Alder, Aldersgrunnlag>,
-                        arbeidsforhold = arbeidsforhold as Vurdering.Avklart<Boolean, List<Arbeidsforhold>>,
+                        arbeidsforhold = arbeidsforhold as Vurdering.Avklart<Boolean, List<ArbeidsforholdDTO>>,
                         opptjeningstid = opptjeningstid as Vurdering.Avklart<Opptjeningstid, Opptjeningsgrunnlag>,
                         sykepengegrunnlag = sykepengegrunnlag as Vurdering.Avklart<Sykepengegrunnlag, Beregningsperiode>,
                         sykepengehistorikk = fakta.faktagrunnlag.sykepengehistorikk,

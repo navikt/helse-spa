@@ -1,11 +1,11 @@
 package no.nav.helse.fastsetting
 
 import no.nav.helse.behandling.FaktagrunnlagResultat
-import no.nav.helse.domain.Arbeidsforhold
 import no.nav.helse.fastsetting.Vurdering.Uavklart
+import no.nav.helse.oppslag.arbeidinntektytelse.dto.ArbeidsforholdDTO
 
-fun vurderArbeidsforhold(fakta : FaktagrunnlagResultat) : Vurdering<Boolean, List<Arbeidsforhold>> {
-    val arbeidsforholdFakta = fakta.faktagrunnlag.arbeidsforhold
+fun vurderArbeidsforhold(fakta : FaktagrunnlagResultat) : Vurdering<Boolean, List<ArbeidsforholdDTO>> {
+    val arbeidsforholdFakta = fakta.faktagrunnlag.arbeidInntektYtelse.arbeidsforhold
 
     return when {
         arbeidsforholdFakta.any {

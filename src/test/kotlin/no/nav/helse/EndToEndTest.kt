@@ -14,13 +14,12 @@ import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import no.nav.common.JAASCredential
 import no.nav.common.KafkaEnvironment
 import no.nav.helse.behandling.*
-import no.nav.helse.domain.Arbeidsforhold
-import no.nav.helse.domain.ArbeidsforholdMedInntekter
-import no.nav.helse.domain.ArbeidsforholdWrapper
-import no.nav.helse.domain.Arbeidsgiver
 import no.nav.helse.dto.*
 import no.nav.helse.fastsetting.*
 import no.nav.helse.oppslag.*
+import no.nav.helse.oppslag.arbeidinntektytelse.dto.ArbeidInntektYtelseDTO
+import no.nav.helse.oppslag.arbeidinntektytelse.dto.ArbeidsforholdDTO
+import no.nav.helse.oppslag.arbeidinntektytelse.dto.ArbeidsgiverDTO
 import no.nav.helse.streams.JsonSerializer
 import no.nav.helse.streams.Topics.SYKEPENGEBEHANDLINGSFEIL
 import no.nav.helse.streams.Topics.SYKEPENGESØKNADER_INN
@@ -163,7 +162,7 @@ class EndToEndTest {
         checkInntekt(faktagrunnlag.beregningsperiode, beregningsgrunnlagStart, beregningsgrunnlagStart.plusMonths(2).with(lastDayOfMonth()))
         checkInntekt(faktagrunnlag.sammenligningsperiode, sammenligningsgrunnlagStart, sammenligningsgrunnlagStart.plusMonths(11).with(lastDayOfMonth()))
         checkSykepengeliste(faktagrunnlag.sykepengehistorikk)
-        checkArbeidsforhold(faktagrunnlag.arbeidsforhold)
+        checkArbeidsforhold(faktagrunnlag.arbeidInntektYtelse.arbeidsforhold)
     }
 
     private fun checkTpsFakta(tps: Tpsfakta) {
@@ -268,7 +267,7 @@ class EndToEndTest {
         }
     }
 
-    private fun checkArbeidsforholdVurdering(arbeidsforholdVurdering: Vurdering.Avklart<Boolean, List<Arbeidsforhold>>) {
+    private fun checkArbeidsforholdVurdering(arbeidsforholdVurdering: Vurdering.Avklart<Boolean, List<ArbeidsforholdDTO>>) {
         assert(arbeidsforholdVurdering.fastsattVerdi).isTrue()
         assert(arbeidsforholdVurdering.begrunnelse).isEqualTo("Søker har et aktivt arbeidsforhold hos MATBUTIKKEN")
         assert(arbeidsforholdVurdering.vurderingstidspunkt).isBetween(LocalDateTime.now().minusHours(1), LocalDateTime.now().plusHours(1))
@@ -277,7 +276,7 @@ class EndToEndTest {
         checkArbeidsforhold(arbeidsforholdVurdering.grunnlag)
     }
 
-    private fun checkArbeidsforhold(arbeidsforhold: List<Arbeidsforhold>) {
+    private fun checkArbeidsforhold(arbeidsforhold: List<ArbeidsforholdDTO>) {
         assert(arbeidsforhold).containsExactly(stubbet_arbeidsforhold)
     }
 
@@ -436,9 +435,9 @@ class EndToEndTest {
             diskresjonskode = null
     )
 
-    val stubbet_arbeidsforhold = Arbeidsforhold(
+    val stubbet_arbeidsforhold = ArbeidsforholdDTO(
             type = "Arbeidstaker",
-            arbeidsgiver = Arbeidsgiver(
+            arbeidsgiver = ArbeidsgiverDTO(
                     type = "Organisasjon",
                     identifikator = "97114455"
             ),
@@ -501,8 +500,9 @@ class EndToEndTest {
 
     private fun arbeidsforholdStub(aktørId: String) {
 
-        val arbeidsforholdWrapper = ArbeidsforholdWrapper(
-                arbeidsforhold = arrayOf(ArbeidsforholdMedInntekter(stubbet_arbeidsforhold))
+        val arbeidsforholdWrapper = ArbeidInntektYtelseDTO(
+                arbeidsforhold = listOf(stubbet_arbeidsforhold),
+                inntekter = emptyList()
         )
 
         stubFor(any(urlPathEqualTo("/api/arbeidsforhold/$aktørId/inntekter"))
