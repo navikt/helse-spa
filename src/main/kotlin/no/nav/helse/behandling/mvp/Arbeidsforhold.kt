@@ -8,9 +8,9 @@ fun vurderMVPKriterierForArbeidsforhold(arbeidsgiverFraSøknad: ArbeidsgiverFraS
         arbeidsforhold.any {
             it.type != "Arbeidstaker"
         } -> MVPFeil("Frilans arbeidsforhold", "Søker har frilansarbeidsforhold")
-        arbeidsforhold.first {
+        arbeidsforhold.firstOrNull {
             it.arbeidsgiver.identifikator == arbeidsgiverFraSøknad.orgnummer
-        }.sluttdato != null -> MVPFeil("Sluttet hos aktuell arbeidsgiver", "Søker har sluttdato hos ${arbeidsgiverFraSøknad.navn}")
+        }?.sluttdato != null -> MVPFeil("Sluttet hos aktuell arbeidsgiver", "Søker har sluttdato hos ${arbeidsgiverFraSøknad.navn}")
         else -> null
     }
 }
