@@ -8,6 +8,7 @@ import no.nav.helse.Behandlingsfeil.*
 import no.nav.helse.Environment
 import no.nav.helse.SaksbehandlingStream
 import no.nav.helse.behandling.SykepengeVedtak
+import no.nav.helse.behandling.mvp.MVPFeil
 import no.nav.helse.fastsetting.Vurdering
 import no.nav.nare.core.evaluations.Evaluering
 import org.slf4j.LoggerFactory
@@ -131,14 +132,21 @@ class SaksbehandlingProbe(val env: Environment) {
                 ))
     }
 
+    fun kriterieForMVPErIkkeOppfylt(søknadId: String, feil: MVPFeil) {
+        log.info("mvp-kriterie ikke oppfylt: ${feil.årsak} - ${feil.beskrivelse}")
+        influxMetricReporter.sendDataPoint("mvpfeil.event",
+                mapOf(
+                        "soknadId" to søknadId,
+                        "beskrivelse" to feil.beskrivelse
+                ),
+                mapOf(
+                        "aarsak" to feil.årsak
+
+                ))
+    }
+
     fun MVPFilterFeil.mvpFilter() {
         behandlingsfeilCounter.labels("mvpFilter").inc()
-        influxMetricReporter.sendDataPoint("mvpfilter.event",
-                mapOf(
-                        "soknadId" to soknadId),
-                mapOf(
-                        "filter" to feilmelding
-                ))
         influxMetricReporter.sendDataPoint("behandlingsfeil.event", mapOf(
                 "soknadId" to soknadId
         ), mapOf(
@@ -177,6 +185,9 @@ class SaksbehandlingProbe(val env: Environment) {
                 ))
             }
         }
+
+
+
         influxMetricReporter.sendDataPoint("behandlingsfeil.event", mapOf(
                 "soknadId" to uavklarteFakta.originalSøknad.id
         ), mapOf(
