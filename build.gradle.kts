@@ -6,6 +6,7 @@ val prometheusVersion = "0.5.0"
 val gsonVersion = "2.7"
 val navStreamsVersion = "1a24b7e"
 val fuelVersion = "1.15.1"
+val arrowVersion = "0.9.0"
 
 val junitJupiterVersion = "5.3.1"
 val assertJVersion = "3.11.1"
@@ -45,6 +46,8 @@ dependencies {
     compile("no.nav.helse:maksdato:ae7c5ad")
     compile("no.nav:nare-prometheus:0b41ab4")
     compile("com.github.kittinunf.fuel:fuel:$fuelVersion")
+
+    compile("io.arrow-kt:arrow-core-data:$arrowVersion")
 
     testCompile("com.github.tomakehurst:wiremock:$wireMockVersion") {
         exclude(group = "junit")

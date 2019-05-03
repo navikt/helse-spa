@@ -1,6 +1,6 @@
 package no.nav.helse.oppslag
 
-import arrow.core.Either
+import arrow.core.Try
 import com.github.kittinunf.fuel.httpGet
 import no.nav.helse.behandling.Sykepengesøknad
 import no.nav.helse.behandling.Tpsfakta
@@ -10,9 +10,8 @@ import java.time.LocalDate
 import java.util.*
 
 class PersonOppslag(val sparkelUrl: String, val stsRestClient: StsRestClient) {
-    private val log = LoggerFactory.getLogger(PersonOppslag::class.java.name)
 
-    fun hentTPSData(input: Sykepengesøknad): Either<Exception, Tpsfakta> {
+    fun hentTPSData(input: Sykepengesøknad): Try<Tpsfakta> {
         return hentPerson(AktørId(input.aktorId)).map { person ->
             Tpsfakta(
                     fodselsdato = person.fdato,
@@ -24,7 +23,7 @@ class PersonOppslag(val sparkelUrl: String, val stsRestClient: StsRestClient) {
         }
     }
 
-    private fun hentPerson(aktørId: AktørId): Either<Exception, Person> {
+    private fun hentPerson(aktørId: AktørId): Try<Person> {
         val bearer = stsRestClient.token()
         val (_, _, result) = "$sparkelUrl/api/person/${aktørId.aktor}".httpGet()
                 .header(mapOf(
@@ -37,11 +36,12 @@ class PersonOppslag(val sparkelUrl: String, val stsRestClient: StsRestClient) {
 
         val (_, error) = result
 
-        return error?.exception?.let {
-            log.error("Error in person lookup", it)
-            Either.Left(it)
-        } ?: try {
-            Either.Right(defaultObjectMapper.readValue(result.component1(), PersonDTO::class.java)).map { person ->
+        return Try {
+            error?.exception?.let {
+                throw it
+            }
+
+            defaultObjectMapper.readValue(result.component1(), PersonDTO::class.java).let { person ->
                 Person(
                         id = AktørId(person.aktørId),
                         fornavn = person.fornavn,
@@ -56,8 +56,6 @@ class PersonOppslag(val sparkelUrl: String, val stsRestClient: StsRestClient) {
 
                 )
             }
-        } catch (err: Exception) {
-            Either.Left(err)
         }
     }
 }

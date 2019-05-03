@@ -14,7 +14,7 @@ interface Behandlingsfeil {
 
     data class Deserialiseringsfeil(override val soknadId: String, val json: JsonNode, override val feilmelding: String): Behandlingsfeil
 
-    data class RegisterFeil(override val feilmelding: String, val søknad: Sykepengesøknad, override val soknadId: String = søknad.id): Behandlingsfeil
+    data class RegisterFeil(override val feilmelding: String, val throwable: Throwable, val søknad: Sykepengesøknad, override val soknadId: String = søknad.id): Behandlingsfeil
 
     data class Avklaringsfeil(val uavklarteFakta: UavklarteFakta, override val feilmelding: String, override val soknadId: String = uavklarteFakta.originalSøknad.id): Behandlingsfeil
 
@@ -42,7 +42,7 @@ interface Behandlingsfeil {
         // her feilet noe under _beregning, men vi har ikke del-resultat, bare exception
         fun beregningsfeil(vilkårsprøving: Behandlingsgrunnlag, exception: Exception) = Beregningsfeil(vilkårsprøving, "Beregning feilet: ${exception.javaClass.simpleName}: ${exception.message}.")
 
-        fun registerFeil(exception: Exception, søknad: Sykepengesøknad):RegisterFeil = RegisterFeil("Feil i opphenting av register-data: ${exception.javaClass.simpleName} : ${exception.message}\"", søknad)
+        fun registerFeil(exception: Throwable, søknad: Sykepengesøknad):RegisterFeil = RegisterFeil("Feil i opphenting av register-data: ${exception.javaClass.simpleName} : ${exception.message}\"", exception, søknad)
 
     }
 }

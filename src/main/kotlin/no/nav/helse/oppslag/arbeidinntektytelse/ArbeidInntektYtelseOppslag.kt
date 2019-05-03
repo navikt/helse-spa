@@ -1,6 +1,6 @@
 package no.nav.helse.oppslag.arbeidinntektytelse
 
-import arrow.core.Either
+import arrow.core.Try
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.github.kittinunf.fuel.httpGet
 import no.nav.helse.behandling.Sykepengesøknad
@@ -8,15 +8,13 @@ import no.nav.helse.oppslag.AktørId
 import no.nav.helse.oppslag.StsRestClient
 import no.nav.helse.oppslag.arbeidinntektytelse.dto.ArbeidInntektYtelseDTO
 import no.nav.helse.streams.defaultObjectMapper
-import org.slf4j.LoggerFactory
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 import java.util.*
 
 class ArbeidInntektYtelseOppslag(val sparkelUrl: String, val stsRestClient: StsRestClient) {
-    private val log = LoggerFactory.getLogger(ArbeidInntektYtelseOppslag::class.java.name)
 
-    fun hentArbeidInntektYtelse(sykepengesøknad: Sykepengesøknad) : Either<Exception, ArbeidInntektYtelseDTO> {
+    fun hentArbeidInntektYtelse(sykepengesøknad: Sykepengesøknad) : Try<ArbeidInntektYtelseDTO> {
         val forsteSykdomsdag = sykepengesøknad.startSyketilfelle
         // Opptjeningstid = minst 4 uker i arbeid før sykdommen
         val fireUkerForSykdomsDag = forsteSykdomsdag.minus(4, ChronoUnit.WEEKS)
@@ -24,7 +22,7 @@ class ArbeidInntektYtelseOppslag(val sparkelUrl: String, val stsRestClient: StsR
         return hentArbeidsforholdRest(AktørId(sykepengesøknad.aktorId), fireUkerForSykdomsDag, forsteSykdomsdag)
     }
 
-    fun hentArbeidsforholdRest(aktørId: AktørId, fom: LocalDate, tom: LocalDate) : Either<Exception, ArbeidInntektYtelseDTO> {
+    fun hentArbeidsforholdRest(aktørId: AktørId, fom: LocalDate, tom: LocalDate) : Try<ArbeidInntektYtelseDTO> {
         val bearer = stsRestClient.token()
         val (_, _, result) =
                 "$sparkelUrl/api/arbeidsforhold/${aktørId.aktor}/inntekter?fom=$fom&tom=$tom".httpGet()
@@ -38,13 +36,12 @@ class ArbeidInntektYtelseOppslag(val sparkelUrl: String, val stsRestClient: StsR
 
         val (_, error) = result
 
-        return error?.exception?.let {
-            log.error("Error in arbeidsforhold lookup", it)
-            Either.Left(it)
-        } ?: try {
-            Either.Right(defaultObjectMapper.readValue<ArbeidInntektYtelseDTO>(result.component1()!!))
-        } catch (err: Exception) {
-            Either.Left(err)
+        return Try {
+            error?.exception?.let {
+                throw it
+            }
+
+            defaultObjectMapper.readValue<ArbeidInntektYtelseDTO>(result.component1()!!)
         }
     }
 }

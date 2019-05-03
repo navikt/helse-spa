@@ -156,6 +156,8 @@ class SaksbehandlingProbe(val env: Environment) {
     }
 
     fun RegisterFeil.registerFeil() {
+        log.warn(throwable.message, throwable)
+
         behandlingsfeilCounter.labels("register").inc()
         influxMetricReporter.sendDataPoint("behandlingsfeil.event", mapOf(
                 "soknadId" to søknad.id
