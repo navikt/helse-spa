@@ -1,7 +1,7 @@
 package no.nav.helse.behandling
 
+import arrow.core.Either
 import no.nav.helse.Behandlingsfeil
-import no.nav.helse.Either
 import no.nav.helse.domain.ArbeidsgiverFraSøknad
 import no.nav.helse.dto.FravarstypeDTO
 import no.nav.helse.dto.SykepengesøknadV2DTO

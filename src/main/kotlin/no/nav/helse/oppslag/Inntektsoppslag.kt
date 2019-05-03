@@ -1,11 +1,10 @@
 package no.nav.helse.oppslag
 
+import arrow.core.Either
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.github.kittinunf.fuel.httpGet
-import no.nav.helse.Either
 import no.nav.helse.streams.defaultObjectMapper
 import org.slf4j.LoggerFactory
-
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.YearMonth

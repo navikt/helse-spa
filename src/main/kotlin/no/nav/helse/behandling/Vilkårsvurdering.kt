@@ -1,7 +1,7 @@
 package no.nav.helse.behandling
 
+import arrow.core.Either
 import no.nav.helse.Behandlingsfeil
-import no.nav.helse.Either
 import no.nav.helse.oppslag.getGrunnbeløpForDato
 import no.nav.helse.probe.SaksbehandlingProbe
 import no.nav.helse.sykepenger.vilkar.Vilkårsgrunnlag

@@ -1,10 +1,9 @@
 package no.nav.helse.oppslag
 
+import arrow.core.Either
 import com.github.kittinunf.fuel.httpGet
-import no.nav.helse.Either
 import no.nav.helse.behandling.Sykepengesøknad
 import no.nav.helse.behandling.Tpsfakta
-import no.nav.helse.map
 import no.nav.helse.streams.defaultObjectMapper
 import org.slf4j.LoggerFactory
 import java.time.LocalDate

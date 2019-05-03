@@ -1,9 +1,8 @@
 package no.nav.helse.behandling
 
+import arrow.core.Either
+import arrow.core.flatMap
 import no.nav.helse.Behandlingsfeil
-import no.nav.helse.Either
-import no.nav.helse.flatMap
-import no.nav.helse.mapLeft
 import no.nav.helse.oppslag.Inntektsoppslag
 import no.nav.helse.oppslag.PersonOppslag
 import no.nav.helse.oppslag.StsRestClient

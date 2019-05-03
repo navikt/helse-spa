@@ -1,5 +1,7 @@
 package no.nav.helse
 
+import arrow.core.Either
+import arrow.core.flatMap
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException
 import io.prometheus.client.CollectorRegistry
@@ -68,7 +70,7 @@ class SaksbehandlingStream(val env: Environment) {
     private fun sendTilVedtakskø(vedtak: KStream<String, Either<Behandlingsfeil, SykepengeVedtak>>) {
         vedtak
                 .peek { _, _ -> probe.behandlingOk() }
-                .mapValues { _, sykepengevedtak -> (sykepengevedtak as Either.Right).right }
+                .mapValues { _, sykepengevedtak -> (sykepengevedtak as Either.Right).b }
                 .peek { _, sykepengevedtak ->
                     loggMedSøknadId(sykepengevedtak.originalSøknad.id) {
                         probe.vedtakBehandlet(sykepengevedtak)
@@ -83,7 +85,7 @@ class SaksbehandlingStream(val env: Environment) {
     private fun sendTilFeilkø(feilendeSøknader: KStream<String, Either<Behandlingsfeil, SykepengeVedtak>>) {
         feilendeSøknader
                 .peek { _, _ -> probe.behandlingFeil() }
-                .mapValues { _, behandlingsfeil -> (behandlingsfeil as Either.Left).left }
+                .mapValues { _, behandlingsfeil -> (behandlingsfeil as Either.Left).a }
                 .peek { _, behandlingsfeil ->
                     loggMedSøknadId(behandlingsfeil.soknadId) {
                         probe.behandlingsFeilMedType(behandlingsfeil)

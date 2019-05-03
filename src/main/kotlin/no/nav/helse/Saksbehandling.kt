@@ -1,5 +1,7 @@
 package no.nav.helse
 
+import arrow.core.Either
+import arrow.core.flatMap
 import no.nav.helse.behandling.*
 import no.nav.helse.dto.SykepengesøknadV2DTO
 import no.nav.helse.fastsetting.vurderFakta

@@ -1,7 +1,7 @@
 package no.nav.helse.behandling
 
+import arrow.core.Either
 import no.nav.helse.Behandlingsfeil
-import no.nav.helse.Either
 import no.nav.helse.dto.ArbeidsgiverDTO
 import no.nav.helse.dto.SoknadsstatusDTO
 import no.nav.helse.dto.SoknadstypeDTO
@@ -21,7 +21,7 @@ class SykepengesøknadMapperTest {
         val actual = søknad.mapToSykepengesøknad()
         when (actual) {
             is Either.Right -> fail { "expected Either.Left" }
-            is Either.Left -> assertTrue(actual.left is Behandlingsfeil.Deserialiseringsfeil)
+            is Either.Left -> assertTrue(actual.a is Behandlingsfeil.Deserialiseringsfeil)
         }
     }
 

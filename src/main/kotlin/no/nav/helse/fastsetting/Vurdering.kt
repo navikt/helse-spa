@@ -1,10 +1,10 @@
 package no.nav.helse.fastsetting
 
+import arrow.core.Either
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import io.prometheus.client.Counter
 import no.nav.helse.Behandlingsfeil
-import no.nav.helse.Either
 import no.nav.helse.Grunnlagsdata
 import no.nav.helse.Yrkesstatus
 import no.nav.helse.behandling.*
