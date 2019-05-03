@@ -132,7 +132,7 @@ class SaksbehandlingProbe(val env: Environment) {
                 ))
     }
 
-    fun kriterieForMVPErIkkeOppfylt(søknadId: String, feil: MVPFeil) {
+    private fun kriterieForMVPErIkkeOppfylt(søknadId: String, feil: MVPFeil) {
         log.info("mvp-kriterie ikke oppfylt: ${feil.årsak} - ${feil.beskrivelse}")
         influxMetricReporter.sendDataPoint("mvpfeil.event",
                 mapOf(
@@ -146,12 +146,16 @@ class SaksbehandlingProbe(val env: Environment) {
     }
 
     fun MVPFilterFeil.mvpFilter() {
+        mvpFeil.onEach {
+            kriterieForMVPErIkkeOppfylt(soknadId, it)
+        }
+
         behandlingsfeilCounter.labels("mvpFilter").inc()
         influxMetricReporter.sendDataPoint("behandlingsfeil.event", mapOf(
                 "soknadId" to soknadId
         ), mapOf(
                 "steg" to "mvpFilter",
-                "type" to søknad.type
+                "type" to søknadstype
         ))
     }
 

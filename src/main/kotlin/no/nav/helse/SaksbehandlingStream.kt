@@ -8,6 +8,7 @@ import io.prometheus.client.CollectorRegistry
 import no.nav.NarePrometheus
 import no.nav.helse.behandling.Oppslag
 import no.nav.helse.behandling.SykepengeVedtak
+import no.nav.helse.behandling.mvp.MVPFeil
 import no.nav.helse.dto.SykepengesøknadV2DTO
 import no.nav.helse.oppslag.StsRestClient
 import no.nav.helse.probe.SaksbehandlingProbe
@@ -56,10 +57,24 @@ class SaksbehandlingStream(val env: Environment) {
 
         val (arbeidstakersøknader, frilanssøknader, alleAndreSøknader) = splittPåType(builder)
 
-        frilanssøknader.peek { søknadId, value -> probe.mottattFrilansSøknad(søknadId, value) }
-        alleAndreSøknader.peek { søknadId, value -> probe.mottattAnnenSøknad(søknadId, value) }
+        frilanssøknader.peek { søknadId, value ->
+            probe.mottattFrilansSøknad(søknadId, value)
+        }.mapValues { søknadId, value ->
+            val type = value.get("soknadstype").asText()
+            Behandlingsfeil.mvpFilter(søknadId, type, listOf(
+                    MVPFeil("Søknadstype - $type", "Søknaden er av feil type")
+            ))
+        }.foreach { søknadId, behandlingsfeil ->
+            loggMedSøknadId(søknadId) {
+                probe.behandlingsFeilMedType(behandlingsfeil)
+            }
+        }
+        alleAndreSøknader.peek { søknadId, value ->
+            probe.mottattAnnenSøknad(søknadId, value)
+        }
 
-        val (feilendeSøknader, vedtak) = prøvArbeidstaker(arbeidstakersøknader)
+        val (feilendeSøknader,
+                vedtak) = prøvArbeidstaker(arbeidstakersøknader)
 
         sendTilFeilkø(feilendeSøknader)
         sendTilVedtakskø(vedtak)

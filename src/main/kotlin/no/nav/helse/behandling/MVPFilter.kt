@@ -3,9 +3,8 @@ package no.nav.helse.behandling
 import arrow.core.Either
 import no.nav.helse.Behandlingsfeil
 import no.nav.helse.behandling.mvp.*
-import no.nav.helse.probe.SaksbehandlingProbe
 
-fun FaktagrunnlagResultat.mvpFilter(probe: SaksbehandlingProbe): Either<Behandlingsfeil, FaktagrunnlagResultat> {
+fun FaktagrunnlagResultat.mvpFilter(): Either<Behandlingsfeil, FaktagrunnlagResultat> {
     val mvpKriterier = listOf(
             sjekkSvarISøknaden(originalSøknad),
             vurderMVPKriterierForMedlemskap(faktagrunnlag.tps),
@@ -15,16 +14,11 @@ fun FaktagrunnlagResultat.mvpFilter(probe: SaksbehandlingProbe): Either<Behandli
             vurderMVPKriterierForAndreYtelser(faktagrunnlag.arbeidInntektYtelse.ytelser)
     )
 
-    val antallFeil = mvpKriterier.filterNotNull()
-            .onEach {
-                probe.kriterieForMVPErIkkeOppfylt(originalSøknad.id, it)
-            }.size
-
-    if (antallFeil > 0) {
-        return Either.Left(Behandlingsfeil.mvpFilter(originalSøknad))
+    return if (mvpKriterier.any { it != null }) {
+        Either.Left(Behandlingsfeil.mvpFilter(originalSøknad.id, originalSøknad.type, mvpKriterier.filterNotNull()))
+    } else {
+        Either.Right(this)
     }
-
-    return Either.Right(this)
 }
 
 private fun sjekkSvarISøknaden(søknad: Sykepengesøknad): MVPFeil? {
