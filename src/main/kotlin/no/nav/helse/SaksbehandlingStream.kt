@@ -1,15 +1,10 @@
 package no.nav.helse
 
 import arrow.core.Either
-import arrow.core.flatMap
 import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException
-import io.prometheus.client.CollectorRegistry
-import no.nav.NarePrometheus
 import no.nav.helse.behandling.Oppslag
 import no.nav.helse.behandling.SykepengeVedtak
-import no.nav.helse.behandling.mvp.MVPFeil
-import no.nav.helse.dto.SykepengesøknadV2DTO
+import no.nav.helse.behandling.søknad.Sykepengesøknad
 import no.nav.helse.oppslag.StsRestClient
 import no.nav.helse.probe.SaksbehandlingProbe
 import no.nav.helse.streams.*
@@ -41,7 +36,7 @@ class SaksbehandlingStream(val env: Environment) {
         val streamConfig = if ("true" == env.plainTextKafka) streamConfigPlainTextKafka() else streamConfig(appId, env.bootstrapServersUrl,
                 env.kafkaUsername to env.kafkaPassword,
                 env.navTruststorePath to env.navTruststorePassword)
-        consumer = StreamConsumer(appId, KafkaStreams(topology(), streamConfig))
+        consumer = StreamConsumer(appId, KafkaStreams(topology(oppslag, probe), streamConfig))
     }
 
     private fun streamConfigPlainTextKafka(): Properties = Properties().apply {
@@ -52,116 +47,93 @@ class SaksbehandlingStream(val env: Environment) {
         put(StreamsConfig.DEFAULT_DESERIALIZATION_EXCEPTION_HANDLER_CLASS_CONFIG, LogAndFailExceptionHandler::class.java)
     }
 
-    private fun topology(): Topology {
-        val builder = StreamsBuilder()
+    companion object {
+        fun topology(oppslag: Oppslag, probe: SaksbehandlingProbe): Topology {
+            val builder = StreamsBuilder()
 
-        val (arbeidstakersøknader, frilanssøknader, alleAndreSøknader) = splittPåType(builder)
+            val (feilendeSøknader,
+                    vedtak) = builder.consumeTopic(Topics.SYKEPENGESØKNADER_INN)
+                    .peek { søknadId, _ ->
+                        loggMedSøknadId(søknadId) {
+                            probe.mottattSøknadUansettStatusOgType(søknadId)
+                        }
+                    }
+                    .mapValues { søknadId, jsonNode ->
+                        loggMedSøknadId(søknadId) {
+                            Sykepengesøknad(jsonNode)
+                        }
+                    }
+                    .filter { _, søknad ->
+                        søknad.status != "UKJENT"
+                    }
+                    .peek { søknadId, søknad ->
+                        loggMedSøknadId(søknadId) {
+                            probe.mottattSøknadUansettType(søknad.id, søknad.status)
+                        }
+                    }
+                    .filter { _, søknad ->
+                        søknad.type == "OPPHOLD_UTLAND" ||
+                                søknad.type == "SELVSTENDIGE_OG_FRILANSERE" ||
+                                søknad.type == "ARBEIDSTAKERE"
+                    }
+                    .peek { søknadId, søknad ->
+                        loggMedSøknadId(søknadId) {
+                            probe.mottattSøknad(søknad.id, søknad.status, søknad.type)
+                        }
+                    }
+                    .filter { _, søknad ->
+                        søknad.sendtTilNAV
+                    }
+                    .peek { søknadId, søknad ->
+                        loggMedSøknadId(søknadId) {
+                            probe.mottattSøknadSendtNAV(søknadId, søknad.type)
+                        }
+                    }
+                    .mapValues { _, søknad ->
+                        loggMedSøknadId(søknad.id) {
+                            søknad.behandle(oppslag, probe)
+                        }
+                    }.branch(
+                            Predicate { _, søknad -> søknad is Either.Left },
+                            Predicate { _, søknad -> søknad is Either.Right }
+                    )
 
-        frilanssøknader.peek { søknadId, value ->
-            probe.mottattFrilansSøknad(søknadId, value)
-        }.mapValues { søknadId, value ->
-            val type = value.get("soknadstype").asText()
-            Behandlingsfeil.mvpFilter(søknadId, type, listOf(
-                    MVPFeil("Søknadstype - $type", "Søknaden er av feil type")
-            ))
-        }.foreach { søknadId, behandlingsfeil ->
-            loggMedSøknadId(søknadId) {
-                probe.behandlingsFeilMedType(behandlingsfeil)
-            }
+            sendTilFeilkø(probe, feilendeSøknader)
+            sendTilVedtakskø(probe, vedtak)
+
+            return builder.build()
         }
-        alleAndreSøknader.peek { søknadId, value ->
-            probe.mottattAnnenSøknad(søknadId, value)
+
+        private fun sendTilVedtakskø(probe: SaksbehandlingProbe, vedtak: KStream<String, Either<Behandlingsfeil, SykepengeVedtak>>) {
+            vedtak
+                    .peek { _, _ -> probe.behandlingOk() }
+                    .mapValues { _, sykepengevedtak -> (sykepengevedtak as Either.Right).b }
+                    .peek { _, sykepengevedtak ->
+                        loggMedSøknadId(sykepengevedtak.originalSøknad.id) {
+                            probe.vedtakBehandlet(sykepengevedtak)
+                        }
+                    }.mapValues { _, sykepengevedtak ->
+                        loggMedSøknadId(sykepengevedtak.originalSøknad.id) {
+                            serialize(sykepengevedtak)
+                        }
+                    }.toTopic(VEDTAK_SYKEPENGER)
         }
 
-        val (feilendeSøknader,
-                vedtak) = prøvArbeidstaker(arbeidstakersøknader)
-
-        sendTilFeilkø(feilendeSøknader)
-        sendTilVedtakskø(vedtak)
-
-        return builder.build()
+        private fun sendTilFeilkø(probe: SaksbehandlingProbe, feilendeSøknader: KStream<String, Either<Behandlingsfeil, SykepengeVedtak>>) {
+            feilendeSøknader
+                    .peek { _, _ -> probe.behandlingFeil() }
+                    .mapValues { _, behandlingsfeil -> (behandlingsfeil as Either.Left).a }
+                    .peek { _, behandlingsfeil ->
+                        loggMedSøknadId(behandlingsfeil.soknadId) {
+                            probe.behandlingsFeilMedType(behandlingsfeil)
+                        }
+                    }.mapValues { _, behandlingsfeil ->
+                        loggMedSøknadId(behandlingsfeil.soknadId) {
+                            serializeBehandlingsfeil(behandlingsfeil)
+                        }
+                    }.toTopic(SYKEPENGEBEHANDLINGSFEIL)
+        }
     }
-
-    private fun sendTilVedtakskø(vedtak: KStream<String, Either<Behandlingsfeil, SykepengeVedtak>>) {
-        vedtak
-                .peek { _, _ -> probe.behandlingOk() }
-                .mapValues { _, sykepengevedtak -> (sykepengevedtak as Either.Right).b }
-                .peek { _, sykepengevedtak ->
-                    loggMedSøknadId(sykepengevedtak.originalSøknad.id) {
-                        probe.vedtakBehandlet(sykepengevedtak)
-                    }
-                }.mapValues { _, sykepengevedtak ->
-                    loggMedSøknadId(sykepengevedtak.originalSøknad.id) {
-                        serialize(sykepengevedtak)
-                    }
-                }.toTopic(VEDTAK_SYKEPENGER)
-    }
-
-    private fun sendTilFeilkø(feilendeSøknader: KStream<String, Either<Behandlingsfeil, SykepengeVedtak>>) {
-        feilendeSøknader
-                .peek { _, _ -> probe.behandlingFeil() }
-                .mapValues { _, behandlingsfeil -> (behandlingsfeil as Either.Left).a }
-                .peek { _, behandlingsfeil ->
-                    loggMedSøknadId(behandlingsfeil.soknadId) {
-                        probe.behandlingsFeilMedType(behandlingsfeil)
-                    }
-                }.mapValues { _, behandlingsfeil ->
-                    loggMedSøknadId(behandlingsfeil.soknadId) {
-                        serializeBehandlingsfeil(behandlingsfeil)
-                    }
-                }.toTopic(SYKEPENGEBEHANDLINGSFEIL)
-    }
-
-    private fun prøvArbeidstaker(arbeidstakersøknader: KStream<String, JsonNode>): VedtakEllerFeil {
-        val (feil, vedtak) = arbeidstakersøknader
-                .peek { søknadId, value -> probe.mottattArbeidstakerSøknad(søknadId, value) }
-                .filter { _, value -> value.get("status").asText() == "SENDT" && value.has("sendtNav") && !value.get("sendtNav").isNull }
-                .peek { søknadId, value -> probe.mottattSøknadSendtNAV(søknadId, value) }
-                .mapValues { soknadId, jsonNode ->
-                    loggMedSøknadId(soknadId) {
-                        jsonNode.deserializeSykepengesøknadV2(soknadId)
-                    }
-                }
-                .mapValues { _, either -> either.flatMap {
-                    loggMedSøknadId(it.id) {
-                        it.behandle(oppslag, probe)
-                    }
-                } }
-                .branch(
-                        Predicate { _, søknad -> søknad is Either.Left },
-                        Predicate { _, søknad -> søknad is Either.Right }
-                )
-        return VedtakEllerFeil(feil, vedtak)
-    }
-
-
-    private fun splittPåType(builder: StreamsBuilder): SplitByType {
-        val (arbeidstakersøknader, frilanssøknader, alleAndreSøknader) = builder.consumeTopic(Topics.SYKEPENGESØKNADER_INN)
-                .peek { søknadId, _ ->
-                    probe.mottattSøknadUansettStatusOgType(søknadId)
-                }
-                .filter { _, value -> value.has("status") }
-                .peek { søknadId, value ->
-                    probe.mottattSøknadUansettType(søknadId, value.get("status").asText())
-                }
-                .branch(
-                        Predicate { _, value -> value.has("type") },
-                        Predicate { _, value -> value.has("soknadstype") },
-                        Predicate { _, _ -> true }
-                )
-        return SplitByType(arbeidstakersøknader = arbeidstakersøknader, frilanssøknader = frilanssøknader, alleAndreSøknader = alleAndreSøknader)
-    }
-
-    private fun JsonNode.deserializeSykepengesøknadV2(soknadId: String): Either<Behandlingsfeil, SykepengesøknadV2DTO> =
-            try {
-                Either.Right(defaultObjectMapper.treeToValue(this, SykepengesøknadV2DTO::class.java))
-            } catch (e: MissingKotlinParameterException) {
-                probe.missingNonNullablefield(e)
-                Either.Left(Behandlingsfeil.manglendeFeilDeserialiseringsfeil(soknadId, this, e))
-            } catch (e: Exception) {
-                probe.failedToDeserialize(e)
-                Either.Left(Behandlingsfeil.ukjentDeserialiseringsfeil(soknadId, this, e))
-            }
 
     fun start() {
         consumer.start()
@@ -173,9 +145,9 @@ class SaksbehandlingStream(val env: Environment) {
 
 }
 
-private fun <T> loggMedSøknadId(soknadId: String, block: () -> T): T {
+private fun <T> loggMedSøknadId(søknadId: String, block: () -> T): T {
     try {
-        MDC.put("soknadId", soknadId)
+        MDC.put("soknadId", søknadId)
         return block()
     } finally {
         MDC.remove("soknadId")
@@ -184,17 +156,3 @@ private fun <T> loggMedSøknadId(soknadId: String, block: () -> T): T {
 
 fun serialize(vedtak: SykepengeVedtak): JsonNode = defaultObjectMapper.valueToTree(vedtak)
 fun serializeBehandlingsfeil(feil: Behandlingsfeil): JsonNode = defaultObjectMapper.valueToTree(feil)
-
-val narePrometheus = NarePrometheus(CollectorRegistry.defaultRegistry)
-
-
-private data class SplitByType(
-        val arbeidstakersøknader: KStream<String, JsonNode>,
-        val frilanssøknader: KStream<String, JsonNode>,
-        val alleAndreSøknader: KStream<String, JsonNode>
-)
-
-private data class VedtakEllerFeil(
-        val behandlingsFeil: KStream<String, Either<Behandlingsfeil, SykepengeVedtak>>,
-        val vedtak: KStream<String, Either<Behandlingsfeil, SykepengeVedtak>>
-)

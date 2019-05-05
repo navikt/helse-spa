@@ -1,6 +1,8 @@
 package no.nav.helse.dto
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import com.fasterxml.jackson.databind.JsonNode
+import no.nav.helse.streams.defaultObjectMapper
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -20,3 +22,5 @@ data class SykepengesøknadV2DTO(
         val fravar: List<FravarDTO>,
         val andreInntektskilder: List<InntektskildeDTO>
 )
+
+fun SykepengesøknadV2DTO.asJsonNode() = defaultObjectMapper.valueToTree<JsonNode>(this)

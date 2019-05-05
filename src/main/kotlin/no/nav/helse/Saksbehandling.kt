@@ -2,30 +2,48 @@ package no.nav.helse
 
 import arrow.core.Either
 import arrow.core.flatMap
+import arrow.core.left
+import arrow.core.right
+import no.nav.helse.Behandlingsfeil.Companion.mvpFilter
 import no.nav.helse.behandling.*
-import no.nav.helse.dto.SykepengesøknadV2DTO
+import no.nav.helse.behandling.mvp.MVPFeil
+import no.nav.helse.behandling.søknad.Sykepengesøknad
 import no.nav.helse.fastsetting.vurderFakta
 import no.nav.helse.probe.SaksbehandlingProbe
 
-fun SykepengesøknadV2DTO.behandle(oppslag: Oppslag, probe: SaksbehandlingProbe): Either<Behandlingsfeil, SykepengeVedtak> =
-        this.mapToSykepengesøknad()
-                .flatMap {
-                    hentRegisterData(it, oppslag)
-                }.flatMap {
-                    mvpFilter(it)
-                }.flatMap {
-                    fastsettFakta(it)
-                }.flatMap {
-                    prøvVilkår(it, probe)
-                }.flatMap {
-                    beregnSykepenger(it)
-                }.flatMap {
-                    fattVedtak(it)
-                }
+fun Sykepengesøknad.behandle(oppslag: Oppslag, probe: SaksbehandlingProbe): Either<Behandlingsfeil, SykepengeVedtak> =
+        mvpFilter().flatMap {
+            hentRegisterData(oppslag)
+        }.flatMap { faktagrunnlagResultat ->
+            faktagrunnlagResultat.mvpFilter()
+        }.flatMap { faktagrunnlagResultat ->
+            faktagrunnlagResultat.fastsettFakta()
+        }.flatMap { avklarteFakta ->
+            avklarteFakta.prøvVilkår(probe)
+        }.flatMap { behandlingsgrunnlag ->
+            behandlingsgrunnlag.beregnSykepenger()
+        }.flatMap { sykepengeberegning ->
+            sykepengeberegning.fattVedtak()
+        }
 
-private fun mvpFilter(fakta: FaktagrunnlagResultat): Either<Behandlingsfeil, FaktagrunnlagResultat> = fakta.mvpFilter()
-private fun hentRegisterData(søknad: Sykepengesøknad, oppslag: Oppslag): Either<Behandlingsfeil, FaktagrunnlagResultat> = oppslag.hentRegisterData(søknad)
-private fun fastsettFakta(fakta: FaktagrunnlagResultat): Either<Behandlingsfeil, AvklarteFakta> = vurderFakta(fakta)
-private fun prøvVilkår(fakta: AvklarteFakta, probe: SaksbehandlingProbe): Either<Behandlingsfeil, Behandlingsgrunnlag> = vilkårsprøving(fakta, probe)
-private fun beregnSykepenger(vilkårsprøving: Behandlingsgrunnlag): Either<Behandlingsfeil, Sykepengeberegning> = sykepengeBeregning(vilkårsprøving)
-private fun fattVedtak(beregning: Sykepengeberegning): Either<Behandlingsfeil, SykepengeVedtak> = vedtak(beregning)
+fun Sykepengesøknad.mvpFilter() = when (type) {
+    "ARBEIDSTAKERE" -> right()
+    else -> mvpFilter(id, type, listOf(
+            MVPFeil("Søknadstype - $type", "Søknaden er av feil type")
+    )).left()
+}
+
+private fun Sykepengesøknad.hentRegisterData(oppslag: Oppslag): Either<Behandlingsfeil, FaktagrunnlagResultat> =
+        oppslag.hentRegisterData(this)
+
+private fun FaktagrunnlagResultat.fastsettFakta(): Either<Behandlingsfeil, AvklarteFakta> =
+        vurderFakta(this)
+
+private fun AvklarteFakta.prøvVilkår(probe: SaksbehandlingProbe): Either<Behandlingsfeil, Behandlingsgrunnlag> =
+        vilkårsprøving(this, probe)
+
+private fun Behandlingsgrunnlag.beregnSykepenger(): Either<Behandlingsfeil, Sykepengeberegning> =
+        sykepengeBeregning(this)
+
+private fun Sykepengeberegning.fattVedtak(): Either<Behandlingsfeil, SykepengeVedtak> =
+        vedtak(this)

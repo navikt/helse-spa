@@ -1,7 +1,5 @@
 package no.nav.helse.probe
 
-import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException
 import io.prometheus.client.Counter
 import no.nav.helse.Behandlingsfeil
 import no.nav.helse.Behandlingsfeil.*
@@ -13,7 +11,7 @@ import no.nav.helse.fastsetting.Vurdering
 import no.nav.nare.core.evaluations.Evaluering
 import org.slf4j.LoggerFactory
 
-class SaksbehandlingProbe(val env: Environment) {
+class SaksbehandlingProbe(env: Environment) {
     private val sensuClient = SensuClient(env.sensuHostname, env.sensuPort)
 
     private val influxMetricReporter = InfluxMetricReporter(sensuClient, "spa-events", mapOf(
@@ -28,8 +26,8 @@ class SaksbehandlingProbe(val env: Environment) {
 
         private val mottattCounter = Counter.build()
                 .name("soknader_mottatt_total")
-                .labelNames("status", "type", "version")
-                .help("Antall søknader mottatt fordelt på status og versjon (v1/v2)")
+                .labelNames("status", "type")
+                .help("Antall søknader mottatt fordelt på status")
                 .register()
         private val behandlingsCounter = Counter.build()
                 .name("soknader_behandlet_total")
@@ -50,8 +48,6 @@ class SaksbehandlingProbe(val env: Environment) {
     }
 
     fun startKakaWithPlainText() = log.warn("Using kafka plain text config only works in development!")
-    fun missingNonNullablefield(e: MissingKotlinParameterException) = log.error("Failed to deserialize søknad due to missing non-nullable parameter: ${e.parameter.name} of type ${e.parameter.type}")
-    fun failedToDeserialize(e: Exception) = log.error("Failed to deserialize søknad", e)
 
     private fun sendMottattSykepengesøknadEvent(søknadId: String, status: String, type: String) {
         influxMetricReporter.sendDataPoint("sykepengesoknad.mottatt",
@@ -64,47 +60,27 @@ class SaksbehandlingProbe(val env: Environment) {
                 ))
     }
 
-    fun mottattSøknadUansettStatusOgType(søknadId: String) = sendMottattSykepengesøknadEvent(søknadId, "ALLE", "ALLE")
-
-    fun mottattSøknadUansettType(søknadId: String, status: String) = sendMottattSykepengesøknadEvent(søknadId, status, "ALLE")
-
-    fun mottattFrilansSøknad(søknadId: String, value: JsonNode) {
-        val status = value.get("status").asText()
-        val type = value.get("soknadstype").asText()
-
-        sendMottattSykepengesøknadEvent(søknadId, status, type)
-        mottattCounter.labels(status, type, "v2").inc()
+    fun mottattSøknad(søknadId: String, søknadStatus: String, søknadType: String) {
+        sendMottattSykepengesøknadEvent(søknadId, søknadStatus, søknadType)
+        mottattCounter.labels(søknadStatus, søknadType).inc()
     }
 
-    fun mottattAnnenSøknad(søknadId: String, value: JsonNode) {
-        val status = value.get("status").asText()
-        val type = "UKJENT"
-
-        sendMottattSykepengesøknadEvent(søknadId, status, type)
-        mottattCounter.labels(status, type, "v2").inc()
+    fun mottattSøknadUansettStatusOgType(søknadId: String) {
+        mottattSøknad(søknadId, "ALLE", "ALLE")
     }
 
-    fun mottattArbeidstakerSøknad(søknadId: String, value: JsonNode) {
-        val status = value.get("status").asText()
-        val type = value.get("type").asText()
-
-        sendMottattSykepengesøknadEvent(søknadId, status, type)
-        mottattCounter.labels(status, type, "v2").inc()
+    fun mottattSøknadUansettType(søknadId: String, status: String) {
+        mottattSøknad(søknadId, status, "ALLE")
     }
 
-    fun mottattSøknadSendtNAV(søknadId: String, value: JsonNode) {
-        val status = "SENDT_NAV"
-        val type = value.get("type").asText()
-
-        sendMottattSykepengesøknadEvent(søknadId, status, type)
-        mottattCounter.labels(status, type, "v2").inc()
+    fun mottattSøknadSendtNAV(søknadId: String, søknadType: String) {
+        mottattSøknad(søknadId, "SENDT_NAV", søknadType)
     }
 
     fun gjennomførtVilkårsprøving(value: Evaluering) {
 
             influxMetricReporter.sendDataPoints(toDatapoints(value))
     }
-
 
     fun behandlingsFeilMedType(behandlingsfeil: Behandlingsfeil) {
         log.warn(behandlingsfeil.feilmelding)
@@ -120,7 +96,7 @@ class SaksbehandlingProbe(val env: Environment) {
         }
     }
 
-    fun Deserialiseringsfeil.serialiseringsFeil() {
+    private fun Deserialiseringsfeil.serialiseringsFeil() {
         behandlingsfeilCounter.labels("deserialisering").inc()
         influxMetricReporter.sendDataPoint("behandlingsfeil.event",
                 mapOf(
@@ -145,7 +121,7 @@ class SaksbehandlingProbe(val env: Environment) {
                 ))
     }
 
-    fun MVPFilterFeil.mvpFilter() {
+    private fun MVPFilterFeil.mvpFilter() {
         mvpFeil.onEach {
             kriterieForMVPErIkkeOppfylt(soknadId, it)
         }
@@ -159,7 +135,7 @@ class SaksbehandlingProbe(val env: Environment) {
         ))
     }
 
-    fun RegisterFeil.registerFeil() {
+    private fun RegisterFeil.registerFeil() {
         log.warn(throwable.message, throwable)
 
         behandlingsfeilCounter.labels("register").inc()
@@ -171,7 +147,7 @@ class SaksbehandlingProbe(val env: Environment) {
         ))
     }
 
-    fun Avklaringsfeil.avklaringsFeil() {
+    private fun Avklaringsfeil.avklaringsFeil() {
         behandlingsfeilCounter.labels("avklaring").inc()
         uavklarteFakta.uavklarteVerdier.asNamedList().forEach { (name, fakta) ->
             if (fakta is Vurdering.Uavklart) {
@@ -203,7 +179,7 @@ class SaksbehandlingProbe(val env: Environment) {
         log.info("Søknad for aktør ${uavklarteFakta.originalSøknad.aktorId} med id ${uavklarteFakta.originalSøknad.id} er uavklart")
     }
 
-    fun Vilkårsprøvingsfeil.vilkårsPrøvingsFeil() {
+    private fun Vilkårsprøvingsfeil.vilkårsPrøvingsFeil() {
         behandlingsfeilCounter.labels("vilkarsproving").inc()
         influxMetricReporter.sendDataPoint("behandlingsfeil.event", mapOf(
                 "soknadId" to vilkårsprøving.originalSøknad.id
@@ -214,7 +190,7 @@ class SaksbehandlingProbe(val env: Environment) {
         log.info("Søknad for aktør ${vilkårsprøving.originalSøknad.aktorId} med id ${vilkårsprøving.originalSøknad.id} oppfyller ikke vilkårene")
     }
 
-    fun Beregningsfeil.beregningsfeil() {
+    private fun Beregningsfeil.beregningsfeil() {
         behandlingsfeilCounter.labels("beregning").inc()
         influxMetricReporter.sendDataPoint("behandlingsfeil.event", mapOf(
                 "soknadId" to vilkårsprøving.originalSøknad.id

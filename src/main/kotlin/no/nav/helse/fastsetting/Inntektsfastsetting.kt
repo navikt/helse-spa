@@ -1,7 +1,7 @@
 package no.nav.helse.fastsetting
 
-import no.nav.helse.behandling.Søknadsperiode
-import no.nav.helse.domain.ArbeidsgiverFraSøknad
+import no.nav.helse.behandling.søknad.Søknadsperiode
+import no.nav.helse.behandling.søknad.ArbeidsgiverFraSøknad
 import no.nav.helse.fastsetting.Vurdering.Uavklart
 import no.nav.helse.fastsetting.Vurdering.Uavklart.Årsak.*
 import no.nav.helse.oppslag.Inntekt

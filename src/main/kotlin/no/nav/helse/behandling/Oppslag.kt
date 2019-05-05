@@ -4,6 +4,7 @@ import arrow.core.Either
 import arrow.core.Try
 import arrow.core.flatMap
 import no.nav.helse.Behandlingsfeil
+import no.nav.helse.behandling.søknad.Sykepengesøknad
 import no.nav.helse.oppslag.Inntektsoppslag
 import no.nav.helse.oppslag.PersonOppslag
 import no.nav.helse.oppslag.StsRestClient

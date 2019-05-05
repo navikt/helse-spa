@@ -3,7 +3,7 @@ package no.nav.helse
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException
 import no.nav.helse.behandling.Behandlingsgrunnlag
-import no.nav.helse.behandling.Sykepengesøknad
+import no.nav.helse.behandling.søknad.Sykepengesøknad
 import no.nav.helse.behandling.UavklarteFakta
 import no.nav.helse.behandling.mvp.MVPFeil
 

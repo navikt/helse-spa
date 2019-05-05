@@ -1,7 +1,8 @@
 package no.nav.helse
 
 import no.nav.helse.behandling.*
-import no.nav.helse.domain.ArbeidsgiverFraSøknad
+import no.nav.helse.behandling.søknad.Sykepengesøknad
+import no.nav.helse.dto.*
 import no.nav.helse.fastsetting.*
 import no.nav.helse.oppslag.arbeidinntektytelse.dto.ArbeidInntektYtelseDTO
 import no.nav.helse.oppslag.arbeidinntektytelse.dto.ArbeidsforholdDTO
@@ -33,21 +34,21 @@ val faktagrunnlagUtenVerdi = Faktagrunnlag(
         )
 )
 
-val originalSoknad = Sykepengesøknad(
+val originalSoknad = Sykepengesøknad(SykepengesøknadV2DTO(
         id = "1",
         aktorId = "1",
-        type = "ARBEIDSTAKERE",
-        arbeidsgiver = ArbeidsgiverFraSøknad("Test 1", "1111"),
+        type = SoknadstypeDTO.ARBEIDSTAKERE,
+        arbeidsgiver = ArbeidsgiverDTO("Test 1", "1111"),
         startSyketilfelle = LocalDate.now(),
         soktUtenlandsopphold = true,
         soknadsperioder = emptyList(),
         sendtNav = LocalDateTime.now(),
         tom = LocalDate.now(),
         fom = LocalDate.now(),
-        status = "SENDT",
+        status = SoknadsstatusDTO.SENDT,
         andreInntektskilder = emptyList(),
-        fravær = emptyList()
-)
+        fravar = emptyList()
+).asJsonNode())
 
 val soknadUtenVerdi = FaktagrunnlagResultat(
         originalSøknad = originalSoknad,

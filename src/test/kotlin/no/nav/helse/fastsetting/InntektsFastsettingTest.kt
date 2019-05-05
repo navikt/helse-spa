@@ -1,6 +1,6 @@
 package no.nav.helse.fastsetting
 
-import no.nav.helse.domain.ArbeidsgiverFraSøknad
+import no.nav.helse.behandling.søknad.ArbeidsgiverFraSøknad
 import no.nav.helse.oppslag.Inntekt
 import no.nav.helse.oppslag.Inntektsarbeidsgiver
 import org.junit.jupiter.api.Assertions

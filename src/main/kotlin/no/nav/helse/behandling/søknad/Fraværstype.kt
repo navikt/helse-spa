@@ -1,4 +1,4 @@
-package no.nav.helse.behandling
+package no.nav.helse.behandling.søknad
 
 enum class Fraværstype {
     FERIE,

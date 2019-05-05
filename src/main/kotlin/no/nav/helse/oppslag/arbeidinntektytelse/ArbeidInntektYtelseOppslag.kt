@@ -3,7 +3,7 @@ package no.nav.helse.oppslag.arbeidinntektytelse
 import arrow.core.Try
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.github.kittinunf.fuel.httpGet
-import no.nav.helse.behandling.Sykepengesøknad
+import no.nav.helse.behandling.søknad.Sykepengesøknad
 import no.nav.helse.oppslag.AktørId
 import no.nav.helse.oppslag.StsRestClient
 import no.nav.helse.oppslag.arbeidinntektytelse.dto.ArbeidInntektYtelseDTO

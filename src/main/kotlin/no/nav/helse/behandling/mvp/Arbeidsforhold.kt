@@ -1,6 +1,6 @@
 package no.nav.helse.behandling.mvp
 
-import no.nav.helse.domain.ArbeidsgiverFraSøknad
+import no.nav.helse.behandling.søknad.ArbeidsgiverFraSøknad
 import no.nav.helse.oppslag.arbeidinntektytelse.dto.ArbeidsforholdDTO
 
 fun vurderMVPKriterierForArbeidsforhold(arbeidsgiverFraSøknad: ArbeidsgiverFraSøknad, arbeidsforhold: List<ArbeidsforholdDTO>): MVPFeil? {

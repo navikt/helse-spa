@@ -2,7 +2,8 @@ package no.nav.helse
 
 import arrow.core.Either
 import no.nav.helse.behandling.*
-import no.nav.helse.domain.ArbeidsgiverFraSøknad
+import no.nav.helse.behandling.søknad.Sykepengesøknad
+import no.nav.helse.dto.*
 import no.nav.helse.fastsetting.Aldersgrunnlag
 import no.nav.helse.fastsetting.Beregningsperiode
 import no.nav.helse.fastsetting.Opptjeningsgrunnlag
@@ -55,20 +56,20 @@ class BeregningTest {
 
     fun vilkårsprøvdSøknad(fom: LocalDate, tom: LocalDate, årslønn: Long, sykmeldingsgrad: Int) =
             Behandlingsgrunnlag(
-                    originalSøknad = Sykepengesøknad(
+                    originalSøknad = Sykepengesøknad(SykepengesøknadV2DTO(
                             id = "1",
                             aktorId = "123123",
-                            type = "ARBEIDSTAKERE",
+                            type = SoknadstypeDTO.ARBEIDSTAKERE,
                             fom = fom,
                             tom = tom,
-                            arbeidsgiver = ArbeidsgiverFraSøknad("TheWorkplace", "999888777"),
+                            arbeidsgiver = ArbeidsgiverDTO("TheWorkplace", "999888777"),
                             sendtNav = LocalDateTime.ofEpochSecond(parse("2019-01-31").toEpochSecond(LocalTime.NOON, ZoneOffset.UTC), 0, ZoneOffset.UTC),
-                            soknadsperioder = listOf(Søknadsperiode(parse("2019-01-05"), parse("2019-01-31"), sykmeldingsgrad = sykmeldingsgrad)),
+                            soknadsperioder = listOf(SoknadsperiodeDTO(parse("2019-01-05"), parse("2019-01-31"), sykmeldingsgrad = sykmeldingsgrad)),
                             soktUtenlandsopphold = false,
                             startSyketilfelle = parse("2018-12-01"),
-                            status = "SENDT",
+                            status = SoknadsstatusDTO.SENDT,
                             andreInntektskilder = emptyList(),
-                            fravær = emptyList()),
+                            fravar = emptyList()).asJsonNode()),
                     faktagrunnlag = faktagrunnlagUtenVerdi,
                     avklarteVerdier = AvklarteVerdier(
                             medlemsskap = Avklart(fastsattVerdi = true, begrunnelse = "derfor", fastsattAv = "test", grunnlag = Tpsfakta(LocalDate.parse("1980-01-01"), "NOR", "NOR", "BOSA", null)),

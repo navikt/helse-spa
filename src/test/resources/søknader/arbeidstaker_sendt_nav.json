@@ -1,0 +1,40 @@
+{
+  "id": "1c6d9930-ce09-49dc-bcb3-b6fee2ff4e32",
+  "type": "ARBEIDSTAKERE",
+  "status": "SENDT",
+  "aktorId": "123456789",
+  "sykmeldingId": "07ca41de-fe79-4c2b-b077-b493658ed5f2",
+  "arbeidsgiver": {
+    "navn": "ARBEIDS- OG VELFERDSDIREKTORATET AVD SANNERGATA",
+    "orgnummer": "995298775"
+  },
+  "arbeidssituasjon": "ARBEIDSTAKER",
+  "korrigerer": null,
+  "korrigertAv": null,
+  "soktUtenlandsopphold": null,
+  "arbeidsgiverForskutterer": null,
+  "fom": "2019-01-01",
+  "tom": "2019-01-31",
+  "startSyketilfelle": "2019-01-01",
+  "arbeidGjenopptatt": null,
+  "sykmeldingSkrevet": "2018-12-31T00:00:00",
+  "opprettet": "2018-12-31T00:00:00.000",
+  "sendtNav": "2019-02-14T00:00:00.000",
+  "sendtArbeidsgiver": "2019-02-01T00:00:00.000",
+  "egenmeldinger": [],
+  "papirsykmeldinger": null,
+  "fravar": [],
+  "andreInntektskilder": [],
+  "soknadsperioder": [
+    {
+      "fom": "2019-01-01",
+      "tom": "2019-01-31",
+      "sykmeldingsgrad": 100,
+      "faktiskGrad": null,
+      "avtaltTimer": null,
+      "faktiskTimer": null,
+      "sykmeldingstype": null
+    }
+  ],
+  "sporsmal": null
+}

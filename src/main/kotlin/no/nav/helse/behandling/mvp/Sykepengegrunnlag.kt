@@ -1,6 +1,6 @@
 package no.nav.helse.behandling.mvp
 
-import no.nav.helse.behandling.Søknadsperiode
+import no.nav.helse.behandling.søknad.Søknadsperiode
 import no.nav.helse.oppslag.Inntekt
 import java.time.LocalDate
 

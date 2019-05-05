@@ -3,6 +3,8 @@ package no.nav.helse.behandling
 import arrow.core.Either
 import no.nav.helse.Behandlingsfeil
 import no.nav.helse.behandling.mvp.*
+import no.nav.helse.behandling.søknad.Fraværstype
+import no.nav.helse.behandling.søknad.Sykepengesøknad
 
 fun FaktagrunnlagResultat.mvpFilter(): Either<Behandlingsfeil, FaktagrunnlagResultat> {
     val mvpKriterier = listOf(

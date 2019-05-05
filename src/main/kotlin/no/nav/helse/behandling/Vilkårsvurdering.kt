@@ -14,7 +14,7 @@ fun vilkårsprøving(avklarteFakta: AvklarteFakta, probe: SaksbehandlingProbe): 
             alder = avklarteFakta.avklarteVerdier.alder.fastsattVerdi,
             erMedlem = avklarteFakta.avklarteVerdier.medlemsskap.fastsattVerdi,
             ytelser = emptyList(),
-            søknadSendt = avklarteFakta.originalSøknad.sendtNav.toLocalDate(),
+            søknadSendt = avklarteFakta.originalSøknad.sendtNav!!.toLocalDate(),
             førsteDagSøknadGjelderFor = avklarteFakta.originalSøknad.fom,
             sisteDagSøknadenGjelderFor = avklarteFakta.originalSøknad.tom,
             sisteMuligeSykepengedag = avklarteFakta.avklarteVerdier.maksdato.fastsattVerdi,

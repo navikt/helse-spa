@@ -14,6 +14,7 @@ import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import no.nav.common.JAASCredential
 import no.nav.common.KafkaEnvironment
 import no.nav.helse.behandling.*
+import no.nav.helse.behandling.søknad.Sykepengesøknad
 import no.nav.helse.dto.*
 import no.nav.helse.dto.ArbeidsgiverDTO
 import no.nav.helse.fastsetting.*
