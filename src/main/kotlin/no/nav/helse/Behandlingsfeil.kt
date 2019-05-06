@@ -1,19 +1,16 @@
 package no.nav.helse
 
 import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException
 import no.nav.helse.behandling.Behandlingsgrunnlag
-import no.nav.helse.behandling.søknad.Sykepengesøknad
 import no.nav.helse.behandling.UavklarteFakta
 import no.nav.helse.behandling.mvp.MVPFeil
+import no.nav.helse.behandling.søknad.Sykepengesøknad
 
 interface Behandlingsfeil {
     val soknadId: String
     val feilmelding: String
 
     data class MVPFilterFeil(val søknadstype: String, val mvpFeil: List<MVPFeil>, override val feilmelding: String, override val soknadId: String): Behandlingsfeil
-
-    data class Deserialiseringsfeil(override val soknadId: String, val json: JsonNode, override val feilmelding: String): Behandlingsfeil
 
     data class RegisterFeil(override val feilmelding: String, val throwable: Throwable, val søknad: Sykepengesøknad, override val soknadId: String = søknad.id): Behandlingsfeil
 
@@ -27,12 +24,6 @@ interface Behandlingsfeil {
     companion object {
 
         fun mvpFilter(søknadId: String, søknadstype: String, mvpFeil: List<MVPFeil>) = MVPFilterFeil(søknadstype, mvpFeil, "Søknad faller ut fordi den passer ikke for MVP", søknadId)
-
-        // deserializering feilet pga null-verdi som ikke kan være null
-        fun manglendeFeilDeserialiseringsfeil(soknadId: String, json: JsonNode, exception: MissingKotlinParameterException) = Deserialiseringsfeil(soknadId, json, "Det mangler felt ${exception.parameter} i søknad med id $soknadId.")
-
-        // deserializering feilet av ukjent årsak
-        fun ukjentDeserialiseringsfeil(soknadId: String, json: JsonNode, exception: Exception) = Deserialiseringsfeil(soknadId, json, "Det er en ukjent feil i søknaden (id $soknadId) som gjør at vi ikke kan tolke den: ${exception.javaClass.simpleName} : ${exception.message}")
 
         // vi klarte ikke avklare alle fakta
         fun avklaringsfeil(uavklarteFakta: UavklarteFakta) = Avklaringsfeil(uavklarteFakta, "Kunne ikke fastsette alle fakta.")

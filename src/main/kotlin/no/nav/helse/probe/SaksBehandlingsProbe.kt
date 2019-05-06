@@ -86,7 +86,6 @@ class SaksbehandlingProbe(env: Environment) {
         log.warn(behandlingsfeil.feilmelding)
         with(behandlingsfeil) {
             when (this) {
-                is Deserialiseringsfeil -> serialiseringsFeil()
                 is MVPFilterFeil -> mvpFilter()
                 is RegisterFeil -> registerFeil()
                 is Avklaringsfeil -> avklaringsFeil()
@@ -94,18 +93,6 @@ class SaksbehandlingProbe(env: Environment) {
                 is Beregningsfeil -> beregningsfeil()
             }
         }
-    }
-
-    private fun Deserialiseringsfeil.serialiseringsFeil() {
-        behandlingsfeilCounter.labels("deserialisering").inc()
-        influxMetricReporter.sendDataPoint("behandlingsfeil.event",
-                mapOf(
-                        "soknadId" to soknadId,
-                        "feilmelding" to feilmelding),
-                mapOf(
-                        "steg" to "deserialisering",
-                        "type" to json.get("type").asText()
-                ))
     }
 
     private fun kriterieForMVPErIkkeOppfylt(søknadId: String, feil: MVPFeil) {

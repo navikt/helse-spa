@@ -5,7 +5,7 @@ import no.nav.helse.oppslag.Inntekt
 import java.time.LocalDate
 
 fun vurderMVPKriterierForSykepengegrunnlaget(førsteSykdomsdag: LocalDate, perioder: List<Søknadsperiode>, beregningsgrunnlag: List<Inntekt>): MVPFeil? {
-    if (perioder.size > 1) {
+    if (perioder.size != 1) {
         return MVPFeil("Mer enn én sykdomsperiode", "Søknaden inneholder mer enn én sykdomsperiode")
     }
     if (perioder[0].fom != førsteSykdomsdag) {
