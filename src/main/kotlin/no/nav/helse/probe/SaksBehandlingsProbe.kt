@@ -83,7 +83,7 @@ class SaksbehandlingProbe(env: Environment) {
     }
 
     fun behandlingsFeilMedType(behandlingsfeil: Behandlingsfeil) {
-        log.warn(behandlingsfeil.feilmelding)
+        log.info(behandlingsfeil.feilmelding)
         with(behandlingsfeil) {
             when (this) {
                 is MVPFilterFeil -> mvpFilter()
