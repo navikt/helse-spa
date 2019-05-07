@@ -1,13 +1,12 @@
 package no.nav.helse.behandling.mvp
 
+import no.nav.helse.behandling.søknad.ArbeidsgiverFraSøknad
 import no.nav.helse.oppslag.arbeidinntektytelse.dto.ArbeidsforholdDTO
 
-fun vurderMVPKriterierForOpptjeningstid(arbeidsforhold: List<ArbeidsforholdDTO>): MVPFeil? {
-    if (arbeidsforhold.size != 1) {
-        return MVPFeil("For mange arbeidsforhold", "Søker har ${arbeidsforhold.size} arbeidsforhold og vi forventer kun 1")
-    } else {
-        return arbeidsforhold[0].sluttdato?.let {
-            MVPFeil("Kun avsluttet arbeidsforhold", "Søker har ett arbeidsforhold som han eller hun har avsluttet")
-        }
+fun vurderMVPKriterierForOpptjeningstid(arbeidsgiverFraSøknad: ArbeidsgiverFraSøknad, arbeidsforhold: List<ArbeidsforholdDTO>): MVPFeil? {
+    return when {
+        arbeidsforhold.size != 1 -> MVPFeil("Mer enn ett arbeidsforhold", "Søker har ${arbeidsforhold.size} arbeidsforhold og vi forventer kun 1")
+        arbeidsgiverFraSøknad.orgnummer != arbeidsforhold[0].arbeidsgiver.identifikator -> MVPFeil("Finner ikke arbeidsforhold fra søknad", "Finner ikke arbeidsforholdet søker har opplyst om i søknaden i listen over registrerte arbeidsforhold")
+        else -> null
     }
 }
