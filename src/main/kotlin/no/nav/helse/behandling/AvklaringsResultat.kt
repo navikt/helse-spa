@@ -4,6 +4,7 @@ import no.nav.helse.Grunnlagsdata
 import no.nav.helse.behandling.søknad.Sykepengesøknad
 import no.nav.helse.fastsetting.*
 import no.nav.helse.oppslag.AnvistPeriode
+import no.nav.helse.oppslag.Inntekt
 import no.nav.helse.oppslag.arbeidinntektytelse.dto.ArbeidsforholdDTO
 import java.time.LocalDate
 
@@ -22,7 +23,7 @@ data class AvklarteVerdier(
         val sykepengehistorikk: List<AnvistPeriode>,
         val arbeidsforhold: Vurdering.Avklart<Boolean, List<ArbeidsforholdDTO>>,
         val opptjeningstid: Vurdering.Avklart<Opptjeningstid, Opptjeningsgrunnlag>,
-        val sykepengegrunnlag: Vurdering.Avklart<Sykepengegrunnlag, Beregningsperiode>
+        val sykepengegrunnlag: Vurdering.Avklart<Sykepengegrunnlag, List<Inntekt>>
 )
 
 data class UavklarteFakta(

@@ -217,7 +217,7 @@ class EndToEndTest {
         assert(medlemsskap.grunnlag.diskresjonskode).isNull()
     }
 
-    private fun checkSykepengegrunnlag(sykepengegrunnlagVurdering: Vurdering.Avklart<Sykepengegrunnlag, Beregningsperiode>) {
+    private fun checkSykepengegrunnlag(sykepengegrunnlagVurdering: Vurdering.Avklart<Sykepengegrunnlag, List<Inntekt>>) {
         checkSykepengegrunnlagNårTrygdenYter(sykepengegrunnlagVurdering.fastsattVerdi.sykepengegrunnlagNårTrygdenYter)
         checkSykepengegrunnlagIArbeidsgiverperioden(sykepengegrunnlagVurdering.fastsattVerdi.sykepengegrunnlagIArbeidsgiverperioden)
         assert(sykepengegrunnlagVurdering.begrunnelse).isEqualTo("")
@@ -227,7 +227,7 @@ class EndToEndTest {
         checkBeregningsperiode12mnd(sykepengegrunnlagVurdering.grunnlag)
     }
 
-    private fun checkSykepengegrunnlagNårTrygdenYter(sykepengegrunnlagNårTrygdenYterVurdering: Vurdering.Avklart<Long, Beregningsperiode>) {
+    private fun checkSykepengegrunnlagNårTrygdenYter(sykepengegrunnlagNårTrygdenYterVurdering: Vurdering.Avklart<Long, List<Inntekt>>) {
         assert(sykepengegrunnlagNårTrygdenYterVurdering.fastsattVerdi).isEqualTo(300000L)
         assert(sykepengegrunnlagNårTrygdenYterVurdering.begrunnelse).contains(paragraf_8_30_første_ledd)
         assert(sykepengegrunnlagNårTrygdenYterVurdering.vurderingstidspunkt).isBetween(LocalDateTime.now().minusHours(1), LocalDateTime.now().plusHours(1))
@@ -236,7 +236,7 @@ class EndToEndTest {
         checkBeregningsperiode3mnd(sykepengegrunnlagNårTrygdenYterVurdering.grunnlag)
     }
 
-    private fun checkSykepengegrunnlagIArbeidsgiverperioden(sykepengegrunnlagIArbeidsgiverperiodenVurdering: Vurdering.Avklart<Long, Beregningsperiode>) {
+    private fun checkSykepengegrunnlagIArbeidsgiverperioden(sykepengegrunnlagIArbeidsgiverperiodenVurdering: Vurdering.Avklart<Long, List<Inntekt>>) {
         assert(sykepengegrunnlagIArbeidsgiverperiodenVurdering.fastsattVerdi).isEqualTo(25000L)
         assert(sykepengegrunnlagIArbeidsgiverperiodenVurdering.begrunnelse).contains(paragraf_8_28_andre_ledd)
         assert(sykepengegrunnlagIArbeidsgiverperiodenVurdering.vurderingstidspunkt).isBetween(LocalDateTime.now().minusHours(1), LocalDateTime.now().plusHours(1))
@@ -245,16 +245,12 @@ class EndToEndTest {
         checkBeregningsperiode3mnd(sykepengegrunnlagIArbeidsgiverperiodenVurdering.grunnlag)
     }
 
-    private fun checkBeregningsperiode3mnd(beregningsperiode: Beregningsperiode) {
-        assert(beregningsperiode.begrunnelse).isEqualTo(paragraf_8_28_tredje_ledd_bokstav_a + "(${første_dag_i_syketilfelle}) legges til grunn.")
-
-        //checkInntekt(beregningsperiode.inntekter, beregningsgrunnlagStart, beregningsgrunnlagStart.plusMonths(2).with(lastDayOfMonth()))
+    private fun checkBeregningsperiode3mnd(beregningsperiode: List<Inntekt>) {
+        checkInntekt(beregningsperiode, beregningsgrunnlagStart, beregningsgrunnlagStart.plusMonths(2).with(lastDayOfMonth()))
     }
 
-    private fun checkBeregningsperiode12mnd(beregningsperiode: Beregningsperiode) {
-        assert(beregningsperiode.begrunnelse).isNotEmpty()
-
-        //checkInntekt(beregningsperiode.inntekter, sammenligningsgrunnlagStart, sammenligningsgrunnlagStart.plusMonths(11).with(lastDayOfMonth()))
+    private fun checkBeregningsperiode12mnd(beregningsperiode: List<Inntekt>) {
+        checkInntekt(beregningsperiode, sammenligningsgrunnlagStart, sammenligningsgrunnlagStart.plusMonths(11).with(lastDayOfMonth()))
     }
 
     private fun checkInntekt(inntekter: List<Inntekt>, startDate: LocalDate, endDate: LocalDate) {

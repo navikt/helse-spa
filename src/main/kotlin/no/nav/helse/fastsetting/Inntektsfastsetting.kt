@@ -1,9 +1,8 @@
 package no.nav.helse.fastsetting
 
-import no.nav.helse.behandling.søknad.Søknadsperiode
-import no.nav.helse.behandling.søknad.ArbeidsgiverFraSøknad
 import no.nav.helse.fastsetting.Vurdering.Uavklart
-import no.nav.helse.fastsetting.Vurdering.Uavklart.Årsak.*
+import no.nav.helse.fastsetting.Vurdering.Uavklart.Årsak.HAR_IKKE_DATA
+import no.nav.helse.fastsetting.Vurdering.Uavklart.Årsak.KREVER_SKJØNNSMESSIG_VURDERING
 import no.nav.helse.oppslag.Inntekt
 import no.nav.helse.sykepenger.beregning.longValueExact
 import java.math.BigDecimal
@@ -13,22 +12,14 @@ import java.time.YearMonth
 
 fun LocalDate.yearMonth() = YearMonth.of(year, month.value)
 
-fun fastsettingAvSykepengegrunnlaget(førsteSykdomsdag: LocalDate, perioder: List<Søknadsperiode>, arbeidsgiver: ArbeidsgiverFraSøknad, beregningsgrunnlag: List<Inntekt>, sammenligningsgrunnlag: List<Inntekt>): Vurdering<*, *> {
-    if (perioder.size > 1) {
-        return Uavklart<Long, List<Beregningsperiode>>(FALLER_UTENFOR_MVP, "Mer enn én sykdomsperiode", "Søknaden inneholder mer enn én sykdomsperiode", emptyList())
-    }
-    if (perioder[0].fom != førsteSykdomsdag) {
-        return Uavklart<Long, List<Beregningsperiode>>(FALLER_UTENFOR_MVP, "Periode og sykdom har forskjellig start", "Første dag i perioden (${perioder[0].fom}) er ikke den samme som første sykdomsdag ($førsteSykdomsdag)", emptyList())
-    }
-
-    val sykepengegrunnlagIArbeidsgiverperioden = fastsettingAvSykepengegrunnlagetIArbeidsgiverperioden(førsteSykdomsdag,
-            arbeidsgiver, beregningsgrunnlag)
+fun fastsettingAvSykepengegrunnlaget(førsteSykdomsdag: LocalDate, beregningsgrunnlag: List<Inntekt>, sammenligningsgrunnlag: List<Inntekt>): Vurdering<*, List<Inntekt>> {
+    val sykepengegrunnlagIArbeidsgiverperioden = fastsettingAvSykepengegrunnlagetIArbeidsgiverperioden(førsteSykdomsdag, beregningsgrunnlag)
 
     if (sykepengegrunnlagIArbeidsgiverperioden is Uavklart) {
         return sykepengegrunnlagIArbeidsgiverperioden
     }
 
-    val fastsattSammenligningsgrunnlag = fastsettSammenligningsgrunnlag(førsteSykdomsdag, sammenligningsgrunnlag)
+    val fastsattSammenligningsgrunnlag = fastsettSammenligningsgrunnlag(sammenligningsgrunnlag)
 
     if (fastsattSammenligningsgrunnlag is Uavklart) {
         return fastsattSammenligningsgrunnlag
@@ -46,106 +37,44 @@ fun fastsettingAvSykepengegrunnlaget(førsteSykdomsdag: LocalDate, perioder: Lis
 const val paragraf_8_28_tredje_ledd_bokstav_a = "§ 8-28 tredje ledd bokstav a) - De tre siste kalendermånedene før arbeidstakeren ble arbeidsufør"
 const val paragraf_8_28_andre_ledd = "§ 8-28 andre ledd"
 // https://lovdata.no/lov/1997-02-28-19/§8-28
-fun fastsettingAvSykepengegrunnlagetIArbeidsgiverperioden(førsteSykdomsdag: LocalDate, arbeidsgiver: ArbeidsgiverFraSøknad, inntekter: List<Inntekt>): Vurdering<Long, Beregningsperiode> {
+fun fastsettingAvSykepengegrunnlagetIArbeidsgiverperioden(førsteSykdomsdag: LocalDate, beregningsperiode: List<Inntekt>): Vurdering<Long, List<Inntekt>> {
+    if (beregningsperiode.isEmpty()) {
+        return Uavklart(HAR_IKKE_DATA, "Ingen inntekter i beregningsperiode", "Kan ikke avklare sykepengegrunnlaget fordi det ikke er inntekter i beregningsperioden", beregningsperiode)
+    }
+
     val enMånedFør = førsteSykdomsdag.minusMonths(1)
             .yearMonth()
     val treMånederFør = førsteSykdomsdag.minusMonths(3)
             .yearMonth()
 
-    val beregningsperiode = inntekter.filter { inntekt ->
-        inntekt.utbetalingsperiode in treMånederFør..enMånedFør
-    }.groupBy { inntekt ->
-        inntekt.virksomhet.identifikator
-    }.mapValues { entry ->
-        entry.value.groupBy {  inntekt ->
-            inntekt.utbetalingsperiode
-        }
-    }.let {
-        Beregningsperiode(it, paragraf_8_28_tredje_ledd_bokstav_a + "(${førsteSykdomsdag}) legges til grunn.")
+    val gruppertEtterMåned = beregningsperiode.groupBy { it.utbetalingsperiode }.filter { it.key >= treMånederFør && it.key <= enMånedFør }
+    if (gruppertEtterMåned.size != 3 || gruppertEtterMåned.any { it.value.isEmpty() }) {
+        return Uavklart(HAR_IKKE_DATA, "Mangler inntekter for minst én av tre foregående måneder", "Kan ikke avklare sykepengegrunnlaget fordi vi forventer inntekter fra tre måneder før", beregningsperiode)
     }
 
-    if (beregningsperiode.inntekter.isEmpty()) {
-        return Uavklart(HAR_IKKE_DATA, "Ingen inntekter i beregningsperiode", "Kan ikke avklare sykepengegrunnlaget fordi det ikke er inntekter i beregningsperioden", beregningsperiode)
-    } else if (beregningsperiode.inntekter.keys.size > 1) {
-        return if (beregningsperiode.inntekter.keys.firstOrNull { it == arbeidsgiver.orgnummer } == null) {
-            Uavklart(HAR_IKKE_DATA, "Ingen inntekter fra aktuell arbeidsgiver", "Kan ikke avklare sykepengegrunnlaget fordi det finnes ikke inntekter fra aktuell arbeidsgiver", beregningsperiode)
-        } else {
-            Uavklart(FORSTÅR_IKKE_DATA, "Inntekter i perioden i tillegg til aktuell arbeidsgiver", "Kan ikke avklare sykepengegrunnlaget fordi det andre inntekter i arbeidsgiverperioden i tillegg til aktuell arbeidsgiver", beregningsperiode)
-        }
-    } else if (beregningsperiode.inntekter.keys.firstOrNull { it == arbeidsgiver.orgnummer } == null) {
-        return Uavklart(HAR_IKKE_DATA, "Ingen inntekter fra aktuell arbeidsgiver", "Kan ikke avklare sykepengegrunnlaget fordi det finnes ikke inntekter fra aktuell arbeidsgiver", beregningsperiode)
-    }
-
-    val inntekterForArbeidsgiver = beregningsperiode.inntekter.getValue(arbeidsgiver.orgnummer)
-
-    if (inntekterForArbeidsgiver.size != 3) {
-        return Uavklart(FALLER_UTENFOR_MVP, "Ikke tre måneder med inntekter", "Kan ikke avklare sykepengegrunnlaget fordi vi forventer inntekter fra tre måneder", beregningsperiode)
-    } else {
-        val inntekterFraTreMånederFør = inntekterForArbeidsgiver[treMånederFør]
-        val inntekterFraToMånederFør = inntekterForArbeidsgiver[treMånederFør.plusMonths(1)]
-        val inntekterFraEnMånedFør = inntekterForArbeidsgiver[treMånederFør.plusMonths(2)]
-
-        if (inntekterFraTreMånederFør == null || inntekterFraToMånederFør == null || inntekterFraEnMånedFør == null) {
-            return Uavklart(HAR_IKKE_DATA, "Mangler inntekter for minst én av tre foregående måneder", "Kan ikke avklare sykepengegrunnlaget fordi vi forventer inntekter fra tre måneder før", beregningsperiode)
-        }
-
-        if (inntekterFraTreMånederFør.isEmpty() || inntekterFraToMånederFør.isEmpty() || inntekterFraEnMånedFør.isEmpty()) {
-            return Uavklart(HAR_IKKE_DATA, "Mangler inntekter for minst én av tre foregående måneder", "Kan ikke avklare sykepengegrunnlaget fordi vi forventer inntekter fra tre måneder før", beregningsperiode)
-        }
-
-        val sumInntekterTreMånederFør = inntekterFraTreMånederFør.fold(BigDecimal.ZERO) { acc, current ->
-            acc.add(current.beløp)
-        }
-        val sumInntekterToMånederFør = inntekterFraToMånederFør.fold(BigDecimal.ZERO) { acc, current ->
-            acc.add(current.beløp)
-        }
-        val sumInntekterEnMånedFør = inntekterFraEnMånedFør.fold(BigDecimal.ZERO) { acc, current ->
-            acc.add(current.beløp)
-        }
-
-        // § 8-28 andre ledd
-        val aktuellMånedsinntekt = sumInntekterTreMånederFør
-                .add(sumInntekterToMånederFør)
-                .add(sumInntekterEnMånedFør)
-                .divide(BigDecimal.valueOf(3), RoundingMode.HALF_UP)
-                .longValueExact(RoundingMode.HALF_UP)
+    // § 8-28 andre ledd
+    val aktuellMånedsinntekt = gruppertEtterMåned.flatMap { it.value }
+            .fold(BigDecimal.ZERO) { acc, current ->
+                acc.add(current.beløp)
+            }
+            .divide(BigDecimal.valueOf(3), RoundingMode.HALF_UP)
+            .longValueExact(RoundingMode.HALF_UP)
 
         return Vurdering.Avklart(aktuellMånedsinntekt, paragraf_8_28_andre_ledd, beregningsperiode, "SPA")
-    }
 }
 
-fun fastsettSammenligningsgrunnlag(førsteSykdomsdag: LocalDate, sammenligningsgrunnlag: List<Inntekt>) : Vurdering<Long, Beregningsperiode> {
-    val enMånedFør = førsteSykdomsdag.minusMonths(1)
-            .yearMonth()
-    val tolvMånederFør = førsteSykdomsdag.minusMonths(12)
-            .yearMonth()
-
-    val beregningsperiode = sammenligningsgrunnlag.filter { inntekt ->
-        inntekt.utbetalingsperiode in tolvMånederFør..enMånedFør
-    }.groupBy { inntekt ->
-        inntekt.virksomhet.identifikator
-    }.mapValues { entry ->
-        entry.value.groupBy {  inntekt ->
-            inntekt.utbetalingsperiode
-        }
-    }.let {
-        Beregningsperiode(it, "§ 8-30 andre ledd - rapportert inntekt (se § 8-29) til a-ordningen etter reglene i a-opplysningsloven de siste tolv kalendermånedene før arbeidsuførheten inntraff (${førsteSykdomsdag}) legges til grunn.")
-    }
-
-    return Vurdering.Avklart(beregningsperiode.inntekter
-            .flatMap {
-                it.value.flatMap {
-                    it.value
-                }
-            }.map {
-                it.beløp
-            }.reduce(BigDecimal::add).longValueExact(RoundingMode.HALF_UP), "§ 8-30 andre ledd", beregningsperiode, "SPA")
+fun fastsettSammenligningsgrunnlag(sammenligningsgrunnlag: List<Inntekt>) : Vurdering<Long, List<Inntekt>> {
+    return Vurdering.Avklart(sammenligningsgrunnlag
+            .fold(BigDecimal.ZERO) { acc, current ->
+                acc.add(current.beløp)
+            }
+            .longValueExact(RoundingMode.HALF_UP), "§ 8-30 andre ledd", sammenligningsgrunnlag, "SPA")
 }
 
 val paragraf_8_30_første_ledd = "§ 8-30 første ledd"
 // § 8-30 første ledd
-fun fastsettingAvSykepengegrunnlagetNårTrygdenYterSykepenger(sammenligningsgrunnlag: Vurdering.Avklart<Long, Beregningsperiode>,
-                                                             beregnetAktuellMånedsinntekt: Vurdering.Avklart<Long, Beregningsperiode>): Vurdering<Long, Beregningsperiode> {
+fun fastsettingAvSykepengegrunnlagetNårTrygdenYterSykepenger(sammenligningsgrunnlag: Vurdering.Avklart<Long, List<Inntekt>>,
+                                                             beregnetAktuellMånedsinntekt: Vurdering.Avklart<Long, List<Inntekt>>): Vurdering<Long, List<Inntekt>> {
     val omregnetÅrsinntekt = beregnetAktuellMånedsinntekt.fastsattVerdi * 12
 
     val rapportertInntekt = sammenligningsgrunnlag.fastsattVerdi
@@ -161,7 +90,5 @@ fun fastsettingAvSykepengegrunnlagetNårTrygdenYterSykepenger(sammenligningsgrun
     return Vurdering.Avklart(omregnetÅrsinntekt, paragraf_8_30_første_ledd, beregnetAktuellMånedsinntekt.grunnlag, "SPA")
 }
 
-data class Beregningsperiode(val inntekter: Map<String, Map<YearMonth, List<Inntekt>>>, val begrunnelse: String)
-
-data class Sykepengegrunnlag(val sykepengegrunnlagNårTrygdenYter: Vurdering.Avklart<Long, Beregningsperiode>, val sykepengegrunnlagIArbeidsgiverperioden: Vurdering.Avklart<Long, Beregningsperiode>)
+data class Sykepengegrunnlag(val sykepengegrunnlagNårTrygdenYter: Vurdering.Avklart<Long, List<Inntekt>>, val sykepengegrunnlagIArbeidsgiverperioden: Vurdering.Avklart<Long, List<Inntekt>>)
 

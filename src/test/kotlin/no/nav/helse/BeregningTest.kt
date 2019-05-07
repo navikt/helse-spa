@@ -1,11 +1,13 @@
 package no.nav.helse
 
 import arrow.core.Either
-import no.nav.helse.behandling.*
+import no.nav.helse.behandling.AvklarteVerdier
+import no.nav.helse.behandling.Behandlingsgrunnlag
+import no.nav.helse.behandling.Tpsfakta
+import no.nav.helse.behandling.sykepengeBeregning
 import no.nav.helse.behandling.søknad.Sykepengesøknad
 import no.nav.helse.dto.*
 import no.nav.helse.fastsetting.Aldersgrunnlag
-import no.nav.helse.fastsetting.Beregningsperiode
 import no.nav.helse.fastsetting.Opptjeningsgrunnlag
 import no.nav.helse.fastsetting.Sykepengegrunnlag
 import no.nav.helse.fastsetting.Vurdering.Avklart
@@ -75,11 +77,11 @@ class BeregningTest {
                             medlemsskap = Avklart(fastsattVerdi = true, begrunnelse = "derfor", fastsattAv = "test", grunnlag = Tpsfakta(LocalDate.parse("1980-01-01"), "NOR", "NOR", "BOSA", null)),
                             sykepengegrunnlag = Avklart(fastsattVerdi =
                             Sykepengegrunnlag(
-                                    sykepengegrunnlagNårTrygdenYter = Avklart(fastsattVerdi = årslønn, grunnlag = Beregningsperiode(emptyMap(), "derfor"), begrunnelse = "derfor", fastsattAv = "test"),
-                                    sykepengegrunnlagIArbeidsgiverperioden = Avklart(fastsattVerdi = årslønn, grunnlag = Beregningsperiode(emptyMap(), "derfor"), begrunnelse = "derfor", fastsattAv = "test")),
+                                    sykepengegrunnlagNårTrygdenYter = Avklart(fastsattVerdi = årslønn, grunnlag = emptyList(), begrunnelse = "derfor", fastsattAv = "test"),
+                                    sykepengegrunnlagIArbeidsgiverperioden = Avklart(fastsattVerdi = årslønn, grunnlag = emptyList(), begrunnelse = "derfor", fastsattAv = "test")),
                                     fastsattAv = "test",
                                     begrunnelse = "derfor",
-                                    grunnlag = Beregningsperiode(emptyMap(), "derfor")),
+                                    grunnlag = emptyList()),
                             alder = Avklart(fastsattVerdi = 40, grunnlag = Aldersgrunnlag(parse("1979-01-01")), begrunnelse = "derfor", fastsattAv = "test"),
                             arbeidsforhold = Avklart(fastsattVerdi = true, grunnlag = arbeidsforholdUtenVerdi, begrunnelse = "derfor", fastsattAv = "test"),
                             maksdato = Avklart(fastsattVerdi = parse("2019-03-03"),

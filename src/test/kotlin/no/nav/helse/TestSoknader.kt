@@ -3,7 +3,10 @@ package no.nav.helse
 import no.nav.helse.behandling.*
 import no.nav.helse.behandling.søknad.Sykepengesøknad
 import no.nav.helse.dto.*
-import no.nav.helse.fastsetting.*
+import no.nav.helse.fastsetting.Aldersgrunnlag
+import no.nav.helse.fastsetting.Opptjeningsgrunnlag
+import no.nav.helse.fastsetting.Sykepengegrunnlag
+import no.nav.helse.fastsetting.Vurdering
 import no.nav.helse.oppslag.arbeidinntektytelse.dto.ArbeidInntektYtelseDTO
 import no.nav.helse.oppslag.arbeidinntektytelse.dto.ArbeidsforholdDTO
 import no.nav.helse.sykepenger.beregning.Beregningsresultat
@@ -66,19 +69,15 @@ val enkleAvklarteVerdier = AvklarteVerdier(
                                 fastsattVerdi = 1L,
                                 fastsattAv = "test",
                                 begrunnelse = "whatevs",
-                                grunnlag = Beregningsperiode(
-                                        inntekter = emptyMap(),
-                                        begrunnelse = "whatevs")),
+                                grunnlag = emptyList()),
                         sykepengegrunnlagIArbeidsgiverperioden = Vurdering.Avklart(
                                 fastsattVerdi = 1L,
                                 fastsattAv = "test",
                                 begrunnelse = "whatevs",
-                                grunnlag = Beregningsperiode(
-                                        inntekter = emptyMap(),
-                                        begrunnelse = "whatevs"))),
+                                grunnlag = emptyList())),
                 fastsattAv = "test",
                 begrunnelse = "whatevs",
-                grunnlag = Beregningsperiode(inntekter = emptyMap(), begrunnelse = "whatevs")),
+                grunnlag = emptyList()),
         maksdato = Vurdering.Avklart(fastsattVerdi = LocalDate.now().plusDays(248), fastsattAv = "test", begrunnelse = "whatevs", grunnlag = Grunnlagsdata(førsteFraværsdag = LocalDate.now(), førsteSykepengedag = LocalDate.now(), tidligerePerioder = emptyList(), yrkesstatus = Yrkesstatus.ARBEIDSTAKER, personensAlder = 50)),
         sykepengehistorikk = emptyList())
 
