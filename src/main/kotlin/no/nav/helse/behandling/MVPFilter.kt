@@ -16,7 +16,7 @@ fun FaktagrunnlagResultat.mvpFilter(): Either<Behandlingsfeil, FaktagrunnlagResu
     val mvpFeil = mvpKriterier.filter { it.isNotEmpty() }.flatMap { it }
 
     return if (mvpFeil.isNotEmpty()) {
-        Either.Left(Behandlingsfeil.mvpFilter(originalSøknad.id, originalSøknad.type, mvpFeil))
+        Either.Left(Behandlingsfeil.mvpFilter(originalSøknad, mvpFeil))
     } else {
         Either.Right(this)
     }

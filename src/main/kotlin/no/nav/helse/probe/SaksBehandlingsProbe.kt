@@ -83,7 +83,6 @@ class SaksbehandlingProbe(env: Environment) {
     }
 
     fun behandlingsFeilMedType(behandlingsfeil: Behandlingsfeil) {
-        log.info(behandlingsfeil.feilmelding)
         with(behandlingsfeil) {
             when (this) {
                 is MVPFilterFeil -> mvpFilter()
@@ -118,12 +117,14 @@ class SaksbehandlingProbe(env: Environment) {
                 "soknadId" to soknadId
         ), mapOf(
                 "steg" to "mvpFilter",
-                "type" to søknadstype
+                "type" to søknad.type
         ))
+
+        log.info("Søknad for aktør ${søknad.aktorId} faller ut av MVP")
     }
 
     private fun RegisterFeil.registerFeil() {
-        log.warn(throwable.message, throwable)
+        log.warn("$feilmelding: ${throwable.message}", throwable)
 
         behandlingsfeilCounter.labels("register").inc()
         influxMetricReporter.sendDataPoint("behandlingsfeil.event", mapOf(
@@ -185,6 +186,7 @@ class SaksbehandlingProbe(env: Environment) {
                 "steg" to "beregning",
                 "type" to vilkårsprøving.originalSøknad.type
         ))
+        log.info(feilmelding)
     }
 
     fun vedtakBehandlet(vedtak: SykepengeVedtak) {

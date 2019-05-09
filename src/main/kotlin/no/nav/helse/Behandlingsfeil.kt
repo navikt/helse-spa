@@ -1,6 +1,5 @@
 package no.nav.helse
 
-import com.fasterxml.jackson.databind.JsonNode
 import no.nav.helse.behandling.Behandlingsgrunnlag
 import no.nav.helse.behandling.UavklarteFakta
 import no.nav.helse.behandling.mvp.MVPFeil
@@ -10,7 +9,7 @@ interface Behandlingsfeil {
     val soknadId: String
     val feilmelding: String
 
-    data class MVPFilterFeil(val søknadstype: String, val mvpFeil: List<MVPFeil>, override val feilmelding: String, override val soknadId: String): Behandlingsfeil
+    data class MVPFilterFeil(val søknad: Sykepengesøknad, val mvpFeil: List<MVPFeil>, override val feilmelding: String, override val soknadId: String = søknad.id): Behandlingsfeil
 
     data class RegisterFeil(override val feilmelding: String, val throwable: Throwable, val søknad: Sykepengesøknad, override val soknadId: String = søknad.id): Behandlingsfeil
 
@@ -23,7 +22,7 @@ interface Behandlingsfeil {
 
     companion object {
 
-        fun mvpFilter(søknadId: String, søknadstype: String, mvpFeil: List<MVPFeil>) = MVPFilterFeil(søknadstype, mvpFeil, "Søknad faller ut fordi den passer ikke for MVP", søknadId)
+        fun mvpFilter(søknad: Sykepengesøknad, mvpFeil: List<MVPFeil>) = MVPFilterFeil(søknad, mvpFeil, "Søknad faller ut fordi den passer ikke for MVP")
 
         // vi klarte ikke avklare alle fakta
         fun avklaringsfeil(uavklarteFakta: UavklarteFakta) = Avklaringsfeil(uavklarteFakta, "Kunne ikke fastsette alle fakta.")

@@ -28,7 +28,7 @@ fun Sykepengesøknad.behandle(oppslag: Oppslag, probe: SaksbehandlingProbe): Eit
 
 fun Sykepengesøknad.mvpFilter() = when (type) {
     "ARBEIDSTAKERE" -> right()
-    else -> mvpFilter(id, type, listOf(
+    else -> mvpFilter(this, listOf(
             MVPFeil("Søknadstype - $type", "Søknaden er av feil type")
     )).left()
 }
