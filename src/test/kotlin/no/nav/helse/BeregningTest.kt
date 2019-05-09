@@ -11,6 +11,7 @@ import no.nav.helse.fastsetting.Aldersgrunnlag
 import no.nav.helse.fastsetting.Opptjeningsgrunnlag
 import no.nav.helse.fastsetting.Sykepengegrunnlag
 import no.nav.helse.fastsetting.Vurdering.Avklart
+import no.nav.helse.oppslag.arbeidinntektytelse.dto.ArbeidsforholdDTO
 import no.nav.helse.oppslag.getGrunnbeløpForDato
 import no.nav.nare.core.evaluations.Evaluering
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -18,6 +19,7 @@ import org.junit.jupiter.api.Test
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.LocalDate
+import java.time.LocalDate.now
 import java.time.LocalDate.parse
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -83,7 +85,7 @@ class BeregningTest {
                                     begrunnelse = "derfor",
                                     grunnlag = emptyList()),
                             alder = Avklart(fastsattVerdi = 40, grunnlag = Aldersgrunnlag(parse("1979-01-01")), begrunnelse = "derfor", fastsattAv = "test"),
-                            arbeidsforhold = Avklart(fastsattVerdi = true, grunnlag = arbeidsforholdUtenVerdi, begrunnelse = "derfor", fastsattAv = "test"),
+                            arbeidsforhold = Avklart(fastsattVerdi = ArbeidsforholdDTO("", no.nav.helse.oppslag.arbeidinntektytelse.dto.ArbeidsgiverDTO("", ""), now(), null), grunnlag = arbeidsforholdUtenVerdi, begrunnelse = "derfor", fastsattAv = "test"),
                             maksdato = Avklart(fastsattVerdi = parse("2019-03-03"),
                                     grunnlag = Grunnlagsdata(
                                             førsteFraværsdag = parse("2020-01-01"),
@@ -95,7 +97,7 @@ class BeregningTest {
                                     begrunnelse = "derfor",
                                     fastsattAv = "test"),
                             sykepengehistorikk = emptyList(),
-                            opptjeningstid = Avklart(fastsattVerdi = 20, grunnlag = Opptjeningsgrunnlag(førsteSykdomsdag = parse("2018-12-01"), arbeidsforhold = emptyList()), begrunnelse = "defor", fastsattAv = "test")),
+                            opptjeningstid = Avklart(fastsattVerdi = 20, grunnlag = Opptjeningsgrunnlag(førsteSykdomsdag = parse("2018-12-01"), arbeidsforhold = Avklart(fastsattVerdi = ArbeidsforholdDTO("", no.nav.helse.oppslag.arbeidinntektytelse.dto.ArbeidsgiverDTO("", ""), now(), null), grunnlag = arbeidsforholdUtenVerdi, begrunnelse = "derfor", fastsattAv = "test")), begrunnelse = "defor", fastsattAv = "test")),
                     vilkårsprøving = Evaluering.ja("claro"))
 
 }

@@ -10,50 +10,15 @@ import java.time.LocalDate
 class OpptjeningstidTest {
 
     @Test
-    fun `kan ikke fastsette opptjeningstid om søker ikke har noen arbeidsgivere`() {
+    fun `kan ikke fastsette opptjeningstid om arbeidsforholdet er uavklart`() {
         val førsteSykdomsdag = LocalDate.parse("2019-01-01")
-        val arbeidsforhold = emptyList<ArbeidsforholdDTO>()
+        val arbeidsforhold = Vurdering.Uavklart<ArbeidsforholdDTO, List<ArbeidsforholdDTO>>(Vurdering.Uavklart.Årsak.HAR_IKKE_DATA, "UKJENT", "", emptyList())
         val actual = vurderOpptjeningstid(Opptjeningsgrunnlag(førsteSykdomsdag, arbeidsforhold))
 
         when (actual) {
             is Vurdering.Uavklart -> {
-                assertEquals("Søker har 0 arbeidsforhold og vi forventer kun 1", actual.begrunnelse)
-                assertEquals(Vurdering.Uavklart.Årsak.FALLER_UTENFOR_MVP, actual.årsak)
-            }
-            is Vurdering.Avklart -> fail { "Expected Vurdering.Uavklart to be returned" }
-        }
-    }
-
-    @Test
-    fun `kan ikke fastsette opptjeningstid om søker har flere enn 1 arbeidsgiver`() {
-        val førsteSykdomsdag = LocalDate.parse("2019-01-01")
-        val arbeidsforhold = listOf(
-                ArbeidsforholdDTO("Arbeidstaker", ArbeidsgiverDTO("11223344", "Organisasjon"), LocalDate.now(), null),
-                ArbeidsforholdDTO("Arbeidstaker", ArbeidsgiverDTO("11223344", "Organisasjon"), LocalDate.now(), null)
-        )
-        val actual = vurderOpptjeningstid(Opptjeningsgrunnlag(førsteSykdomsdag, arbeidsforhold))
-
-        when (actual) {
-            is Vurdering.Uavklart -> {
-                assertEquals("Søker har 2 arbeidsforhold og vi forventer kun 1", actual.begrunnelse)
-                assertEquals(Vurdering.Uavklart.Årsak.FALLER_UTENFOR_MVP, actual.årsak)
-            }
-            is Vurdering.Avklart -> fail { "Expected Vurdering.Uavklart to be returned" }
-        }
-    }
-
-    @Test
-    fun `kan ikke fastsette opptjeningstid om søker har avsluttet arbeidsforholdet`() {
-        val førsteSykdomsdag = LocalDate.parse("2019-01-01")
-        val arbeidsforhold = listOf(
-                ArbeidsforholdDTO("Arbeidstaker", ArbeidsgiverDTO("11223344", "Organisasjon"), LocalDate.now(), LocalDate.now())
-        )
-        val actual = vurderOpptjeningstid(Opptjeningsgrunnlag(førsteSykdomsdag, arbeidsforhold))
-
-        when (actual) {
-            is Vurdering.Uavklart -> {
-                assertEquals("Søker har ett arbeidsforhold som han eller hun har avsluttet", actual.begrunnelse)
-                assertEquals(Vurdering.Uavklart.Årsak.FALLER_UTENFOR_MVP, actual.årsak)
+                assertEquals("Kan ikke avklare opptjeningstid når arbeidsforholdet ikke er avklart", actual.begrunnelse)
+                assertEquals(Vurdering.Uavklart.Årsak.HAR_IKKE_DATA, actual.årsak)
             }
             is Vurdering.Avklart -> fail { "Expected Vurdering.Uavklart to be returned" }
         }
@@ -65,7 +30,9 @@ class OpptjeningstidTest {
         val arbeidsforhold = listOf(
                 ArbeidsforholdDTO("Arbeidstaker", ArbeidsgiverDTO("11223344", "Organisasjon"), LocalDate.parse("2018-12-01"), null)
         )
-        val actual = vurderOpptjeningstid(Opptjeningsgrunnlag(førsteSykdomsdag, arbeidsforhold))
+        val arbeidsforholdVurdering = Vurdering.Avklart(arbeidsforhold[0], "", arbeidsforhold, "SPA")
+
+        val actual = vurderOpptjeningstid(Opptjeningsgrunnlag(førsteSykdomsdag, arbeidsforholdVurdering))
 
         when (actual) {
             is Vurdering.Avklart -> {

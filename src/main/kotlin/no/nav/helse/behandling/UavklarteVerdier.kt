@@ -11,7 +11,7 @@ data class UavklarteVerdier(
         val alder: Vurdering<Alder, Aldersgrunnlag>,
         val maksdato: Vurdering<LocalDate, Grunnlagsdata?>,
         val sykepengehistorikk: List<AnvistPeriode>,
-        val arbeidsforhold: Vurdering<Boolean, List<ArbeidsforholdDTO>>,
+        val arbeidsforhold: Vurdering<ArbeidsforholdDTO, List<ArbeidsforholdDTO>>,
         val opptjeningstid: Vurdering<Opptjeningstid, Opptjeningsgrunnlag>,
         val sykepengegrunnlag: Vurdering<*, *>
 ) {

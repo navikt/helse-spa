@@ -80,7 +80,7 @@ fun vurderFakta(fakta: FaktagrunnlagResultat): Either<Behandlingsfeil, AvklarteF
             vurderingerCounter.labels("arbeidsforhold", "avklart").inc()
         }
     }
-    val opptjeningstid = vurderOpptjeningstid(Opptjeningsgrunnlag(fakta.originalSøknad.startSyketilfelle, fakta.faktagrunnlag.arbeidInntektYtelse.arbeidsforhold)).also {
+    val opptjeningstid = vurderOpptjeningstid(Opptjeningsgrunnlag(fakta.originalSøknad.startSyketilfelle, arbeidsforhold)).also {
         if (it is Vurdering.Uavklart) {
             vurderingerCounter.labels("opptjeningstid", "uavklart").inc()
         } else {
@@ -129,7 +129,7 @@ fun vurderFakta(fakta: FaktagrunnlagResultat): Either<Behandlingsfeil, AvklarteF
                 avklarteVerdier = AvklarteVerdier(
                         medlemsskap = medlemsskap as Vurdering.Avklart<Boolean, Tpsfakta>,
                         alder = alder as Vurdering.Avklart<Alder, Aldersgrunnlag>,
-                        arbeidsforhold = arbeidsforhold as Vurdering.Avklart<Boolean, List<ArbeidsforholdDTO>>,
+                        arbeidsforhold = arbeidsforhold as Vurdering.Avklart<ArbeidsforholdDTO, List<ArbeidsforholdDTO>>,
                         opptjeningstid = opptjeningstid as Vurdering.Avklart<Opptjeningstid, Opptjeningsgrunnlag>,
                         sykepengegrunnlag = sykepengegrunnlag as Vurdering.Avklart<Sykepengegrunnlag, List<Inntekt>>,
                         sykepengehistorikk = fakta.faktagrunnlag.sykepengehistorikk,

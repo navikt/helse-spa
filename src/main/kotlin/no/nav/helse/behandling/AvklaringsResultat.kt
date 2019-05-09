@@ -21,7 +21,7 @@ data class AvklarteVerdier(
         val alder: Vurdering.Avklart<Alder, Aldersgrunnlag>,
         val maksdato: Vurdering.Avklart<LocalDate, Grunnlagsdata>,
         val sykepengehistorikk: List<AnvistPeriode>,
-        val arbeidsforhold: Vurdering.Avklart<Boolean, List<ArbeidsforholdDTO>>,
+        val arbeidsforhold: Vurdering.Avklart<ArbeidsforholdDTO, List<ArbeidsforholdDTO>>,
         val opptjeningstid: Vurdering.Avklart<Opptjeningstid, Opptjeningsgrunnlag>,
         val sykepengegrunnlag: Vurdering.Avklart<Sykepengegrunnlag, List<Inntekt>>
 )

@@ -61,8 +61,8 @@ val soknadUtenVerdi = FaktagrunnlagResultat(
 val enkleAvklarteVerdier = AvklarteVerdier(
         alder = Vurdering.Avklart(fastsattVerdi = 50, fastsattAv = "test", begrunnelse = "whatevs", grunnlag = Aldersgrunnlag(fodselsdato = LocalDate.now().minusYears(50))),
         medlemsskap = Vurdering.Avklart(fastsattVerdi = true, fastsattAv = "test", begrunnelse = "whatevs", grunnlag = Tpsfakta(LocalDate.now().minusYears(50), "NOR", "NOR", "BOSA", null)),
-        arbeidsforhold = Vurdering.Avklart(fastsattVerdi = true, fastsattAv = "test", begrunnelse = "whatevs", grunnlag = emptyList()),
-        opptjeningstid = Vurdering.Avklart(fastsattVerdi = 25L, fastsattAv = "test", begrunnelse = "whatevs", grunnlag = Opptjeningsgrunnlag(førsteSykdomsdag = LocalDate.now(), arbeidsforhold = emptyList())),
+        arbeidsforhold = Vurdering.Avklart(fastsattVerdi = ArbeidsforholdDTO("", no.nav.helse.oppslag.arbeidinntektytelse.dto.ArbeidsgiverDTO("", ""), LocalDate.now(), null), grunnlag = arbeidsforholdUtenVerdi, begrunnelse = "derfor", fastsattAv = "test"),
+        opptjeningstid = Vurdering.Avklart(fastsattVerdi = 25L, fastsattAv = "test", begrunnelse = "whatevs", grunnlag = Opptjeningsgrunnlag(førsteSykdomsdag = LocalDate.now(), arbeidsforhold = Vurdering.Avklart(fastsattVerdi = ArbeidsforholdDTO("", no.nav.helse.oppslag.arbeidinntektytelse.dto.ArbeidsgiverDTO("", ""), LocalDate.now(), null), grunnlag = arbeidsforholdUtenVerdi, begrunnelse = "derfor", fastsattAv = "test"))),
         sykepengegrunnlag = Vurdering.Avklart(
                 fastsattVerdi = Sykepengegrunnlag(
                         sykepengegrunnlagNårTrygdenYter = Vurdering.Avklart(

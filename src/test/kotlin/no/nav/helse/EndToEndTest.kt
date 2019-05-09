@@ -263,9 +263,9 @@ class EndToEndTest {
         }
     }
 
-    private fun checkArbeidsforholdVurdering(arbeidsforholdVurdering: Vurdering.Avklart<Boolean, List<ArbeidsforholdDTO>>) {
-        assert(arbeidsforholdVurdering.fastsattVerdi).isTrue()
-        assert(arbeidsforholdVurdering.begrunnelse).isEqualTo("Søker har et aktivt arbeidsforhold hos MATBUTIKKEN")
+    private fun checkArbeidsforholdVurdering(arbeidsforholdVurdering: Vurdering.Avklart<ArbeidsforholdDTO, List<ArbeidsforholdDTO>>) {
+        assert(arbeidsforholdVurdering.fastsattVerdi).isEqualTo(stubbet_arbeidsforhold)
+        assert(arbeidsforholdVurdering.begrunnelse).isEqualTo("Søker har et arbeidsforhold hos MATBUTIKKEN")
         assert(arbeidsforholdVurdering.vurderingstidspunkt).isBetween(LocalDateTime.now().minusHours(1), LocalDateTime.now().plusHours(1))
         assert(arbeidsforholdVurdering.fastsattAv).isEqualTo("SPA")
 
@@ -284,7 +284,7 @@ class EndToEndTest {
 
         val opptjeningsgrunnlag = opptjeningstidVurdering.grunnlag
         assert(opptjeningsgrunnlag.førsteSykdomsdag).isEqualTo(første_dag_i_syketilfelle)
-        checkArbeidsforhold(opptjeningsgrunnlag.arbeidsforhold)
+        checkArbeidsforholdVurdering((opptjeningsgrunnlag.arbeidsforhold as Vurdering.Avklart))
     }
 
     private fun checkSykepengeliste(sykepengeliste: List<AnvistPeriode>) {

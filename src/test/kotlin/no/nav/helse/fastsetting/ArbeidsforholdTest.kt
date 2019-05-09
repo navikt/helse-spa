@@ -34,7 +34,7 @@ class ArbeidsforholdTest {
         val faktagrunnlag = Faktagrunnlag(tps = tpsFaktaUtenVerdi, beregningsperiode = emptyList(), sammenligningsperiode = emptyList(), arbeidInntektYtelse = arbeidInntektYtelse,
                 sykepengehistorikk = emptyList())
         val vurdering = vurderArbeidsforhold(FaktagrunnlagResultat(originalSoknad, faktagrunnlag))
-        if (vurdering is Vurdering.Avklart) assertThat(vurdering.fastsattVerdi).isTrue() else fail("Feil vurdering!")
+        if (vurdering is Vurdering.Avklart) assertThat(vurdering.fastsattVerdi).isEqualTo(arbeidsforhold[0]) else fail("Feil vurdering!")
 
     }
 
@@ -85,7 +85,7 @@ class ArbeidsforholdTest {
         val faktagrunnlag = Faktagrunnlag(tps = tpsFaktaUtenVerdi, beregningsperiode = emptyList(), sammenligningsperiode = emptyList(), arbeidInntektYtelse = arbeidInntektYtelse,
                 sykepengehistorikk = emptyList())
         val vurdering = vurderArbeidsforhold(FaktagrunnlagResultat(originalSoknad, faktagrunnlag))
-        if (vurdering is Vurdering.Avklart) assertThat(vurdering.fastsattVerdi).isTrue() else fail("Feil vurdering!")
+        if (vurdering is Vurdering.Avklart) assertThat(vurdering.fastsattVerdi).isEqualTo(arbeidsforhold[0]) else fail("Feil vurdering!")
 
     }
 }
