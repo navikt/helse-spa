@@ -27,6 +27,6 @@ fun sjekkSvarISøknaden(søknad: Sykepengesøknad): List<MVPFeil> {
             feil.add(MVPFeil("Har utenlandsopphold", "Søker har opplyst at han/hun har utenlandsopphold"))
         }
 
-        return feil
+        feil
     }
 }
