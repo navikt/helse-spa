@@ -13,8 +13,10 @@ fun FaktagrunnlagResultat.mvpFilter(): Either<Behandlingsfeil, FaktagrunnlagResu
             vurderMVPKriterierForAndreYtelser(faktagrunnlag.arbeidInntektYtelse.ytelser)
     )
 
-    return if (mvpKriterier.any { it != null }) {
-        Either.Left(Behandlingsfeil.mvpFilter(originalSøknad.id, originalSøknad.type, mvpKriterier.filterNotNull()))
+    val mvpFeil = mvpKriterier.filter { it.isNotEmpty() }.flatMap { it }
+
+    return if (mvpFeil.isNotEmpty()) {
+        Either.Left(Behandlingsfeil.mvpFilter(originalSøknad.id, originalSøknad.type, mvpFeil))
     } else {
         Either.Right(this)
     }
