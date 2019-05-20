@@ -4,7 +4,7 @@ import no.nav.helse.oppslag.arbeidinntektytelse.dto.YtelseDTO
 
 fun vurderMVPKriterierForAndreYtelser(ytelser: List<YtelseDTO>): List<MVPFeil> {
     if (ytelser.isNotEmpty()) {
-        listOf(MVPFeil("Andre ytelser", "Søker har ${ytelser.size} ytelseutbetalinger fra det offentlige"))
+        return listOf(MVPFeil("Andre ytelser", "Søker har ${ytelser.size} ytelseutbetalinger fra det offentlige"))
     }
     return emptyList()
 }
