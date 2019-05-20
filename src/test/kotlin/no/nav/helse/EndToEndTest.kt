@@ -127,6 +127,7 @@ class EndToEndTest {
         inntektStub(aktørId)
         arbeidsforholdStub(aktørId)
         sykepengehistorikkStub(aktørId)
+        ytelserStub(aktørId)
 
         val innsendtSøknad = produserSykepengesøknadV2(aktørId)
 
@@ -479,6 +480,13 @@ class EndToEndTest {
         stubFor(any(urlPathEqualTo("/api/inntekt/$aktørId/sammenligningsgrunnlag"))
                 .willReturn(okJson(defaultObjectMapper.writeValueAsString(
                         InntektsoppslagResultat(stubbet_inntekt_sammenligningsgrunnlag)
+                ))))
+    }
+
+    private fun ytelserStub(aktørId: String) {
+        stubFor(any(urlPathEqualTo("/api/ytelser/$aktørId"))
+                .willReturn(okJson(defaultObjectMapper.writeValueAsString(
+                        YtelserDTO(infotrygd = emptyList())
                 ))))
     }
 
