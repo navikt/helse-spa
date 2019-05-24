@@ -9,10 +9,10 @@ fun vurderMVPKriterierForAndreYtelser(ytelser: List<YtelseDTO>, ytelserFraArenaO
         feil.add(MVPFeil("Andre ytelser", "Søker har ${ytelser.size} ytelseutbetalinger fra det offentlige"))
     }
     if (ytelserFraArenaOgInfotrygd.infotrygd.isNotEmpty()) {
-        feil.add(MVPFeil("Andre ytelser (Infotrygd)", "Søker har ${ytelserFraArenaOgInfotrygd.infotrygd} saker i Infotrygd"))
+        feil.add(MVPFeil("Andre ytelser (Infotrygd)", "Søker har ${ytelserFraArenaOgInfotrygd.infotrygd.size} saker i Infotrygd"))
     }
     if (ytelserFraArenaOgInfotrygd.arena.isNotEmpty()) {
-        feil.add(MVPFeil("Andre ytelser (Arena)", "Søker har ${ytelserFraArenaOgInfotrygd.arena} saker i Arena"))
+        feil.add(MVPFeil("Andre ytelser (Arena)", "Søker har ${ytelserFraArenaOgInfotrygd.arena.size} saker i Arena"))
     }
     return feil
 }
