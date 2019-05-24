@@ -10,7 +10,7 @@ fun FaktagrunnlagResultat.mvpFilter(): Either<Behandlingsfeil, FaktagrunnlagResu
             vurderMVPKriterierForMedlemskap(faktagrunnlag.tps),
             vurderMVPKriterierForOpptjeningstid(originalSøknad.arbeidsgiver, faktagrunnlag.arbeidInntektYtelse.arbeidsforhold),
             vurderMVPKriterierForSykepengegrunnlaget(originalSøknad.startSyketilfelle, originalSøknad.soknadsperioder, faktagrunnlag.beregningsperiode),
-            vurderMVPKriterierForAndreYtelser(faktagrunnlag.arbeidInntektYtelse.ytelser)
+            vurderMVPKriterierForAndreYtelser(faktagrunnlag.arbeidInntektYtelse.ytelser, faktagrunnlag.ytelser)
     )
 
     val mvpFeil = mvpKriterier.filter { it.isNotEmpty() }.flatMap { it }

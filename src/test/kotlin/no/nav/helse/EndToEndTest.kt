@@ -486,7 +486,10 @@ class EndToEndTest {
     private fun ytelserStub(aktørId: String) {
         stubFor(any(urlPathEqualTo("/api/ytelser/$aktørId"))
                 .willReturn(okJson(defaultObjectMapper.writeValueAsString(
-                        YtelserDTO(infotrygd = emptyList())
+                        YtelserDTO(
+                                infotrygd = emptyList(),
+                                arena = emptyList()
+                        )
                 ))))
     }
 
