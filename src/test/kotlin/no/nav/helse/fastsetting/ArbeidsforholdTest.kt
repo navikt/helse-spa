@@ -31,8 +31,17 @@ class ArbeidsforholdTest {
                 ),
                 ytelser = emptyList()
         )
-        val faktagrunnlag = Faktagrunnlag(tps = tpsFaktaUtenVerdi, beregningsperiode = emptyList(), sammenligningsperiode = emptyList(), arbeidInntektYtelse = arbeidInntektYtelse,
-                sykepengehistorikk = emptyList())
+        val faktagrunnlag = Faktagrunnlag(
+                tps = tpsFaktaUtenVerdi,
+                beregningsperiode = emptyList(),
+                sammenligningsperiode = emptyList(),
+                arbeidInntektYtelse = arbeidInntektYtelse,
+                sykepengehistorikk = emptyList(),
+                ytelser = YtelserDTO(
+                        infotrygd = emptyList(),
+                        arena = emptyList()
+                )
+        )
         val vurdering = vurderArbeidsforhold(FaktagrunnlagResultat(originalSoknad, faktagrunnlag))
         if (vurdering is Vurdering.Avklart) assertThat(vurdering.fastsattVerdi).isEqualTo(arbeidsforhold[0]) else fail("Feil vurdering!")
 
@@ -55,8 +64,17 @@ class ArbeidsforholdTest {
                 ),
                 ytelser = emptyList()
         )
-        val faktagrunnlag = Faktagrunnlag(tps = tpsFaktaUtenVerdi, beregningsperiode = emptyList(), sammenligningsperiode = emptyList(), arbeidInntektYtelse = arbeidInntektYtelse,
-                sykepengehistorikk = emptyList())
+        val faktagrunnlag = Faktagrunnlag(
+                tps = tpsFaktaUtenVerdi,
+                beregningsperiode = emptyList(),
+                sammenligningsperiode = emptyList(),
+                arbeidInntektYtelse = arbeidInntektYtelse,
+                sykepengehistorikk = emptyList(),
+                ytelser = YtelserDTO(
+                        infotrygd = emptyList(),
+                        arena = emptyList()
+                )
+        )
         val vurdering = vurderArbeidsforhold(FaktagrunnlagResultat(originalSoknad, faktagrunnlag))
         if (vurdering is Vurdering.Uavklart) assertThat(vurdering.årsak== Vurdering.Uavklart.Årsak.HAR_IKKE_DATA).isTrue() else fail("Feil vurdering!")
 
@@ -82,8 +100,17 @@ class ArbeidsforholdTest {
                 ),
                 ytelser = emptyList()
         )
-        val faktagrunnlag = Faktagrunnlag(tps = tpsFaktaUtenVerdi, beregningsperiode = emptyList(), sammenligningsperiode = emptyList(), arbeidInntektYtelse = arbeidInntektYtelse,
-                sykepengehistorikk = emptyList())
+        val faktagrunnlag = Faktagrunnlag(
+                tps = tpsFaktaUtenVerdi,
+                beregningsperiode = emptyList(),
+                sammenligningsperiode = emptyList(),
+                arbeidInntektYtelse = arbeidInntektYtelse,
+                sykepengehistorikk = emptyList(),
+                ytelser = YtelserDTO(
+                        infotrygd = emptyList(),
+                        arena = emptyList()
+                )
+        )
         val vurdering = vurderArbeidsforhold(FaktagrunnlagResultat(originalSoknad, faktagrunnlag))
         if (vurdering is Vurdering.Avklart) assertThat(vurdering.fastsattVerdi).isEqualTo(arbeidsforhold[0]) else fail("Feil vurdering!")
 

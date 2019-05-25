@@ -21,7 +21,7 @@ class Oppslag(val sparkelBaseUrl: String, val stsClient: StsRestClient) {
                         hentSammenligningsgrunnlag().toEither { markerFeil(it) }.flatMap { sammenligningsperiode ->
                             hentArbeidInntektYtelse().toEither { markerFeil(it) }.flatMap { arbeidInntektYtelse ->
                                 hentSykepengehistorikk().toEither { markerFeil(it) }.flatMap { sykepengehistorikk ->
-                                    hentYtelser().toEither { markerFeil(it) }.flatMap {
+                                    hentYtelser().toEither { markerFeil(it) }.flatMap { ytelser ->
                                         Try {
                                             FaktagrunnlagResultat(
                                                     originalSøknad = søknad,
@@ -30,7 +30,8 @@ class Oppslag(val sparkelBaseUrl: String, val stsClient: StsRestClient) {
                                                             beregningsperiode = beregningsperiode,
                                                             sammenligningsperiode = sammenligningsperiode,
                                                             sykepengehistorikk = sykepengehistorikk,
-                                                            arbeidInntektYtelse = arbeidInntektYtelse
+                                                            arbeidInntektYtelse = arbeidInntektYtelse,
+                                                            ytelser = ytelser
                                                     ))
                                         }.toEither {
                                             Behandlingsfeil.registerFeil(it, søknad)

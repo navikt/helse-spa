@@ -9,6 +9,7 @@ import no.nav.helse.fastsetting.Sykepengegrunnlag
 import no.nav.helse.fastsetting.Vurdering
 import no.nav.helse.oppslag.arbeidinntektytelse.dto.ArbeidInntektYtelseDTO
 import no.nav.helse.oppslag.arbeidinntektytelse.dto.ArbeidsforholdDTO
+import no.nav.helse.oppslag.arbeidinntektytelse.dto.YtelserDTO
 import no.nav.helse.sykepenger.beregning.Beregningsresultat
 import no.nav.helse.sykepenger.beregning.Dagsats
 import no.nav.nare.core.evaluations.Evaluering
@@ -34,6 +35,10 @@ val faktagrunnlagUtenVerdi = Faktagrunnlag(
                 arbeidsforhold = arbeidsforholdUtenVerdi,
                 inntekter = emptyList(),
                 ytelser = emptyList()
+        ),
+        ytelser = YtelserDTO(
+                infotrygd = emptyList(),
+                arena = emptyList()
         )
 )
 
