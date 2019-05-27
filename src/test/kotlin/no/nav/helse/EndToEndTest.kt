@@ -190,7 +190,7 @@ class EndToEndTest {
         assert(aldersVurdering.grunnlag.fodselsdato).isEqualTo(stubbet_person.fdato)
     }
 
-    private fun checkMaksdato(alder: Alder, sykepengehistorikk: List<AnvistPeriode>, maksdato: Vurdering.Avklart<LocalDate, Grunnlagsdata>) {
+    private fun checkMaksdato(alder: Alder, sykepengehistorikk: List<AnvistPeriodeDTO>, maksdato: Vurdering.Avklart<LocalDate, Grunnlagsdata>) {
         val forventetMaksdato = LocalDate.of(2019, 11, 28)
 
         assert(maksdato.fastsattVerdi).isEqualTo(forventetMaksdato)
@@ -288,7 +288,7 @@ class EndToEndTest {
         checkArbeidsforholdVurdering((opptjeningsgrunnlag.arbeidsforhold as Vurdering.Avklart))
     }
 
-    private fun checkSykepengeliste(sykepengeliste: List<AnvistPeriode>) {
+    private fun checkSykepengeliste(sykepengeliste: List<AnvistPeriodeDTO>) {
         assert(sykepengeliste).isEqualTo(tiDagerSykepengeHistorikk())
     }
 
@@ -500,9 +500,9 @@ class EndToEndTest {
                 ))))
     }
 
-    private fun tiDagerSykepengeHistorikk() : List<AnvistPeriode> {
+    private fun tiDagerSykepengeHistorikk() : List<AnvistPeriodeDTO> {
         val someMonday = første_dag_i_syketilfelle.minusMonths(1).with(TemporalAdjusters.next(DayOfWeek.MONDAY))
-        return listOf(AnvistPeriode(someMonday, someMonday.plusDays(13)))
+        return listOf(AnvistPeriodeDTO(someMonday, someMonday.plusDays(13)))
     }
 
     private fun arbeidsforholdStub(aktørId: String) {

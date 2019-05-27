@@ -10,7 +10,7 @@ import java.util.*
 
 class SykepengehistorikkOppslag(val sparkelUrl: String, val stsRestClient: StsRestClient) {
 
-    fun hentSykepengehistorikk(aktorId: String, tom: LocalDate): Try<List<AnvistPeriode>> {
+    fun hentSykepengehistorikk(aktorId: String, tom: LocalDate): Try<List<AnvistPeriodeDTO>> {
         val bearer = stsRestClient.token()
         val (_, _, result) = "$sparkelUrl/api/sykepengehistorikk/$aktorId?tom=$tom&fom=${tom.minusYears(3)}".httpGet()
                 .header(mapOf(
@@ -27,13 +27,13 @@ class SykepengehistorikkOppslag(val sparkelUrl: String, val stsRestClient: StsRe
                 throw it
             }
 
-            defaultObjectMapper.readValue<List<AnvistPeriode>>(result.component1(), object : TypeReference<List<AnvistPeriode>>(){})
+            defaultObjectMapper.readValue<List<AnvistPeriodeDTO>>(result.component1(), object : TypeReference<List<AnvistPeriodeDTO>>(){})
         }
     }
 }
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-data class AnvistPeriode(
+data class AnvistPeriodeDTO(
         val fom: LocalDate,
         val tom: LocalDate
 )
