@@ -1,6 +1,7 @@
 package no.nav.helse.oppslag
 
 import arrow.core.Try
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.core.type.TypeReference
 import com.github.kittinunf.fuel.httpGet
 import no.nav.helse.streams.defaultObjectMapper
@@ -31,6 +32,7 @@ class SykepengehistorikkOppslag(val sparkelUrl: String, val stsRestClient: StsRe
     }
 }
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 data class AnvistPeriode(
         val fom: LocalDate,
         val tom: LocalDate
