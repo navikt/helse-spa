@@ -2,6 +2,8 @@ package no.nav.helse
 
 import arrow.core.Either
 import com.fasterxml.jackson.databind.JsonNode
+import com.github.kittinunf.fuel.core.FuelManager
+import io.prometheus.client.Counter
 import no.nav.helse.behandling.Oppslag
 import no.nav.helse.behandling.SykepengeVedtak
 import no.nav.helse.behandling.søknad.Sykepengesøknad
@@ -48,6 +50,10 @@ class SaksbehandlingStream(val env: Environment) {
     }
 
     companion object {
+        val requestCounter = Counter.build("http_outgoing_requests_total", "statuskoder for utgående kall")
+                .labelNames("code", "method", "protocol", "host")
+                .register()
+
         fun topology(oppslag: Oppslag, probe: SaksbehandlingProbe): Topology {
             val builder = StreamsBuilder()
 
@@ -136,6 +142,14 @@ class SaksbehandlingStream(val env: Environment) {
     }
 
     fun start() {
+        FuelManager.instance.addResponseInterceptor { next ->
+            { request, response ->
+                requestCounter.labels("${response.statusCode}", request.method.value,
+                        request.url.protocol, request.url.host).inc()
+                next(request, response)
+            }
+        }
+
         consumer.start()
     }
 
