@@ -32,7 +32,8 @@ spec:
   prometheus:
     enabled: true
     path: /metrics
-  secrets: true
+  vault:
+    enabled: true
   env:
     - name: KAFKA_BOOTSTRAP_SERVERS
       value: b27apvl00045.preprod.local:8443,b27apvl00046.preprod.local:8443,b27apvl00047.preprod.local:8443
