@@ -8,7 +8,7 @@ fun vurderMVPKriterierForAndreYtelser(ytelser: List<YtelseDTO>, ytelserFraArenaO
     if (ytelser.isNotEmpty()) {
         feil.add(MVPFeil("Andre ytelser", "Søker har ${ytelser.size} ytelseutbetalinger fra det offentlige"))
     }
-    if (ytelserFraArenaOgInfotrygd.infotrygd.isNotEmpty()) {
+    if (ytelserFraArenaOgInfotrygd.infotrygd.filterNot { it.sak.tema == "Sykepenger" && it.sak.ikkeStartet }.isNotEmpty()) {
         feil.add(MVPFeil("Andre ytelser (Infotrygd)", "Søker har ${ytelserFraArenaOgInfotrygd.infotrygd.size} saker i Infotrygd"))
     }
     if (ytelserFraArenaOgInfotrygd.arena.isNotEmpty()) {
