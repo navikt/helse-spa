@@ -84,13 +84,13 @@ class InntektsFastsettingTest {
             fail { "Expected beregningsgrunnlag and sammenligningsgrunnlag to be Vurdering.Avklart" }
         }
 
-        val fastsattSykepengegrunnlag = fastsettingAvSykepengegrunnlagetNårTrygdenYterSykepenger(sammenligningsgrunnlag, beregningsgrunnlag)
+        val fastsattSykepengegrunnlag = fastsettingAvSykepengegrunnlaget(førsteSykdomsdag, inntekter, inntekter)
 
         if (fastsattSykepengegrunnlag !is Vurdering.Avklart) {
             fail { "Expected fastsattSykepengegrunnlag to be Vurdering.Avklart" }
         }
 
-        assertEquals(30 * 12, fastsattSykepengegrunnlag.fastsattVerdi)
+        assertEquals(30 * 12, (fastsattSykepengegrunnlag.fastsattVerdi as Sykepengegrunnlag).sykepengegrunnlagNårTrygdenYter.fastsattVerdi)
     }
 
     @Test
@@ -118,7 +118,7 @@ class InntektsFastsettingTest {
             fail { "Expected beregningsgrunnlag and sammenligningsgrunnlag to be Vurdering.Avklart" }
         }
 
-        val fastsattSykepengegrunnlag = fastsettingAvSykepengegrunnlagetNårTrygdenYterSykepenger(sammenligningsgrunnlag, beregningsgrunnlag)
+        val fastsattSykepengegrunnlag = fastsettingAvSykepengegrunnlaget(førsteSykdomsdag, inntekter, inntekter)
 
         if (fastsattSykepengegrunnlag !is Vurdering.Uavklart) {
             fail { "Expected fastsattSykepengegrunnlag to be Vurdering.Uavklart" }

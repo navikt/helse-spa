@@ -12,6 +12,8 @@ import java.time.YearMonth
 
 fun LocalDate.yearMonth() = YearMonth.of(year, month.value)
 
+val paragraf_8_30_første_ledd = "§ 8-30 første ledd"
+
 fun fastsettingAvSykepengegrunnlaget(førsteSykdomsdag: LocalDate, beregningsgrunnlag: List<Inntekt>, sammenligningsgrunnlag: List<Inntekt>): Vurdering<*, List<Inntekt>> {
     val sykepengegrunnlagIArbeidsgiverperioden = fastsettingAvSykepengegrunnlagetIArbeidsgiverperioden(førsteSykdomsdag, beregningsgrunnlag)
 
@@ -25,13 +27,24 @@ fun fastsettingAvSykepengegrunnlaget(førsteSykdomsdag: LocalDate, beregningsgru
         return fastsattSammenligningsgrunnlag
     }
 
-    val sykepengegrunnlagNårTrygdenYter = fastsettingAvSykepengegrunnlagetNårTrygdenYterSykepenger(fastsattSammenligningsgrunnlag as Vurdering.Avklart, sykepengegrunnlagIArbeidsgiverperioden as Vurdering.Avklart)
 
-    if (sykepengegrunnlagNårTrygdenYter is Uavklart) {
-        return sykepengegrunnlagNårTrygdenYter
+
+    // § 8-30 første ledd
+    val omregnetÅrsinntekt = (sykepengegrunnlagIArbeidsgiverperioden as Vurdering.Avklart).fastsattVerdi * 12
+
+    val rapportertInntekt = (fastsattSammenligningsgrunnlag as Vurdering.Avklart).fastsattVerdi
+    val avvik = Math.abs(omregnetÅrsinntekt - rapportertInntekt) / rapportertInntekt.toDouble()
+
+    if (avvik > 0.25) {
+        return Uavklart<Long, List<Inntekt>>(KREVER_SKJØNNSMESSIG_VURDERING,
+                "25% avvik",
+                "§ 8-30 andre ledd - Sykepengegrunnlaget skal fastsettes ved skjønn fordi omregner årsinntekt ($omregnetÅrsinntekt) avviker mer enn 25% (${avvik * 100}%) fra rapportert inntekt ($rapportertInntekt)",
+                fastsattSammenligningsgrunnlag.grunnlag)
     }
 
-    return Vurdering.Avklart(Sykepengegrunnlag(sykepengegrunnlagNårTrygdenYter as Vurdering.Avklart, sykepengegrunnlagIArbeidsgiverperioden), "", fastsattSammenligningsgrunnlag.grunnlag , "SPA")
+    val sykepengegrunnlagNårTrygdenYter = Vurdering.Avklart(omregnetÅrsinntekt, paragraf_8_30_første_ledd, sykepengegrunnlagIArbeidsgiverperioden.grunnlag, "SPA")
+
+    return Vurdering.Avklart(Sykepengegrunnlag(sykepengegrunnlagNårTrygdenYter, sykepengegrunnlagIArbeidsgiverperioden, avvik), "", fastsattSammenligningsgrunnlag.grunnlag, "SPA")
 }
 
 const val paragraf_8_28_tredje_ledd_bokstav_a = "§ 8-28 tredje ledd bokstav a) - De tre siste kalendermånedene før arbeidstakeren ble arbeidsufør"
@@ -71,24 +84,5 @@ fun fastsettSammenligningsgrunnlag(sammenligningsgrunnlag: List<Inntekt>) : Vurd
             .longValueExact(RoundingMode.HALF_UP), "§ 8-30 andre ledd", sammenligningsgrunnlag, "SPA")
 }
 
-val paragraf_8_30_første_ledd = "§ 8-30 første ledd"
-// § 8-30 første ledd
-fun fastsettingAvSykepengegrunnlagetNårTrygdenYterSykepenger(sammenligningsgrunnlag: Vurdering.Avklart<Long, List<Inntekt>>,
-                                                             beregnetAktuellMånedsinntekt: Vurdering.Avklart<Long, List<Inntekt>>): Vurdering<Long, List<Inntekt>> {
-    val omregnetÅrsinntekt = beregnetAktuellMånedsinntekt.fastsattVerdi * 12
-
-    val rapportertInntekt = sammenligningsgrunnlag.fastsattVerdi
-    val avvik = Math.abs(omregnetÅrsinntekt - rapportertInntekt) / rapportertInntekt.toDouble()
-
-    if (avvik > 0.25) {
-        return Uavklart(KREVER_SKJØNNSMESSIG_VURDERING,
-                "25% avvik",
-                "§ 8-30 andre ledd - Sykepengegrunnlaget skal fastsettes ved skjønn fordi omregner årsinntekt ($omregnetÅrsinntekt) avviker mer enn 25% (${avvik * 100}%) fra rapportert inntekt ($rapportertInntekt)",
-                sammenligningsgrunnlag.grunnlag) // FIXME: hva ønsker vi egentlig som referert grunnlag her ?
-    }
-
-    return Vurdering.Avklart(omregnetÅrsinntekt, paragraf_8_30_første_ledd, beregnetAktuellMånedsinntekt.grunnlag, "SPA")
-}
-
-data class Sykepengegrunnlag(val sykepengegrunnlagNårTrygdenYter: Vurdering.Avklart<Long, List<Inntekt>>, val sykepengegrunnlagIArbeidsgiverperioden: Vurdering.Avklart<Long, List<Inntekt>>)
+data class Sykepengegrunnlag(val sykepengegrunnlagNårTrygdenYter: Vurdering.Avklart<Long, List<Inntekt>>, val sykepengegrunnlagIArbeidsgiverperioden: Vurdering.Avklart<Long, List<Inntekt>>, val avvik: Double)
 

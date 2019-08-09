@@ -80,7 +80,8 @@ class BeregningTest {
                             sykepengegrunnlag = Avklart(fastsattVerdi =
                             Sykepengegrunnlag(
                                     sykepengegrunnlagNårTrygdenYter = Avklart(fastsattVerdi = årslønn, grunnlag = emptyList(), begrunnelse = "derfor", fastsattAv = "test"),
-                                    sykepengegrunnlagIArbeidsgiverperioden = Avklart(fastsattVerdi = årslønn, grunnlag = emptyList(), begrunnelse = "derfor", fastsattAv = "test")),
+                                    sykepengegrunnlagIArbeidsgiverperioden = Avklart(fastsattVerdi = årslønn, grunnlag = emptyList(), begrunnelse = "derfor", fastsattAv = "test"),
+                                    avvik = 0.0),
                                     fastsattAv = "test",
                                     begrunnelse = "derfor",
                                     grunnlag = emptyList()),
