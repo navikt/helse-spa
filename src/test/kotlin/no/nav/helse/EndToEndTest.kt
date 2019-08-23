@@ -1,8 +1,19 @@
 package no.nav.helse
 
 import assertk.assert
-import assertk.assertions.*
+import assertk.assertions.contains
+import assertk.assertions.containsExactly
+import assertk.assertions.each
+import assertk.assertions.hasSize
+import assertk.assertions.isBetween
+import assertk.assertions.isEqualTo
+import assertk.assertions.isNotIn
+import assertk.assertions.isNull
+import assertk.assertions.isTrue
 import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.SerializationFeature
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock.any
@@ -11,15 +22,50 @@ import com.github.tomakehurst.wiremock.client.WireMock.okJson
 import com.github.tomakehurst.wiremock.client.WireMock.stubFor
 import com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
+import io.prometheus.client.CollectorRegistry
 import no.nav.common.JAASCredential
 import no.nav.common.KafkaEnvironment
-import no.nav.helse.behandling.*
+import no.nav.helse.behandling.AvklarteVerdier
+import no.nav.helse.behandling.Faktagrunnlag
+import no.nav.helse.behandling.Fordeling
+import no.nav.helse.behandling.Sakskompleks
+import no.nav.helse.behandling.SykepengeVedtak
+import no.nav.helse.behandling.Tpsfakta
+import no.nav.helse.behandling.Vedtak
+import no.nav.helse.behandling.Vedtaksperiode
 import no.nav.helse.behandling.søknad.Sykepengesøknad
-import no.nav.helse.dto.*
 import no.nav.helse.dto.ArbeidsgiverDTO
-import no.nav.helse.fastsetting.*
-import no.nav.helse.oppslag.*
-import no.nav.helse.oppslag.arbeidinntektytelse.dto.*
+import no.nav.helse.dto.SoknadsperiodeDTO
+import no.nav.helse.dto.SoknadsstatusDTO
+import no.nav.helse.dto.SoknadstypeDTO
+import no.nav.helse.dto.SykepengesøknadV2DTO
+import no.nav.helse.fastsetting.Alder
+import no.nav.helse.fastsetting.Aldersgrunnlag
+import no.nav.helse.fastsetting.Opptjeningsgrunnlag
+import no.nav.helse.fastsetting.Opptjeningstid
+import no.nav.helse.fastsetting.Sykepengegrunnlag
+import no.nav.helse.fastsetting.Vurdering
+import no.nav.helse.fastsetting.begrunnelse_p_8_51
+import no.nav.helse.fastsetting.begrunnelse_søker_i_aktivt_arbeidsforhold
+import no.nav.helse.fastsetting.bosattstatus
+import no.nav.helse.fastsetting.landskodeNORGE
+import no.nav.helse.fastsetting.paragraf_8_28_andre_ledd
+import no.nav.helse.fastsetting.paragraf_8_30_første_ledd
+import no.nav.helse.fastsetting.søkerOppfyllerKravOmMedlemskap
+import no.nav.helse.oppslag.AnvistPeriodeDTO
+import no.nav.helse.oppslag.Inntekt
+import no.nav.helse.oppslag.Inntektsarbeidsgiver
+import no.nav.helse.oppslag.InntektsoppslagResultat
+import no.nav.helse.oppslag.Kjønn
+import no.nav.helse.oppslag.PersonDTO
+import no.nav.helse.oppslag.StsRestClient
+import no.nav.helse.oppslag.arbeidinntektytelse.dto.ArbeidInntektYtelseDTO
+import no.nav.helse.oppslag.arbeidinntektytelse.dto.ArbeidsforholdDTO
+import no.nav.helse.oppslag.arbeidinntektytelse.dto.InntektDTO
+import no.nav.helse.oppslag.arbeidinntektytelse.dto.InntektMedArbeidsforholdDTO
+import no.nav.helse.oppslag.arbeidinntektytelse.dto.VirksomhetDTO
+import no.nav.helse.oppslag.arbeidinntektytelse.dto.YtelserDTO
+import no.nav.helse.serde.JsonNodeSerializer
 import no.nav.helse.streams.JsonSerializer
 import no.nav.helse.streams.Topics.SYKEPENGEBEHANDLINGSFEIL
 import no.nav.helse.streams.Topics.SYKEPENGESØKNADER_INN
@@ -44,17 +90,26 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.slf4j.LoggerFactory
 import java.math.BigDecimal
-import java.time.*
+import java.time.DayOfWeek
+import java.time.Duration
+import java.time.LocalDate
 import java.time.LocalDate.parse
+import java.time.LocalDateTime
+import java.time.YearMonth
 import java.time.temporal.ChronoUnit
 import java.time.temporal.TemporalAdjusters
 import java.time.temporal.TemporalAdjusters.lastDayOfMonth
+import java.util.concurrent.TimeUnit
 
 class EndToEndTest {
 
     companion object {
         private const val username = "srvkafkaclient"
         private const val password = "kafkaclient"
+
+        private val objectMapper = jacksonObjectMapper()
+            .registerModule(JavaTimeModule())
+            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
 
         val embeddedEnvironment = KafkaEnvironment(
                 users = listOf(JAASCredential(username, password)),
@@ -64,7 +119,8 @@ class EndToEndTest {
                 topics = listOf(
                         SYKEPENGESØKNADER_INN.name,
                         VEDTAK_SYKEPENGER.name,
-                        SYKEPENGEBEHANDLINGSFEIL.name
+                        SYKEPENGEBEHANDLINGSFEIL.name,
+                        SAKSKOMPLEKS_TOPIC
                 )
         )
 
@@ -139,6 +195,36 @@ class EndToEndTest {
         checkVilkårsprøving(sykepengeVedtak.vilkårsprøving)
         checkBeregning(sykepengeVedtak.beregning)
         checkVedtak(sykepengeVedtak.vedtak)
+    }
+
+    @Test
+    fun `behandle et sakskompleks`() {
+        val aktørId = "11987654321"
+
+        println("Kafka: ${embeddedEnvironment.brokersURL}")
+        println("Zookeeper: ${embeddedEnvironment.serverPark.zookeeper.host}:${embeddedEnvironment.serverPark.zookeeper.port}")
+
+        restStsStub()
+        personStub(aktørId)
+        inntektStub(aktørId)
+        arbeidsforholdStub(aktørId)
+        sykepengehistorikkStub(aktørId)
+        ytelserStub(aktørId)
+
+        val sakskompleksJson = objectMapper.readTree("/sakskompleks/sakskompleks.json".readResource())
+        val sakskompleks = Sakskompleks(sakskompleksJson)
+
+        produceOneMessage(SAKSKOMPLEKS_TOPIC, sakskompleks.id, sakskompleks.jsonNode)
+
+        val sykepengeVedtak: SykepengeVedtak = ventPåVedtak()
+
+        //TODO checkSakskompleks()
+        checkFaktagrunnlag(sykepengeVedtak.faktagrunnlag)
+        checkAvklarteVerdier(sykepengeVedtak.faktagrunnlag, sykepengeVedtak.avklarteVerdier)
+        checkVilkårsprøving(sykepengeVedtak.vilkårsprøving)
+        checkBeregning(sykepengeVedtak.beregning)
+        checkVedtak(sykepengeVedtak.vedtak)
+
     }
 
     private fun checkSøknad(innsendtSøknad: SykepengesøknadV2DTO, faktiskSøknad: Sykepengesøknad) {
@@ -525,4 +611,27 @@ class EndToEndTest {
         stubFor(any(urlPathEqualTo("/api/arbeidsforhold/$aktørId/inntekter"))
                 .willReturn((okJson(defaultObjectMapper.writeValueAsString(arbeidsforholdWrapper)))))
     }
+
+    private fun produceOneMessage(topic: String, key: String, message: JsonNode) {
+        val producer = KafkaProducer<String, JsonNode>(producerProperties(), StringSerializer(), JsonNodeSerializer(objectMapper))
+        producer.send(ProducerRecord(topic, key, message))
+            .get(1, TimeUnit.SECONDS)
+    }
+
+    private fun getCounterValue(name: String, labelValues: List<String> = emptyList()) =
+        (CollectorRegistry.defaultRegistry
+            .findMetricSample(name, labelValues)
+            ?.value ?: 0.0).toInt()
+
+    private fun CollectorRegistry.findMetricSample(name: String, labelValues: List<String>) =
+        findSamples(name).firstOrNull { sample ->
+            sample.labelValues.size == labelValues.size && sample.labelValues.containsAll(labelValues)
+        }
+
+    private fun CollectorRegistry.findSamples(name: String) =
+        filteredMetricFamilySamples(setOf(name))
+            .toList()
+            .flatMap { metricFamily ->
+                metricFamily.samples
+            }
 }

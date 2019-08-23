@@ -1,12 +1,12 @@
 {
   "id": "71bd853d-36a1-49df-a34c-6e02cf727awd",
-  "aktørId": "1234567890123",
+  "aktørId": "11987654321",
   "sykmeldinger": [
     {
       "sykmelding": {
         "id": "71bd853d-36a1-49df-a34c-6e02cf727cfa",
         "msgId": "bf74ad38-a008-4792-8c1a-ae3c01583b8b",
-        "pasientAktoerId": "1234567890123",
+        "pasientAktoerId": "11987654321",
         "medisinskVurdering": {
           "hovedDiagnose": {
             "system": "2.16.578.1.12.4.1.1.7170",
@@ -103,24 +103,24 @@
       "id": "68da259c-ff7f-47cf-8fa0-c348ae95e220",
       "type": "ARBEIDSTAKERE",
       "status": "SENDT",
-      "aktorId": "1234567890123",
+      "aktorId": "11987654321",
       "sykmeldingId": "71bd853d-36a1-49df-a34c-6e02cf727cfa",
       "arbeidsgiver": {
-        "navn": "Nærbutikken AS",
-        "orgnummer": "987654321"
+        "navn": "MATBUTIKKEN",
+        "orgnummer": "97114455"
       },
       "arbeidssituasjon": "ARBEIDSTAKER",
       "korrigerer": null,
       "korrigertAv": null,
       "soktUtenlandsopphold": null,
       "arbeidsgiverForskutterer": null,
-      "fom": "2019-06-01",
-      "tom": "2019-06-14",
-      "startSyketilfelle": "2019-06-01",
+      "fom": "2019-01-01",
+      "tom": "2019-01-31",
+      "startSyketilfelle": "2019-01-01",
       "arbeidGjenopptatt": null,
       "sykmeldingSkrevet": "2019-06-01T00:00:00",
       "opprettet": "2019-06-01T00:00:00.000",
-      "sendtNav": "2019-06-14T00:00:00.000",
+      "sendtNav": "2019-01-17T00:00:00.000",
       "sendtArbeidsgiver": "2019-06-14T00:00:00.000",
       "egenmeldinger": [],
       "papirsykmeldinger": null,
@@ -128,8 +128,8 @@
       "andreInntektskilder": [],
       "soknadsperioder": [
         {
-          "fom": "2019-06-01",
-          "tom": "2019-06-14",
+          "fom": "2019-01-01",
+          "tom": "2019-01-31",
           "sykmeldingsgrad": 100,
           "faktiskGrad": null,
           "avtaltTimer": null,
@@ -137,7 +137,7 @@
           "sykmeldingstype": null
         }
       ],
-      "sporsmal": null
+      "sporsmal": []
     }
   ],
   "inntektsmeldinger": [
