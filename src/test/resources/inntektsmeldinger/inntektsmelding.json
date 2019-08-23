@@ -1,0 +1,19 @@
+{
+  "id": "1awdijawd",
+  "arbeidstakerFnr": "00000000000",
+  "arbeidsgiver": "orgnummer",
+  "foersteFravaersdag": "2019-01-01",
+  "refusjon": 50000,
+  "inntekt": 50000,
+  "opphoerAvNaturalytelser": [],
+  "gjenopptakelseNaturalytelser": [],
+  "endringAvRefusjon": null,
+  "refusjonOpphorer": null,
+  "ferie": [],
+  "arbeidsgiverperiode": [
+    {
+      "fom": "2019-01-01",
+      "tom": "2019-01-16"
+    }
+  ]
+}
