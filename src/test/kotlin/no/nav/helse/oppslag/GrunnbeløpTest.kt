@@ -3,8 +3,10 @@ package no.nav.helse.oppslag
 import assertk.assert
 import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
+import assertk.assertions.isGreaterThan
 import assertk.assertions.isTrue
 import org.junit.jupiter.api.Test
+import java.time.LocalDate
 import java.time.LocalDate.of
 import java.time.Month
 
@@ -21,10 +23,24 @@ class GrunnbeløpTest {
     }
 
     @Test
-    fun ` Skal returnere grunnbeløp på 96883 for måned mai 2019 `() {
+    fun ` Nyeste innslag i Grunnbeløpslista må oppdateres jevnlig `() {
+        // Nytt grunnbeløp bør være klart til 1. juni hvert år
+        // Sjekk https://www.nav.no/no/NAV+og+samfunn/Kontakt+NAV/Utbetalinger/Grunnbelopet+i+folketrygden
+        assert(grunnbeløpListe.maxBy { it.fom }!!.fom.plusYears(1).plusMonths(1)).isGreaterThan(LocalDate.now())
+    }
 
-        assert(getGrunnbeløpForDato(of(2019, Month.MAY, 1))).isEqualTo(96883L)
-        assert(getGrunnbeløpForDato(of(2019, Month.MAY, 31))).isEqualTo(96883L)
+    @Test
+    fun ` Skal returnere grunnbeløp på 99858 for måned april 2020 `() {
+
+        assert(getGrunnbeløpForDato(of(2020, Month.APRIL, 1))).isEqualTo(99858L)
+        assert(getGrunnbeløpForDato(of(2020, Month.APRIL, 30))).isEqualTo(99858L)
+    }
+
+    @Test
+    fun ` Skal returnere grunnbeløp på 99858 for måned mai 2019 `() {
+
+        assert(getGrunnbeløpForDato(of(2019, Month.MAY, 1))).isEqualTo(99858L)
+        assert(getGrunnbeløpForDato(of(2019, Month.MAY, 31))).isEqualTo(99858L)
     }
 
     @Test
