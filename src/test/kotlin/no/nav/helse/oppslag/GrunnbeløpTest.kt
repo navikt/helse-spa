@@ -24,7 +24,8 @@ class GrunnbeløpTest {
 
     @Test
     fun ` Nyeste innslag i Grunnbeløpslista må oppdateres jevnlig `() {
-        //Nytt grunnbeløp bør være klart til 1. juni hvert år
+        // Nytt grunnbeløp bør være klart til 1. juni hvert år
+        // Sjekk https://www.nav.no/no/NAV+og+samfunn/Kontakt+NAV/Utbetalinger/Grunnbelopet+i+folketrygden
         assert(grunnbeløpListe.maxBy { it.fom }!!.fom.plusYears(1).plusMonths(1)).isGreaterThan(LocalDate.now())
     }
 
