@@ -2,6 +2,7 @@ package no.nav.helse.oppslag
 
 import arrow.core.Try
 import com.github.kittinunf.fuel.httpGet
+import no.nav.helse.behandling.Sakskompleks
 import no.nav.helse.behandling.søknad.Sykepengesøknad
 import no.nav.helse.behandling.Tpsfakta
 import no.nav.helse.streams.defaultObjectMapper
@@ -10,8 +11,8 @@ import java.util.*
 
 class PersonOppslag(val sparkelUrl: String, val stsRestClient: StsRestClient) {
 
-    fun hentTPSData(input: Sykepengesøknad): Try<Tpsfakta> {
-        return hentPerson(AktørId(input.aktorId)).map { person ->
+    fun hentTPSData(input: Sakskompleks): Try<Tpsfakta> {
+        return hentPerson(AktørId(input.aktørId)).map { person ->
             Tpsfakta(
                     fodselsdato = person.fdato,
                     bostedland = person.bostedsland,

@@ -8,7 +8,7 @@ import java.time.LocalDate
 import java.util.UUID
 
 data class SykepengeVedtak(
-        val originalSøknad: Sykepengesøknad,
+        val sakskompleks: Sakskompleks,
         val faktagrunnlag: Faktagrunnlag,
         val avklarteVerdier: AvklarteVerdier,
         val vilkårsprøving: Evaluering,

@@ -14,12 +14,12 @@ fun vilkårsprøving(avklarteFakta: AvklarteFakta, probe: SaksbehandlingProbe): 
             alder = avklarteFakta.avklarteVerdier.alder.fastsattVerdi,
             erMedlem = avklarteFakta.avklarteVerdier.medlemsskap.fastsattVerdi,
             ytelser = emptyList(),
-            søknadSendt = avklarteFakta.originalSøknad.sendtNav!!.toLocalDate(),
-            førsteDagSøknadGjelderFor = avklarteFakta.originalSøknad.fom,
-            sisteDagSøknadenGjelderFor = avklarteFakta.originalSøknad.tom,
+            søknadSendt = avklarteFakta.sakskompleks.søknader[0].sendtNav!!.toLocalDate(),
+            førsteDagSøknadGjelderFor = avklarteFakta.sakskompleks.søknader[0].fom,
+            sisteDagSøknadenGjelderFor = avklarteFakta.sakskompleks.søknader[0].tom,
             sisteMuligeSykepengedag = avklarteFakta.avklarteVerdier.maksdato.fastsattVerdi,
             fastsattÅrsinntekt = avklarteFakta.avklarteVerdier.sykepengegrunnlag.fastsattVerdi.sykepengegrunnlagNårTrygdenYter.fastsattVerdi,
-            grunnbeløp = getGrunnbeløpForDato(avklarteFakta.originalSøknad.fom)
+            grunnbeløp = getGrunnbeløpForDato(avklarteFakta.sakskompleks.søknader[0].fom)
     )
 
     val vilkårsprøving = sykepengevilkår.evaluer(grunnlag)
@@ -27,7 +27,7 @@ fun vilkårsprøving(avklarteFakta: AvklarteFakta, probe: SaksbehandlingProbe): 
     probe.gjennomførtVilkårsprøving(vilkårsprøving)
 
     val behandlingsgrunnlag = Behandlingsgrunnlag(
-            originalSøknad = avklarteFakta.originalSøknad,
+            sakskompleks = avklarteFakta.sakskompleks,
             faktagrunnlag = avklarteFakta.faktagrunnlag,
             avklarteVerdier = avklarteFakta.avklarteVerdier,
             vilkårsprøving = vilkårsprøving

@@ -80,14 +80,14 @@ fun vurderFakta(fakta: FaktagrunnlagResultat): Either<Behandlingsfeil, AvklarteF
             vurderingerCounter.labels("arbeidsforhold", "avklart").inc()
         }
     }
-    val opptjeningstid = vurderOpptjeningstid(Opptjeningsgrunnlag(fakta.originalSøknad.startSyketilfelle, arbeidsforhold)).also {
+    val opptjeningstid = vurderOpptjeningstid(Opptjeningsgrunnlag(fakta.sakskompleks.startSyketilfelle, arbeidsforhold)).also {
         if (it is Vurdering.Uavklart) {
             vurderingerCounter.labels("opptjeningstid", "uavklart").inc()
         } else {
             vurderingerCounter.labels("opptjeningstid", "avklart").inc()
         }
     }
-    val sykepengegrunnlag = fastsettingAvSykepengegrunnlaget(fakta.originalSøknad.startSyketilfelle, fakta.faktagrunnlag.beregningsperiode, fakta.faktagrunnlag.sammenligningsperiode).also {
+    val sykepengegrunnlag = fastsettingAvSykepengegrunnlaget(fakta.sakskompleks.startSyketilfelle, fakta.faktagrunnlag.beregningsperiode, fakta.faktagrunnlag.sammenligningsperiode).also {
         if (it is Vurdering.Uavklart) {
             vurderingerCounter.labels("sykepengegrunnlag", "uavklart").inc()
         } else {
@@ -95,9 +95,9 @@ fun vurderFakta(fakta: FaktagrunnlagResultat): Either<Behandlingsfeil, AvklarteF
         }
     }
     val maksdato = vurderMaksdato(alder,
-            fakta.originalSøknad.startSyketilfelle,
-            fakta.originalSøknad.fom,
-            fakta.originalSøknad.tom,
+            fakta.sakskompleks.startSyketilfelle,
+            fakta.sakskompleks.søknader[0].fom,
+            fakta.sakskompleks.søknader[0].tom,
             Yrkesstatus.ARBEIDSTAKER,
             fakta.faktagrunnlag.sykepengehistorikk).also {
         if (it is Vurdering.Uavklart) {
@@ -109,7 +109,7 @@ fun vurderFakta(fakta: FaktagrunnlagResultat): Either<Behandlingsfeil, AvklarteF
 
     return if (listOf(medlemsskap, alder, arbeidsforhold, opptjeningstid, sykepengegrunnlag, maksdato).filter { it is Vurdering.Uavklart<*, *> }.isNotEmpty()) {
         Either.Left(Behandlingsfeil.avklaringsfeil(UavklarteFakta(
-                originalSøknad = fakta.originalSøknad,
+                sakskompleks = fakta.sakskompleks,
                 faktagrunnlag = fakta.faktagrunnlag,
                 uavklarteVerdier = UavklarteVerdier(
                         medlemsskap = medlemsskap,
@@ -125,7 +125,7 @@ fun vurderFakta(fakta: FaktagrunnlagResultat): Either<Behandlingsfeil, AvklarteF
     } else {
         @Suppress("UNCHECKED_CAST")
         Either.Right(AvklarteFakta(
-                originalSøknad = fakta.originalSøknad,
+                sakskompleks = fakta.sakskompleks,
                 faktagrunnlag = fakta.faktagrunnlag,
                 avklarteVerdier = AvklarteVerdier(
                         medlemsskap = medlemsskap as Vurdering.Avklart<Boolean, Tpsfakta>,

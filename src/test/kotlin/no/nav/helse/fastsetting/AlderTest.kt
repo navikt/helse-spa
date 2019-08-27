@@ -1,6 +1,7 @@
 package no.nav.helse.fastsetting
 
 import com.fasterxml.jackson.databind.node.ObjectNode
+import no.nav.helse.Sakskompleks
 import no.nav.helse.behandling.FaktagrunnlagResultat
 import no.nav.helse.behandling.søknad.Sykepengesøknad
 import no.nav.helse.faktagrunnlagUtenVerdi
@@ -28,13 +29,13 @@ class AlderTest {
     }
 
     private fun soknadForDato(tom: LocalDate, foedselsDato: LocalDate): FaktagrunnlagResultat = soknadUtenVerdi.copy(
-            originalSøknad = Sykepengesøknad(
+            sakskompleks = Sakskompleks(Sykepengesøknad(
                     jsonNode = with(originalSoknad.jsonNode) {
                         val objectNode: ObjectNode = deepCopy()
                         objectNode.put("tom", tom.toString())
                         objectNode
                     }
-            ),
+            )),
             faktagrunnlag = faktagrunnlagUtenVerdi.copy(
                     tpsFaktaUtenVerdi.copy(
                             fodselsdato = foedselsDato)

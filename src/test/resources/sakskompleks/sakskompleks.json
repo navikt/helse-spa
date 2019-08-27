@@ -1,6 +1,9 @@
 {
   "id": "71bd853d-36a1-49df-a34c-6e02cf727awd",
   "aktørId": "11987654321",
+  "orgnummer": "97114455",
+  "syketilfelleStartdato": "2019-01-01",
+  "syketilfelleSluttdato": "2019-01-31",
   "sykmeldinger": [
     {
       "sykmelding": {
@@ -27,8 +30,8 @@
         },
         "perioder": [
           {
-            "fom": "2019-06-01",
-            "tom": "2019-06-14",
+            "fom": "2019-01-01",
+            "tom": "2019-01-31",
             "aktivitetIkkeMulig": {
               "medisinskArsak": {
                 "beskrivelse": null,

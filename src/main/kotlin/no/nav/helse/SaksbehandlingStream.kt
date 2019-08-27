@@ -8,15 +8,12 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import no.nav.helse.behandling.Oppslag
 import no.nav.helse.behandling.Sakskompleks
 import no.nav.helse.behandling.SykepengeVedtak
-import no.nav.helse.behandling.søknad.Sykepengesøknad
 import no.nav.helse.oppslag.StsRestClient
 import no.nav.helse.probe.SaksbehandlingProbe
 import no.nav.helse.serde.JsonNodeSerde
 import no.nav.helse.streams.StreamConsumer
-import no.nav.helse.streams.Topics
 import no.nav.helse.streams.Topics.SYKEPENGEBEHANDLINGSFEIL
 import no.nav.helse.streams.Topics.VEDTAK_SYKEPENGER
-import no.nav.helse.streams.consumeTopic
 import no.nav.helse.streams.defaultObjectMapper
 import no.nav.helse.streams.streamConfig
 import no.nav.helse.streams.toTopic
@@ -69,73 +66,22 @@ class SaksbehandlingStream(val env: Environment) {
         fun topology(oppslag: Oppslag, probe: SaksbehandlingProbe): Topology {
             val builder = StreamsBuilder()
 
-            val (feilendeSøknader,
-                    vedtak) = builder.consumeTopic(Topics.SYKEPENGESØKNADER_INN)
-                    .peek { søknadId, _ ->
-                        loggMedSøknadId(søknadId) {
-                            probe.mottattSøknadUansettStatusOgType(søknadId)
-                        }
-                    }
-                    .mapValues { søknadId, jsonNode ->
-                        loggMedSøknadId(søknadId) {
-                            Sykepengesøknad(jsonNode)
-                        }
-                    }
-                    .filter { _, søknad ->
-                        søknad.status != "UKJENT"
-                    }
-                    .peek { søknadId, søknad ->
-                        loggMedSøknadId(søknadId) {
-                            probe.mottattSøknadUansettType(søknad.id, søknad.status)
-                        }
-                    }
-                    .filter { _, søknad ->
-                        søknad.type == "OPPHOLD_UTLAND" ||
-                                søknad.type == "SELVSTENDIGE_OG_FRILANSERE" ||
-                                søknad.type == "ARBEIDSTAKERE"
-                    }
-                    .peek { søknadId, søknad ->
-                        loggMedSøknadId(søknadId) {
-                            probe.mottattSøknad(søknad.id, søknad.status, søknad.type)
-                        }
-                    }
-                    .filter { _, søknad ->
-                        søknad.sendtTilNAV
-                    }
-                    .peek { søknadId, søknad ->
-                        loggMedSøknadId(søknadId) {
-                            probe.mottattSøknadSendtNAV(søknadId, søknad.type)
-                        }
-                    }
-                    .mapValues { _, søknad ->
-                        loggMedSøknadId(søknad.id) {
-                            søknad.behandle(oppslag, probe)
-                        }
-                    }.branch(
-                            Predicate { _, søknad -> søknad is Either.Left },
-                            Predicate { _, søknad -> søknad is Either.Right }
-                    )
-
-            sendTilFeilkø(probe, feilendeSøknader)
-            sendTilVedtakskø(probe, vedtak)
-
-            val (feilendeSøknader1,
-                vedtak1) = builder.stream<String, JsonNode>(SAKSKOMPLEKS_TOPIC, Consumed.with(Serdes.String(), JsonNodeSerde(objectMapper))
+            val (feilendeSakskompleks,
+                vedtak) = builder.stream<String, JsonNode>(SAKSKOMPLEKS_TOPIC, Consumed.with(Serdes.String(), JsonNodeSerde(objectMapper))
                 .withOffsetResetPolicy(Topology.AutoOffsetReset.EARLIEST))
                 .mapValues { jsonNode -> Sakskompleks(jsonNode) }
                 .filter { _, sakskompleks -> sakskompleks.søknader.size == 1 }
-                .mapValues { _, sakskompleks -> sakskompleks.søknader[0] }
-                .mapValues { _, søknad -> //TODO: Denne må utvides til å bruke sakskompleks
-                    loggMedSøknadId(søknad.id) {
-                        søknad.behandle(oppslag, probe)
+                .mapValues { _, sakskompleks ->
+                    loggMedSakskompleksId(sakskompleks.id) {
+                        sakskompleks.behandle(oppslag, probe)
                     }
                 }.branch(
                     Predicate { _, søknad -> søknad is Either.Left },
                     Predicate { _, søknad -> søknad is Either.Right }
                 )
 
-            sendTilFeilkø(probe, feilendeSøknader1)
-            sendTilVedtakskø(probe, vedtak1)
+            sendTilFeilkø(probe, feilendeSakskompleks)
+            sendTilVedtakskø(probe, vedtak)
 
             return builder.build()
         }
@@ -145,11 +91,11 @@ class SaksbehandlingStream(val env: Environment) {
                     .peek { _, _ -> probe.behandlingOk() }
                     .mapValues { _, sykepengevedtak -> (sykepengevedtak as Either.Right).b }
                     .peek { _, sykepengevedtak ->
-                        loggMedSøknadId(sykepengevedtak.originalSøknad.id) {
+                        loggMedSakskompleksId(sykepengevedtak.sakskompleks.id) {
                             probe.vedtakBehandlet(sykepengevedtak)
                         }
                     }.mapValues { _, sykepengevedtak ->
-                        loggMedSøknadId(sykepengevedtak.originalSøknad.id) {
+                        loggMedSakskompleksId(sykepengevedtak.sakskompleks.id) {
                             serialize(sykepengevedtak)
                         }
                     }.toTopic(VEDTAK_SYKEPENGER)
@@ -160,11 +106,11 @@ class SaksbehandlingStream(val env: Environment) {
                     .peek { _, _ -> probe.behandlingFeil() }
                     .mapValues { _, behandlingsfeil -> (behandlingsfeil as Either.Left).a }
                     .peek { _, behandlingsfeil ->
-                        loggMedSøknadId(behandlingsfeil.soknadId) {
+                        loggMedSakskompleksId(behandlingsfeil.sakskompleksId) {
                             probe.behandlingsFeilMedType(behandlingsfeil)
                         }
                     }.mapValues { _, behandlingsfeil ->
-                        loggMedSøknadId(behandlingsfeil.soknadId) {
+                        loggMedSakskompleksId(behandlingsfeil.sakskompleksId) {
                             serializeBehandlingsfeil(behandlingsfeil)
                         }
                     }.toTopic(SYKEPENGEBEHANDLINGSFEIL)
@@ -181,12 +127,12 @@ class SaksbehandlingStream(val env: Environment) {
 
 }
 
-private fun <T> loggMedSøknadId(søknadId: String, block: () -> T): T {
+private fun <T> loggMedSakskompleksId(sakskompleksId: String, block: () -> T): T {
     try {
-        MDC.put("soknadId", søknadId)
+        MDC.put("sakskompleksId", sakskompleksId)
         return block()
     } finally {
-        MDC.remove("soknadId")
+        MDC.remove("sakskompleksId")
     }
 }
 

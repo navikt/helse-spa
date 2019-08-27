@@ -13,7 +13,7 @@ const val begrunnelse_p_8_51 = "§ 8-51"
 
 fun vurderAlderPåSisteDagISøknadsPeriode(fakta: FaktagrunnlagResultat): Vurdering<Alder, Aldersgrunnlag> {
     val tpsfakta = fakta.faktagrunnlag.tps
-    val tomDato = fakta.originalSøknad.tom
+    val tomDato = fakta.sakskompleks.sluttSyketilfelle
     val alder = tpsfakta.alder(tomDato)
     return Vurdering.Avklart(alder, begrunnelse_p_8_51, Aldersgrunnlag(fodselsdato = tpsfakta.fodselsdato), "SPA")
 }

@@ -172,32 +172,6 @@ class EndToEndTest {
     }
 
     @Test
-    fun `behandle en søknad`() {
-        val aktørId = "11987654321"
-
-        println("Kafka: ${embeddedEnvironment.brokersURL}")
-        println("Zookeeper: ${embeddedEnvironment.serverPark.zookeeper.host}:${embeddedEnvironment.serverPark.zookeeper.port}")
-
-        restStsStub()
-        personStub(aktørId)
-        inntektStub(aktørId)
-        arbeidsforholdStub(aktørId)
-        sykepengehistorikkStub(aktørId)
-        ytelserStub(aktørId)
-
-        val innsendtSøknad = produserSykepengesøknadV2(aktørId)
-
-        val sykepengeVedtak: SykepengeVedtak = ventPåVedtak()
-
-        checkSøknad(innsendtSøknad, sykepengeVedtak.originalSøknad)
-        checkFaktagrunnlag(sykepengeVedtak.faktagrunnlag)
-        checkAvklarteVerdier(sykepengeVedtak.faktagrunnlag, sykepengeVedtak.avklarteVerdier)
-        checkVilkårsprøving(sykepengeVedtak.vilkårsprøving)
-        checkBeregning(sykepengeVedtak.beregning)
-        checkVedtak(sykepengeVedtak.vedtak)
-    }
-
-    @Test
     fun `behandle et sakskompleks`() {
         val aktørId = "11987654321"
 
@@ -616,6 +590,7 @@ class EndToEndTest {
         val producer = KafkaProducer<String, JsonNode>(producerProperties(), StringSerializer(), JsonNodeSerializer(objectMapper))
         producer.send(ProducerRecord(topic, key, message))
             .get(1, TimeUnit.SECONDS)
+        producer.flush()
     }
 
     private fun getCounterValue(name: String, labelValues: List<String> = emptyList()) =

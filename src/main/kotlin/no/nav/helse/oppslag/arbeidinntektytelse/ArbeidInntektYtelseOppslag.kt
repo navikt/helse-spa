@@ -3,6 +3,7 @@ package no.nav.helse.oppslag.arbeidinntektytelse
 import arrow.core.Try
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.github.kittinunf.fuel.httpGet
+import no.nav.helse.behandling.Sakskompleks
 import no.nav.helse.behandling.søknad.Sykepengesøknad
 import no.nav.helse.oppslag.AktørId
 import no.nav.helse.oppslag.StsRestClient
@@ -14,12 +15,12 @@ import java.util.*
 
 class ArbeidInntektYtelseOppslag(val sparkelUrl: String, val stsRestClient: StsRestClient) {
 
-    fun hentArbeidInntektYtelse(sykepengesøknad: Sykepengesøknad) : Try<ArbeidInntektYtelseDTO> {
-        val forsteSykdomsdag = sykepengesøknad.startSyketilfelle
+    fun hentArbeidInntektYtelse(sakskompleks: Sakskompleks) : Try<ArbeidInntektYtelseDTO> {
+        val forsteSykdomsdag = sakskompleks.startSyketilfelle
         // Opptjeningstid = minst 4 uker i arbeid før sykdommen
         val fireUkerForSykdomsDag = forsteSykdomsdag.minus(4, ChronoUnit.WEEKS)
 
-        return hentArbeidsforholdRest(AktørId(sykepengesøknad.aktorId), fireUkerForSykdomsDag, forsteSykdomsdag)
+        return hentArbeidsforholdRest(AktørId(sakskompleks.aktørId), fireUkerForSykdomsDag, forsteSykdomsdag)
     }
 
     fun hentArbeidsforholdRest(aktørId: AktørId, fom: LocalDate, tom: LocalDate) : Try<ArbeidInntektYtelseDTO> {

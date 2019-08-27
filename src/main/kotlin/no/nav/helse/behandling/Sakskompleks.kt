@@ -13,12 +13,9 @@ import com.fasterxml.jackson.databind.ser.std.StdSerializer
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import no.nav.helse.behandling.inntektsmelding.Inntektsmelding
-import no.nav.helse.behandling.sykmelding.Sykmelding
-import no.nav.helse.behandling.sykmelding.SykmeldingDeserializer
 import no.nav.helse.behandling.sykmelding.SykmeldingMessage
-import no.nav.helse.behandling.sykmelding.SykmeldingSerializer
 import no.nav.helse.behandling.søknad.Sykepengesøknad
-import java.util.UUID
+import java.time.LocalDate
 
 @JsonSerialize(using = SakskompleksSerializer::class)
 @JsonDeserialize(using = SakskompleksDeserializer::class)
@@ -28,8 +25,10 @@ data class Sakskompleks(val jsonNode: JsonNode) {
     val sykmeldinger = jsonNode["sykmeldinger"].map { SykmeldingMessage(it) }
     val søknader = jsonNode["søknader"].map { Sykepengesøknad(it) }
     val inntektsmeldinger = jsonNode["inntektsmeldinger"].map { Inntektsmelding(it) }
+    val orgnummer get() = jsonNode["orgnummer"].asText()
+    val startSyketilfelle get() = jsonNode["syketilfelleStartdato"].safelyUnwrapDate()!!
+    val sluttSyketilfelle get() = jsonNode["syketilfelleSluttdato"].safelyUnwrapDate()!!
 }
-
 
 class SakskompleksSerializer : StdSerializer<Sakskompleks>(Sakskompleks::class.java) {
     override fun serialize(sakskompleks: Sakskompleks?, gen: JsonGenerator?, provider: SerializerProvider?) {
@@ -47,5 +46,13 @@ class SakskompleksDeserializer : StdDeserializer<Sakskompleks>(Sakskompleks::cla
     override fun deserialize(parser: JsonParser?, context: DeserializationContext?) =
         Sakskompleks(objectMapper.readTree(parser))
 
+}
+
+fun JsonNode.safelyUnwrapDate(): LocalDate? {
+    return if (isNull) {
+        null
+    } else {
+        LocalDate.parse(textValue())
+    }
 }
 

@@ -3,6 +3,7 @@ package no.nav.helse
 import arrow.core.Either
 import no.nav.helse.behandling.AvklarteVerdier
 import no.nav.helse.behandling.Behandlingsgrunnlag
+import no.nav.helse.behandling.Sakskompleks
 import no.nav.helse.behandling.Tpsfakta
 import no.nav.helse.behandling.sykepengeBeregning
 import no.nav.helse.behandling.søknad.Sykepengesøknad
@@ -60,7 +61,7 @@ class BeregningTest {
 
     fun vilkårsprøvdSøknad(fom: LocalDate, tom: LocalDate, årslønn: Long, sykmeldingsgrad: Int) =
             Behandlingsgrunnlag(
-                    originalSøknad = Sykepengesøknad(SykepengesøknadV2DTO(
+                    Sakskompleks(Sykepengesøknad(SykepengesøknadV2DTO(
                             id = "1",
                             aktorId = "123123",
                             type = SoknadstypeDTO.ARBEIDSTAKERE,
@@ -73,7 +74,7 @@ class BeregningTest {
                             startSyketilfelle = parse("2018-12-01"),
                             status = SoknadsstatusDTO.SENDT,
                             andreInntektskilder = emptyList(),
-                            fravar = emptyList()).asJsonNode()),
+                            fravar = emptyList()).asJsonNode())),
                     faktagrunnlag = faktagrunnlagUtenVerdi,
                     avklarteVerdier = AvklarteVerdier(
                             medlemsskap = Avklart(fastsattVerdi = true, begrunnelse = "derfor", fastsattAv = "test", grunnlag = Tpsfakta(LocalDate.parse("1980-01-01"), "NOR", "NOR", "BOSA", null)),

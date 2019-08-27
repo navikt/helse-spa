@@ -109,18 +109,18 @@ class SaksbehandlingProbe(env: Environment) {
 
     private fun MVPFilterFeil.mvpFilter() {
         mvpFeil.onEach {
-            kriterieForMVPErIkkeOppfylt(soknadId, it, mvpFeil.size == 1)
+            kriterieForMVPErIkkeOppfylt(sakskompleksId, it, mvpFeil.size == 1)
         }
 
         behandlingsfeilCounter.labels("mvpFilter").inc()
         influxMetricReporter.sendDataPoint("behandlingsfeil.event", mapOf(
-                "soknadId" to soknadId
+                "sakskompleksId" to sakskompleksId
         ), mapOf(
                 "steg" to "mvpFilter",
-                "type" to søknad.type
+                "type" to sakskompleks.søknader[0].type
         ))
 
-        log.info("Søknad for aktør ${søknad.aktorId} faller ut av MVP")
+        log.info("Sakskompleks for aktør ${sakskompleks.aktørId} faller ut av MVP")
     }
 
     private fun RegisterFeil.registerFeil() {
@@ -128,10 +128,10 @@ class SaksbehandlingProbe(env: Environment) {
 
         behandlingsfeilCounter.labels("register").inc()
         influxMetricReporter.sendDataPoint("behandlingsfeil.event", mapOf(
-                "soknadId" to søknad.id
+                "sakskompleksId" to sakskompleks.id
         ), mapOf(
                 "steg" to "register",
-                "type" to søknad.type
+                "type" to sakskompleks.søknader[0].type
         ))
     }
 
@@ -145,7 +145,7 @@ class SaksbehandlingProbe(env: Environment) {
                 influxMetricReporter.sendDataPoint(DataPoint(
                         name = "avklaringsfeil.event",
                         fields = mapOf(
-                                "soknadId" to uavklarteFakta.originalSøknad.id
+                                "sakskompleksId" to uavklarteFakta.sakskompleks.id
                         ),
                         tags = mapOf(
                                 "datum" to name,
@@ -159,43 +159,43 @@ class SaksbehandlingProbe(env: Environment) {
 
 
         influxMetricReporter.sendDataPoint("behandlingsfeil.event", mapOf(
-                "soknadId" to uavklarteFakta.originalSøknad.id
+                "sakskompleksId" to uavklarteFakta.sakskompleks.id
         ), mapOf(
                 "steg" to "avklaring",
-                "type" to uavklarteFakta.originalSøknad.type
+                "type" to uavklarteFakta.sakskompleks.søknader[0].type
         ))
-        log.info("Søknad for aktør ${uavklarteFakta.originalSøknad.aktorId} med id ${uavklarteFakta.originalSøknad.id} er uavklart")
+        log.info("Sakskompleks for aktør ${uavklarteFakta.sakskompleks.aktørId} med id ${uavklarteFakta.sakskompleks.id} er uavklart")
     }
 
     private fun Vilkårsprøvingsfeil.vilkårsPrøvingsFeil() {
         behandlingsfeilCounter.labels("vilkarsproving").inc()
         influxMetricReporter.sendDataPoint("behandlingsfeil.event", mapOf(
-                "soknadId" to vilkårsprøving.originalSøknad.id
+                "sakskompleks" to vilkårsprøving.sakskompleks.id
         ), mapOf(
                 "steg" to "vilkarsproving",
-                "type" to vilkårsprøving.originalSøknad.type
+                "type" to vilkårsprøving.sakskompleks.søknader[0].type
         ))
-        log.info("Søknad for aktør ${vilkårsprøving.originalSøknad.aktorId} med id ${vilkårsprøving.originalSøknad.id} oppfyller ikke vilkårene")
+        log.info("Sakskompleks for aktør ${vilkårsprøving.sakskompleks.aktørId} med id ${vilkårsprøving.sakskompleks.søknader[0].id} oppfyller ikke vilkårene")
     }
 
     private fun Beregningsfeil.beregningsfeil() {
         behandlingsfeilCounter.labels("beregning").inc()
         influxMetricReporter.sendDataPoint("behandlingsfeil.event", mapOf(
-                "soknadId" to vilkårsprøving.originalSøknad.id
+                "sakskompleksId" to vilkårsprøving.sakskompleks.id
         ), mapOf(
                 "steg" to "beregning",
-                "type" to vilkårsprøving.originalSøknad.type
+                "type" to vilkårsprøving.sakskompleks.søknader[0].type
         ))
         log.info(feilmelding)
     }
 
     fun vedtakBehandlet(vedtak: SykepengeVedtak) {
         influxMetricReporter.sendDataPoint("behandling.event", mapOf(
-                "soknadId" to vedtak.originalSøknad.id
+                "sakskompleksId" to vedtak.sakskompleks.id
         ), mapOf(
-                "type" to vedtak.originalSøknad.type
+                "type" to vedtak.sakskompleks.søknader[0].type
         ))
-        log.info("Søknad for aktør ${vedtak.originalSøknad.aktorId} med id ${vedtak.originalSøknad.id} behandlet OK.")
+        log.info("Sakskompleks for aktør ${vedtak.sakskompleks.aktørId} med id ${vedtak.sakskompleks.id} behandlet OK.")
     }
 
 

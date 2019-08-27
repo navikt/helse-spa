@@ -28,7 +28,7 @@ class SakskompleksTest {
     @Test
     fun `sakskompleks inneholder id og aktørId`() {
         assertEquals("71bd853d-36a1-49df-a34c-6e02cf727awd", sakskompleks.id)
-        assertEquals("1234567890123", sakskompleks.aktørId)
+        assertEquals("11987654321", sakskompleks.aktørId)
     }
 
     @Test

@@ -1,5 +1,10 @@
 package no.nav.helse
 
+import com.fasterxml.jackson.databind.SerializationFeature
+import com.fasterxml.jackson.databind.node.ArrayNode
+import com.fasterxml.jackson.databind.node.ObjectNode
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import no.nav.helse.behandling.*
 import no.nav.helse.behandling.søknad.Sykepengesøknad
 import no.nav.helse.dto.*
@@ -59,9 +64,23 @@ val originalSoknad = Sykepengesøknad(SykepengesøknadV2DTO(
 ).asJsonNode())
 
 val soknadUtenVerdi = FaktagrunnlagResultat(
-        originalSøknad = originalSoknad,
+        sakskompleks = Sakskompleks(originalSoknad),
         faktagrunnlag = faktagrunnlagUtenVerdi
 )
+
+fun Sakskompleks(enesteSøknad: Sykepengesøknad): Sakskompleks {
+        val objectMapper = jacksonObjectMapper()
+                .registerModule(JavaTimeModule())
+                .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+
+        val sakskompleksJson = objectMapper.readTree("/sakskompleks/tomtSakskompleks.json".readResource()) as ObjectNode
+        (sakskompleksJson["søknader"] as ArrayNode).addAll(listOf(enesteSøknad.jsonNode))
+        sakskompleksJson.replace("syketilfelleStartDato", enesteSøknad.jsonNode["startSyketilfelle"])
+        sakskompleksJson.replace("orgnummer", enesteSøknad.jsonNode["arbeidsgiver"]["orgnummer"])
+        sakskompleksJson.replace("syketilfelleStartdato", enesteSøknad.jsonNode["startSyketilfelle"])
+        sakskompleksJson.replace("syketilfelleSluttdato", enesteSøknad.jsonNode["tom"])
+        return Sakskompleks(sakskompleksJson)
+}
 
 val enkleAvklarteVerdier = AvklarteVerdier(
         alder = Vurdering.Avklart(fastsattVerdi = 50, fastsattAv = "test", begrunnelse = "whatevs", grunnlag = Aldersgrunnlag(fodselsdato = LocalDate.now().minusYears(50))),
@@ -88,7 +107,7 @@ val enkleAvklarteVerdier = AvklarteVerdier(
 
 val enkelSykepengeberegning: Sykepengeberegning =
         Sykepengeberegning(
-                originalSøknad = originalSoknad,
+                sakskompleks = Sakskompleks(originalSoknad),
                 beregning = Beregningsresultat(dagsatser = listOf(Dagsats(dato = LocalDate.now(), sats = 1000L, skalUtbetales = true)), delresultater = emptyList()),
                 avklarteVerdier = enkleAvklarteVerdier,
                 faktagrunnlag = faktagrunnlagUtenVerdi,

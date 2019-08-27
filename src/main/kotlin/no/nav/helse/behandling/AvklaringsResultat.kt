@@ -11,7 +11,7 @@ import java.time.LocalDate
 sealed class AvklaringsResultat
 
 data class AvklarteFakta(
-        val originalSøknad: Sykepengesøknad,
+        val sakskompleks: Sakskompleks,
         val faktagrunnlag: Faktagrunnlag,
         val avklarteVerdier: AvklarteVerdier
 ) : AvklaringsResultat()
@@ -27,7 +27,7 @@ data class AvklarteVerdier(
 )
 
 data class UavklarteFakta(
-        val originalSøknad: Sykepengesøknad,
+        val sakskompleks: Sakskompleks,
         val faktagrunnlag: Faktagrunnlag,
         val uavklarteVerdier: UavklarteVerdier
 ) : AvklaringsResultat()

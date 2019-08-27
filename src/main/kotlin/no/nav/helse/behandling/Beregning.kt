@@ -10,7 +10,7 @@ fun sykepengeBeregning(vilkårsprøving: Behandlingsgrunnlag): Either<Behandling
         try {
             val beregningsresultat = beregn(lagBeregninggrunnlag(vilkårsprøving))
             Either.Right(Sykepengeberegning(
-                    originalSøknad = vilkårsprøving.originalSøknad,
+                    sakskompleks = vilkårsprøving.sakskompleks,
                     faktagrunnlag = vilkårsprøving.faktagrunnlag,
                     avklarteVerdier = vilkårsprøving.avklarteVerdier,
                     vilkårsprøving = vilkårsprøving.vilkårsprøving,
@@ -21,16 +21,16 @@ fun sykepengeBeregning(vilkårsprøving: Behandlingsgrunnlag): Either<Behandling
 
 private fun lagBeregninggrunnlag(vilkårsprøving: Behandlingsgrunnlag) : Beregningsgrunnlag =
         Beregningsgrunnlag(
-                fom = vilkårsprøving.originalSøknad.fom, // er dette første dag etter arbeidsgiverperiode ?
+                fom = vilkårsprøving.sakskompleks.søknader[0].fom, // er dette første dag etter arbeidsgiverperiode ?
                 ferie = null,
                 permisjon = null,
-                sykmeldingsgrad = vilkårsprøving.originalSøknad.soknadsperioder.let {
+                sykmeldingsgrad = vilkårsprøving.sakskompleks.søknader[0].soknadsperioder.let {
                     if (it.size == 1) it[0].sykmeldingsgrad else throw Exception("takler bare én periode per nå")
                 },
                 sykepengegrunnlag =  no.nav.helse.sykepenger.beregning.Sykepengegrunnlag(
                         fastsattInntekt = vilkårsprøving.avklarteVerdier.sykepengegrunnlag.fastsattVerdi.sykepengegrunnlagNårTrygdenYter.fastsattVerdi,
-                        grunnbeløp = getGrunnbeløpForDato(vilkårsprøving.originalSøknad.fom)),
+                        grunnbeløp = getGrunnbeløpForDato(vilkårsprøving.sakskompleks.søknader[0].fom)),
                 sisteUtbetalingsdato = (vilkårsprøving.avklarteVerdier.maksdato.fastsattVerdi).let {
-                    if (it.isBefore(vilkårsprøving.originalSøknad.tom)) it else vilkårsprøving.originalSøknad.tom
+                    if (it.isBefore(vilkårsprøving.sakskompleks.søknader[0].tom)) it else vilkårsprøving.sakskompleks.søknader[0].tom
                 })
 

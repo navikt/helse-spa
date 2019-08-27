@@ -6,17 +6,17 @@ import no.nav.helse.behandling.mvp.*
 
 fun FaktagrunnlagResultat.mvpFilter(): Either<Behandlingsfeil, FaktagrunnlagResultat> {
     val mvpKriterier = listOf(
-            sjekkSvarISøknaden(originalSøknad),
+            sjekkSvarISøknaden(sakskompleks.søknader[0]),
             vurderMVPKriterierForMedlemskap(faktagrunnlag.tps),
-            vurderMVPKriterierForOpptjeningstid(originalSøknad.arbeidsgiver, faktagrunnlag.arbeidInntektYtelse.arbeidsforhold),
-            vurderMVPKriterierForSykepengegrunnlaget(originalSøknad.startSyketilfelle, originalSøknad.soknadsperioder, faktagrunnlag.beregningsperiode, faktagrunnlag.sammenligningsperiode),
+            vurderMVPKriterierForOpptjeningstid(sakskompleks.søknader[0].arbeidsgiver, faktagrunnlag.arbeidInntektYtelse.arbeidsforhold),
+            vurderMVPKriterierForSykepengegrunnlaget(sakskompleks.søknader[0].startSyketilfelle, sakskompleks.søknader[0].soknadsperioder, faktagrunnlag.beregningsperiode, faktagrunnlag.sammenligningsperiode),
             vurderMVPKriterierForAndreYtelser(faktagrunnlag.arbeidInntektYtelse.ytelser, faktagrunnlag.ytelser)
     )
 
     val mvpFeil = mvpKriterier.filter { it.isNotEmpty() }.flatMap { it }
 
     return if (mvpFeil.isNotEmpty()) {
-        Either.Left(Behandlingsfeil.mvpFilter(originalSøknad, mvpFeil))
+        Either.Left(Behandlingsfeil.mvpFilter(sakskompleks, mvpFeil))
     } else {
         Either.Right(this)
     }

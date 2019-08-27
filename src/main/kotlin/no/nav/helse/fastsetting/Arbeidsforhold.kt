@@ -34,15 +34,15 @@ fun vurderArbeidsforhold(fakta : FaktagrunnlagResultat) : Vurdering<Arbeidsforho
         return Uavklart(Uavklart.Årsak.FORSTÅR_IKKE_DATA, "Flere arbeidsforhold med inntekt", "Søker har ${forskjelligeArbeidsforhold.size} forskjellige arbeidsforhold som han eller hun har mottatt inntekt på", forskjelligeArbeidsforhold)
     }
 
-    if (forskjelligeArbeidsforhold[0].arbeidsgiver.identifikator != fakta.originalSøknad.arbeidsgiver.orgnummer) {
+    if (forskjelligeArbeidsforhold[0].arbeidsgiver.identifikator != fakta.sakskompleks.orgnummer) {
         return Uavklart(Uavklart.Årsak.HAR_IKKE_DATA, "Ingen inntekter hos aktuell arbeidsgiver", "Søker har ingen inntekter hos aktuell arbeidsgiver", forskjelligeArbeidsforhold)
     }
 
     val arbeidsforholdFakta = fakta.faktagrunnlag.arbeidInntektYtelse.arbeidsforhold
     return when {
         arbeidsforholdFakta.none {
-            it.arbeidsgiver.identifikator == fakta.originalSøknad.arbeidsgiver.orgnummer
-        } -> Uavklart(Uavklart.Årsak.HAR_IKKE_DATA, "Ingen arbeidsforhold hos aktuell arbeidsgiver", "Søker har ikke arbeidsforhold hos ${fakta.originalSøknad.arbeidsgiver.navn}", arbeidsforholdFakta)
-        else -> Vurdering.Avklart(arbeidsforholdFakta.first { it.arbeidsgiver.identifikator == fakta.originalSøknad.arbeidsgiver.orgnummer }, "Søker har et arbeidsforhold hos ${fakta.originalSøknad.arbeidsgiver.navn}", arbeidsforholdFakta, "SPA")
+            it.arbeidsgiver.identifikator == fakta.sakskompleks.orgnummer
+        } -> Uavklart(Uavklart.Årsak.HAR_IKKE_DATA, "Ingen arbeidsforhold hos aktuell arbeidsgiver", "Søker har ikke arbeidsforhold hos ${fakta.sakskompleks.søknader[0].arbeidsgiver.navn}", arbeidsforholdFakta)
+        else -> Vurdering.Avklart(arbeidsforholdFakta.first { it.arbeidsgiver.identifikator == fakta.sakskompleks.orgnummer }, "Søker har et arbeidsforhold hos ${fakta.sakskompleks.søknader[0].arbeidsgiver.navn}", arbeidsforholdFakta, "SPA")
     }
 }
