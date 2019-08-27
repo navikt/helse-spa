@@ -43,7 +43,7 @@ fun Sakskompleks.mvpFilter(): Either<Behandlingsfeil.MVPFilterFeil, Sakskompleks
         mvpFilter(
             this, listOf(
                 MVPFeil(
-                    "Sakskompleks inneholder ${søknader.size} med typene [${søknader.joinToString { it.type }}]",
+                    "Sakskompleks inneholder ${søknader.size} søknader med typene [${søknader.joinToString { it.type }}]",
                     "Et sakskompleks må inneholde nøyaktig en søknad med typen ARBEIDSTAKERE"
                 )
             )

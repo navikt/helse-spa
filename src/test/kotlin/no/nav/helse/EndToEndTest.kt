@@ -12,6 +12,7 @@ import assertk.assertions.isNull
 import assertk.assertions.isTrue
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.SerializationFeature
+import com.fasterxml.jackson.databind.node.ArrayNode
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
@@ -34,10 +35,6 @@ import no.nav.helse.behandling.Tpsfakta
 import no.nav.helse.behandling.Vedtak
 import no.nav.helse.behandling.Vedtaksperiode
 import no.nav.helse.behandling.søknad.Sykepengesøknad
-import no.nav.helse.dto.ArbeidsgiverDTO
-import no.nav.helse.dto.SoknadsperiodeDTO
-import no.nav.helse.dto.SoknadsstatusDTO
-import no.nav.helse.dto.SoknadstypeDTO
 import no.nav.helse.dto.SykepengesøknadV2DTO
 import no.nav.helse.fastsetting.Alder
 import no.nav.helse.fastsetting.Aldersgrunnlag
@@ -66,7 +63,6 @@ import no.nav.helse.oppslag.arbeidinntektytelse.dto.InntektMedArbeidsforholdDTO
 import no.nav.helse.oppslag.arbeidinntektytelse.dto.VirksomhetDTO
 import no.nav.helse.oppslag.arbeidinntektytelse.dto.YtelserDTO
 import no.nav.helse.serde.JsonNodeSerializer
-import no.nav.helse.streams.JsonSerializer
 import no.nav.helse.streams.Topics.SYKEPENGEBEHANDLINGSFEIL
 import no.nav.helse.streams.Topics.SYKEPENGESØKNADER_INN
 import no.nav.helse.streams.Topics.VEDTAK_SYKEPENGER
@@ -99,6 +95,7 @@ import java.time.YearMonth
 import java.time.temporal.ChronoUnit
 import java.time.temporal.TemporalAdjusters
 import java.time.temporal.TemporalAdjusters.lastDayOfMonth
+import java.util.UUID
 import java.util.concurrent.TimeUnit
 
 class EndToEndTest {
@@ -112,16 +109,16 @@ class EndToEndTest {
             .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
 
         val embeddedEnvironment = KafkaEnvironment(
-                users = listOf(JAASCredential(username, password)),
-                autoStart = false,
-                withSchemaRegistry = false,
-                withSecurity = true,
-                topics = listOf(
-                        SYKEPENGESØKNADER_INN.name,
-                        VEDTAK_SYKEPENGER.name,
-                        SYKEPENGEBEHANDLINGSFEIL.name,
-                        SAKSKOMPLEKS_TOPIC
-                )
+            users = listOf(JAASCredential(username, password)),
+            autoStart = false,
+            withSchemaRegistry = false,
+            withSecurity = true,
+            topics = listOf(
+                SYKEPENGESØKNADER_INN.name,
+                VEDTAK_SYKEPENGER.name,
+                SYKEPENGEBEHANDLINGSFEIL.name,
+                SAKSKOMPLEKS_TOPIC
+            )
         )
 
         val server: WireMockServer = WireMockServer(WireMockConfiguration.options().dynamicPort())
@@ -148,13 +145,13 @@ class EndToEndTest {
 
         private fun startSpa() {
             val env = Environment(
-                    username = username,
-                    password = password,
-                    kafkaUsername = username,
-                    kafkaPassword = password,
-                    bootstrapServersUrl = embeddedEnvironment.brokersURL,
-                    sparkelBaseUrl = server.baseUrl(),
-                    stsRestUrl = server.baseUrl()
+                username = username,
+                password = password,
+                kafkaUsername = username,
+                kafkaPassword = password,
+                bootstrapServersUrl = embeddedEnvironment.brokersURL,
+                sparkelBaseUrl = server.baseUrl(),
+                stsRestUrl = server.baseUrl()
             )
 
             app = SaksbehandlingStream(env)
@@ -198,7 +195,31 @@ class EndToEndTest {
         checkVilkårsprøving(sykepengeVedtak.vilkårsprøving)
         checkBeregning(sykepengeVedtak.beregning)
         checkVedtak(sykepengeVedtak.vedtak)
+    }
 
+    @Test
+    fun `et sakskompleks med flere søknader får ikke automatisk vedtak`() {
+        val aktørId = "11987654321"
+
+        println("Kafka: ${embeddedEnvironment.brokersURL}")
+        println("Zookeeper: ${embeddedEnvironment.serverPark.zookeeper.host}:${embeddedEnvironment.serverPark.zookeeper.port}")
+
+        restStsStub()
+        personStub(aktørId)
+        inntektStub(aktørId)
+        arbeidsforholdStub(aktørId)
+        sykepengehistorikkStub(aktørId)
+        ytelserStub(aktørId)
+
+        val sakskompleksJson = objectMapper.readTree("/sakskompleks/sakskompleks.json".readResource())
+        (sakskompleksJson["søknader"] as ArrayNode).add(originalSoknad.jsonNode)
+        val sakskompleks = Sakskompleks(sakskompleksJson)
+
+        produceOneMessage(SAKSKOMPLEKS_TOPIC, sakskompleks.id, sakskompleks.jsonNode)
+
+        val behandlingsfeil: Behandlingsfeil = ventPåBehandlingsfeil()
+        assertEquals("Sakskompleks faller ut fordi det passer ikke for MVP", behandlingsfeil.feilmelding)
+        assertEquals("71bd853d-36a1-49df-a34c-6e02cf727awd", behandlingsfeil.sakskompleksId)
     }
 
     private fun checkSøknad(innsendtSøknad: SykepengesøknadV2DTO, faktiskSøknad: Sykepengesøknad) {
@@ -220,8 +241,16 @@ class EndToEndTest {
 
     private fun checkFaktagrunnlag(faktagrunnlag: Faktagrunnlag) {
         checkTpsFakta(faktagrunnlag.tps)
-        checkInntekt(faktagrunnlag.beregningsperiode, beregningsgrunnlagStart, beregningsgrunnlagStart.plusMonths(2).with(lastDayOfMonth()))
-        checkInntekt(faktagrunnlag.sammenligningsperiode, sammenligningsgrunnlagStart, sammenligningsgrunnlagStart.plusMonths(11).with(lastDayOfMonth()))
+        checkInntekt(
+            faktagrunnlag.beregningsperiode,
+            beregningsgrunnlagStart,
+            beregningsgrunnlagStart.plusMonths(2).with(lastDayOfMonth())
+        )
+        checkInntekt(
+            faktagrunnlag.sammenligningsperiode,
+            sammenligningsgrunnlagStart,
+            sammenligningsgrunnlagStart.plusMonths(11).with(lastDayOfMonth())
+        )
         checkSykepengeliste(faktagrunnlag.sykepengehistorikk)
         checkArbeidsforhold(faktagrunnlag.arbeidInntektYtelse.arbeidsforhold)
     }
@@ -244,18 +273,28 @@ class EndToEndTest {
     private fun checkAlder(aldersVurdering: Vurdering.Avklart<Alder, Aldersgrunnlag>) {
         assert(aldersVurdering.fastsattVerdi).isEqualTo(48)
         assert(aldersVurdering.begrunnelse).isEqualTo(begrunnelse_p_8_51)
-        assert(aldersVurdering.vurderingstidspunkt).isBetween(LocalDateTime.now().minusHours(1), LocalDateTime.now().plusHours(1))
+        assert(aldersVurdering.vurderingstidspunkt).isBetween(
+            LocalDateTime.now().minusHours(1),
+            LocalDateTime.now().plusHours(1)
+        )
         assert(aldersVurdering.fastsattAv).isEqualTo("SPA")
 
         assert(aldersVurdering.grunnlag.fodselsdato).isEqualTo(stubbet_person.fdato)
     }
 
-    private fun checkMaksdato(alder: Alder, sykepengehistorikk: List<AnvistPeriodeDTO>, maksdato: Vurdering.Avklart<LocalDate, Grunnlagsdata>) {
+    private fun checkMaksdato(
+        alder: Alder,
+        sykepengehistorikk: List<AnvistPeriodeDTO>,
+        maksdato: Vurdering.Avklart<LocalDate, Grunnlagsdata>
+    ) {
         val forventetMaksdato = LocalDate.of(2019, 11, 28)
 
         assert(maksdato.fastsattVerdi).isEqualTo(forventetMaksdato)
         assert(maksdato.begrunnelse).isEqualTo("§ 8-12: ARBEIDSTAKER på 48 år gir maks 248 dager. 10 av disse er forbrukt")
-        assert(maksdato.vurderingstidspunkt).isBetween(LocalDateTime.now().minusHours(1), LocalDateTime.now().plusHours(1))
+        assert(maksdato.vurderingstidspunkt).isBetween(
+            LocalDateTime.now().minusHours(1),
+            LocalDateTime.now().plusHours(1)
+        )
         assert(maksdato.fastsattAv).isEqualTo("SPA")
 
         val grunnlag = maksdato.grunnlag
@@ -269,7 +308,10 @@ class EndToEndTest {
     private fun checkMedlemsskap(medlemsskap: Vurdering.Avklart<Boolean, Tpsfakta>) {
         assert(medlemsskap.fastsattVerdi).isTrue()
         assert(medlemsskap.begrunnelse).contains(søkerOppfyllerKravOmMedlemskap)
-        assert(medlemsskap.vurderingstidspunkt).isBetween(LocalDateTime.now().minusHours(1), LocalDateTime.now().plusHours(1))
+        assert(medlemsskap.vurderingstidspunkt).isBetween(
+            LocalDateTime.now().minusHours(1),
+            LocalDateTime.now().plusHours(1)
+        )
         assert(medlemsskap.fastsattAv).isEqualTo("SPA")
 
         assert(medlemsskap.grunnlag.bostedland).isEqualTo(landskodeNORGE)
@@ -282,7 +324,10 @@ class EndToEndTest {
         checkSykepengegrunnlagNårTrygdenYter(sykepengegrunnlagVurdering.fastsattVerdi.sykepengegrunnlagNårTrygdenYter)
         checkSykepengegrunnlagIArbeidsgiverperioden(sykepengegrunnlagVurdering.fastsattVerdi.sykepengegrunnlagIArbeidsgiverperioden)
         assert(sykepengegrunnlagVurdering.begrunnelse).isEqualTo("")
-        assert(sykepengegrunnlagVurdering.vurderingstidspunkt).isBetween(LocalDateTime.now().minusHours(1), LocalDateTime.now().plusHours(1))
+        assert(sykepengegrunnlagVurdering.vurderingstidspunkt).isBetween(
+            LocalDateTime.now().minusHours(1),
+            LocalDateTime.now().plusHours(1)
+        )
         assert(sykepengegrunnlagVurdering.fastsattAv).isEqualTo("SPA")
 
         checkBeregningsperiode12mnd(sykepengegrunnlagVurdering.grunnlag)
@@ -291,7 +336,10 @@ class EndToEndTest {
     private fun checkSykepengegrunnlagNårTrygdenYter(sykepengegrunnlagNårTrygdenYterVurdering: Vurdering.Avklart<Long, List<Inntekt>>) {
         assert(sykepengegrunnlagNårTrygdenYterVurdering.fastsattVerdi).isEqualTo(300000L)
         assert(sykepengegrunnlagNårTrygdenYterVurdering.begrunnelse).contains(paragraf_8_30_første_ledd)
-        assert(sykepengegrunnlagNårTrygdenYterVurdering.vurderingstidspunkt).isBetween(LocalDateTime.now().minusHours(1), LocalDateTime.now().plusHours(1))
+        assert(sykepengegrunnlagNårTrygdenYterVurdering.vurderingstidspunkt).isBetween(
+            LocalDateTime.now().minusHours(1),
+            LocalDateTime.now().plusHours(1)
+        )
         assert(sykepengegrunnlagNårTrygdenYterVurdering.fastsattAv).isEqualTo("SPA")
 
         checkBeregningsperiode3mnd(sykepengegrunnlagNårTrygdenYterVurdering.grunnlag)
@@ -300,18 +348,30 @@ class EndToEndTest {
     private fun checkSykepengegrunnlagIArbeidsgiverperioden(sykepengegrunnlagIArbeidsgiverperiodenVurdering: Vurdering.Avklart<Long, List<Inntekt>>) {
         assert(sykepengegrunnlagIArbeidsgiverperiodenVurdering.fastsattVerdi).isEqualTo(25000L)
         assert(sykepengegrunnlagIArbeidsgiverperiodenVurdering.begrunnelse).contains(paragraf_8_28_andre_ledd)
-        assert(sykepengegrunnlagIArbeidsgiverperiodenVurdering.vurderingstidspunkt).isBetween(LocalDateTime.now().minusHours(1), LocalDateTime.now().plusHours(1))
+        assert(sykepengegrunnlagIArbeidsgiverperiodenVurdering.vurderingstidspunkt).isBetween(
+            LocalDateTime.now().minusHours(
+                1
+            ), LocalDateTime.now().plusHours(1)
+        )
         assert(sykepengegrunnlagIArbeidsgiverperiodenVurdering.fastsattAv).isEqualTo("SPA")
 
         checkBeregningsperiode3mnd(sykepengegrunnlagIArbeidsgiverperiodenVurdering.grunnlag)
     }
 
     private fun checkBeregningsperiode3mnd(beregningsperiode: List<Inntekt>) {
-        checkInntekt(beregningsperiode, beregningsgrunnlagStart, beregningsgrunnlagStart.plusMonths(2).with(lastDayOfMonth()))
+        checkInntekt(
+            beregningsperiode,
+            beregningsgrunnlagStart,
+            beregningsgrunnlagStart.plusMonths(2).with(lastDayOfMonth())
+        )
     }
 
     private fun checkBeregningsperiode12mnd(beregningsperiode: List<Inntekt>) {
-        checkInntekt(beregningsperiode, sammenligningsgrunnlagStart, sammenligningsgrunnlagStart.plusMonths(11).with(lastDayOfMonth()))
+        checkInntekt(
+            beregningsperiode,
+            sammenligningsgrunnlagStart,
+            sammenligningsgrunnlagStart.plusMonths(11).with(lastDayOfMonth())
+        )
     }
 
     private fun checkInntekt(inntekter: List<Inntekt>, startDate: LocalDate, endDate: LocalDate) {
@@ -327,7 +387,10 @@ class EndToEndTest {
     private fun checkArbeidsforholdVurdering(arbeidsforholdVurdering: Vurdering.Avklart<ArbeidsforholdDTO, List<ArbeidsforholdDTO>>) {
         assert(arbeidsforholdVurdering.fastsattVerdi).isEqualTo(stubbet_arbeidsforhold)
         assert(arbeidsforholdVurdering.begrunnelse).isEqualTo("Søker har et arbeidsforhold hos MATBUTIKKEN")
-        assert(arbeidsforholdVurdering.vurderingstidspunkt).isBetween(LocalDateTime.now().minusHours(1), LocalDateTime.now().plusHours(1))
+        assert(arbeidsforholdVurdering.vurderingstidspunkt).isBetween(
+            LocalDateTime.now().minusHours(1),
+            LocalDateTime.now().plusHours(1)
+        )
         assert(arbeidsforholdVurdering.fastsattAv).isEqualTo("SPA")
 
         checkArbeidsforhold(arbeidsforholdVurdering.grunnlag)
@@ -340,7 +403,10 @@ class EndToEndTest {
     private fun checkOpptjeningstid(opptjeningstidVurdering: Vurdering.Avklart<Opptjeningstid, Opptjeningsgrunnlag>) {
         assert(opptjeningstidVurdering.fastsattVerdi).isEqualTo(730L) // Antall dager fra arbeidsfrholdets startdato til første sykdomsdag
         assert(opptjeningstidVurdering.begrunnelse).isEqualTo(begrunnelse_søker_i_aktivt_arbeidsforhold)
-        assert(opptjeningstidVurdering.vurderingstidspunkt).isBetween(LocalDateTime.now().minusHours(1), LocalDateTime.now().plusHours(1))
+        assert(opptjeningstidVurdering.vurderingstidspunkt).isBetween(
+            LocalDateTime.now().minusHours(1),
+            LocalDateTime.now().plusHours(1)
+        )
         assert(opptjeningstidVurdering.fastsattAv).isEqualTo("SPA")
 
         val opptjeningsgrunnlag = opptjeningstidVurdering.grunnlag
@@ -370,37 +436,18 @@ class EndToEndTest {
     }
 
     private fun checkVedtak(vedtak: Vedtak) {
-        assert(vedtak.perioder).containsExactly(Vedtaksperiode(fom = LocalDate.of(2019, 1, 1), tom = LocalDate.of(2019, 1, 31), dagsats = BigDecimal.valueOf(1154L), fordeling = listOf(Fordeling(mottager = "97114455", andel = 100))))
+        assert(vedtak.perioder).containsExactly(
+            Vedtaksperiode(
+                fom = LocalDate.of(2019, 1, 1),
+                tom = LocalDate.of(2019, 1, 31),
+                dagsats = BigDecimal.valueOf(1154L),
+                fordeling = listOf(Fordeling(mottager = "97114455", andel = 100))
+            )
+        )
     }
 
     val første_dag_i_syketilfelle = parse("2019-01-01")
     val siste_dag_i_syketilfelle = parse("2019-01-31")
-
-    private fun produserSykepengesøknadV2(aktørId: String): SykepengesøknadV2DTO {
-        val søknad = SykepengesøknadV2DTO(
-                id = "1",
-                aktorId = aktørId,
-                type = SoknadstypeDTO.ARBEIDSTAKERE,
-                status = SoknadsstatusDTO.SENDT,
-                arbeidsgiver = ArbeidsgiverDTO(navn = "MATBUTIKKEN", orgnummer = stubbet_arbeidsforhold.arbeidsgiver.identifikator),
-                fom = første_dag_i_syketilfelle,
-                tom = siste_dag_i_syketilfelle,
-                startSyketilfelle = første_dag_i_syketilfelle,
-                sendtNav = parse("2019-01-17").atStartOfDay(),
-                soknadsperioder = listOf(
-                        SoknadsperiodeDTO(
-                                fom = første_dag_i_syketilfelle,
-                                tom = siste_dag_i_syketilfelle,
-                                sykmeldingsgrad = 100
-                        )
-                ),
-                soktUtenlandsopphold = false,
-                andreInntektskilder = emptyList(),
-                fravar = emptyList()
-        )
-        produceOneMessage(søknad)
-        return søknad
-    }
 
     class SykepengeVedtakDeserializer : Deserializer<SykepengeVedtak> {
         private val log = LoggerFactory.getLogger("SykepengeVedtakDeserializer")
@@ -422,8 +469,32 @@ class EndToEndTest {
 
     }
 
+    class BehandlingsfeilDeserializer : Deserializer<Behandlingsfeil> {
+        private val log = LoggerFactory.getLogger("BehandlingsfeilDeserializer")
+
+        override fun configure(configs: MutableMap<String, *>?, isKey: Boolean) {}
+
+        override fun deserialize(topic: String?, data: ByteArray?): Behandlingsfeil? {
+            return data?.let {
+                try {
+                    defaultObjectMapper.readValue<Behandlingsfeil.MVPFilterFeil>(it)
+                } catch (e: Exception) {
+                    log.warn("Not a valid json", e)
+                    null
+                }
+            }
+        }
+
+        override fun close() {}
+
+    }
+
     private fun ventPåVedtak(): SykepengeVedtak {
-        val resultConsumer = KafkaConsumer<String, SykepengeVedtak>(consumerProperties(), StringDeserializer(), SykepengeVedtakDeserializer())
+        val resultConsumer = KafkaConsumer<String, SykepengeVedtak>(
+            consumerProperties(),
+            StringDeserializer(),
+            SykepengeVedtakDeserializer()
+        )
         resultConsumer.subscribe(listOf(VEDTAK_SYKEPENGER.name))
 
         val end = System.currentTimeMillis() + 20 * 1000
@@ -444,20 +515,43 @@ class EndToEndTest {
         throw RuntimeException("fant ingen vedtak etter 20 sekunder")
     }
 
+    private fun ventPåBehandlingsfeil(): Behandlingsfeil {
+        val resultConsumer = KafkaConsumer<String, Behandlingsfeil>(
+            consumerProperties(),
+            StringDeserializer(),
+            BehandlingsfeilDeserializer()
+        )
+        resultConsumer.subscribe(listOf(SYKEPENGEBEHANDLINGSFEIL.name))
+
+        val end = System.currentTimeMillis() + 20 * 1000
+
+        while (System.currentTimeMillis() < end) {
+            resultConsumer.seekToBeginning(resultConsumer.assignment())
+            val records = resultConsumer.poll(Duration.ofSeconds(1))
+
+            if (!records.isEmpty) {
+                assertEquals(1, records.count())
+
+                return records.records(SYKEPENGEBEHANDLINGSFEIL.name).map {
+                    it.value()
+                }.first()
+            }
+        }
+
+        throw RuntimeException("fant ingen behandlingsfeil etter 20 sekunder")
+    }
+
     private fun consumerProperties(): MutableMap<String, Any>? {
         return HashMap<String, Any>().apply {
             put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, embeddedEnvironment.brokersURL)
             put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, "SASL_PLAINTEXT")
             put(SaslConfigs.SASL_MECHANISM, "PLAIN")
-            put(SaslConfigs.SASL_JAAS_CONFIG, "org.apache.kafka.common.security.plain.PlainLoginModule required username=\"$username\" password=\"$password\";")
-            put(ConsumerConfig.GROUP_ID_CONFIG, "spa-e2e-verification")
+            put(
+                SaslConfigs.SASL_JAAS_CONFIG,
+                "org.apache.kafka.common.security.plain.PlainLoginModule required username=\"$username\" password=\"$password\";"
+            )
+            put(ConsumerConfig.GROUP_ID_CONFIG, "spa-e2e-verification-${UUID.randomUUID()}")
         }
-    }
-
-    private fun produceOneMessage(message: SykepengesøknadV2DTO) {
-        val producer = KafkaProducer<String, JsonNode>(producerProperties(), StringSerializer(), JsonSerializer())
-        producer.send(ProducerRecord(SYKEPENGESØKNADER_INN.name, message.id, defaultObjectMapper.valueToTree(message)))
-        producer.flush()
     }
 
     private fun producerProperties(): MutableMap<String, Any>? {
@@ -465,102 +559,137 @@ class EndToEndTest {
             put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, embeddedEnvironment.brokersURL)
             put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, "SASL_PLAINTEXT")
             put(SaslConfigs.SASL_MECHANISM, "PLAIN")
-            put(SaslConfigs.SASL_JAAS_CONFIG, "org.apache.kafka.common.security.plain.PlainLoginModule required username=\"$username\" password=\"$password\";")
+            put(
+                SaslConfigs.SASL_JAAS_CONFIG,
+                "org.apache.kafka.common.security.plain.PlainLoginModule required username=\"$username\" password=\"$password\";"
+            )
         }
     }
 
     private fun restStsStub() {
-        stubFor(any(urlPathEqualTo("/rest/v1/sts/token"))
-                .willReturn(okJson(defaultObjectMapper.writeValueAsString(
-                        StsRestClient.Token(
+        stubFor(
+            any(urlPathEqualTo("/rest/v1/sts/token"))
+                .willReturn(
+                    okJson(
+                        defaultObjectMapper.writeValueAsString(
+                            StsRestClient.Token(
                                 accessToken = "test token",
                                 type = "Bearer",
                                 expiresIn = 3600
+                            )
                         )
-                ))))
+                    )
+                )
+        )
     }
 
     val stubbet_person = PersonDTO(
-            aktørId = "1078277661159",
-            fdato = parse("1970-09-01"),
-            fornavn = "MAX",
-            etternavn = "SMEKKER",
-            kjønn = Kjønn.MANN,
-            bostedsland = "NOR",
-            statsborgerskap = "NOR",
-            status = "BOSA",
-            diskresjonskode = null
+        aktørId = "1078277661159",
+        fdato = parse("1970-09-01"),
+        fornavn = "MAX",
+        etternavn = "SMEKKER",
+        kjønn = Kjønn.MANN,
+        bostedsland = "NOR",
+        statsborgerskap = "NOR",
+        status = "BOSA",
+        diskresjonskode = null
     )
 
     val stubbet_arbeidsforhold = ArbeidsforholdDTO(
-            type = "Arbeidstaker",
-            arbeidsgiver = no.nav.helse.oppslag.arbeidinntektytelse.dto.ArbeidsgiverDTO(
-                    type = "Organisasjon",
-                    identifikator = "97114455"
-            ),
-            startdato = parse("2017-01-01"),
-            sluttdato = null
+        type = "Arbeidstaker",
+        arbeidsgiver = no.nav.helse.oppslag.arbeidinntektytelse.dto.ArbeidsgiverDTO(
+            type = "Organisasjon",
+            identifikator = "97114455"
+        ),
+        startdato = parse("2017-01-01"),
+        sluttdato = null
     )
 
     val beregningsgrunnlagStart = første_dag_i_syketilfelle.minusMonths(3)
     val stubbet_inntekt_beregningsgrunnlag: List<Inntekt> = List(3, init = { index ->
         Inntekt(
-                virksomhet = Inntektsarbeidsgiver(stubbet_arbeidsforhold.arbeidsgiver.identifikator, "Organisasjon"),
-                beløp = BigDecimal.valueOf(25000),
-                utbetalingsperiode = YearMonth.from(beregningsgrunnlagStart.plusMonths(index.toLong())),
-                type = "Lønn",
-                ytelse = false,
-                kode = null
+            virksomhet = Inntektsarbeidsgiver(stubbet_arbeidsforhold.arbeidsgiver.identifikator, "Organisasjon"),
+            beløp = BigDecimal.valueOf(25000),
+            utbetalingsperiode = YearMonth.from(beregningsgrunnlagStart.plusMonths(index.toLong())),
+            type = "Lønn",
+            ytelse = false,
+            kode = null
         )
     })
 
     val sammenligningsgrunnlagStart = første_dag_i_syketilfelle.minusMonths(12)
     val stubbet_inntekt_sammenligningsgrunnlag: List<Inntekt> = List(12, init = { index ->
         Inntekt(
-                virksomhet = Inntektsarbeidsgiver(stubbet_arbeidsforhold.arbeidsgiver.identifikator, "Organisasjon"),
-                beløp = BigDecimal.valueOf(25000),
-                utbetalingsperiode = YearMonth.from(sammenligningsgrunnlagStart.plusMonths(index.toLong())),
-                type = "Lønn",
-                ytelse = false,
-                kode = null
+            virksomhet = Inntektsarbeidsgiver(stubbet_arbeidsforhold.arbeidsgiver.identifikator, "Organisasjon"),
+            beløp = BigDecimal.valueOf(25000),
+            utbetalingsperiode = YearMonth.from(sammenligningsgrunnlagStart.plusMonths(index.toLong())),
+            type = "Lønn",
+            ytelse = false,
+            kode = null
         )
     })
 
     private fun personStub(aktørId: String) {
-        stubFor(any(urlPathEqualTo("/api/person/$aktørId"))
-                .willReturn(okJson(defaultObjectMapper.writeValueAsString(stubbet_person))))
+        stubFor(
+            any(urlPathEqualTo("/api/person/$aktørId"))
+                .willReturn(okJson(defaultObjectMapper.writeValueAsString(stubbet_person)))
+        )
     }
 
     private fun inntektStub(aktørId: String) {
-        stubFor(any(urlPathEqualTo("/api/inntekt/$aktørId/beregningsgrunnlag/${stubbet_arbeidsforhold.arbeidsgiver.identifikator}"))
-                .willReturn(okJson(defaultObjectMapper.writeValueAsString(
-                        InntektsoppslagResultat(stubbet_inntekt_beregningsgrunnlag)
-                ))))
+        stubFor(
+            any(urlPathEqualTo("/api/inntekt/$aktørId/beregningsgrunnlag/${stubbet_arbeidsforhold.arbeidsgiver.identifikator}"))
+                .willReturn(
+                    okJson(
+                        defaultObjectMapper.writeValueAsString(
+                            InntektsoppslagResultat(stubbet_inntekt_beregningsgrunnlag)
+                        )
+                    )
+                )
+        )
 
-        stubFor(any(urlPathEqualTo("/api/inntekt/$aktørId/sammenligningsgrunnlag"))
-                .willReturn(okJson(defaultObjectMapper.writeValueAsString(
-                        InntektsoppslagResultat(stubbet_inntekt_sammenligningsgrunnlag)
-                ))))
+        stubFor(
+            any(urlPathEqualTo("/api/inntekt/$aktørId/sammenligningsgrunnlag"))
+                .willReturn(
+                    okJson(
+                        defaultObjectMapper.writeValueAsString(
+                            InntektsoppslagResultat(stubbet_inntekt_sammenligningsgrunnlag)
+                        )
+                    )
+                )
+        )
     }
 
     private fun ytelserStub(aktørId: String) {
-        stubFor(any(urlPathEqualTo("/api/ytelser/$aktørId"))
-                .willReturn(okJson(defaultObjectMapper.writeValueAsString(
-                        YtelserDTO(
+        stubFor(
+            any(urlPathEqualTo("/api/ytelser/$aktørId"))
+                .willReturn(
+                    okJson(
+                        defaultObjectMapper.writeValueAsString(
+                            YtelserDTO(
                                 infotrygd = emptyList(),
                                 arena = emptyList()
+                            )
                         )
-                ))))
+                    )
+                )
+        )
     }
 
     private fun sykepengehistorikkStub(aktørId: String) {
-        stubFor(any(urlPathEqualTo("/api/sykepengehistorikk/$aktørId"))
-                .willReturn(okJson(defaultObjectMapper.writeValueAsString(
-                        tiDagerSykepengeHistorikk()
-                ))))
+        stubFor(
+            any(urlPathEqualTo("/api/sykepengehistorikk/$aktørId"))
+                .willReturn(
+                    okJson(
+                        defaultObjectMapper.writeValueAsString(
+                            tiDagerSykepengeHistorikk()
+                        )
+                    )
+                )
+        )
     }
 
-    private fun tiDagerSykepengeHistorikk() : List<AnvistPeriodeDTO> {
+    private fun tiDagerSykepengeHistorikk(): List<AnvistPeriodeDTO> {
         val someMonday = første_dag_i_syketilfelle.minusMonths(1).with(TemporalAdjusters.next(DayOfWeek.MONDAY))
         return listOf(AnvistPeriodeDTO(someMonday, someMonday.plusDays(13)))
     }
@@ -568,26 +697,32 @@ class EndToEndTest {
     private fun arbeidsforholdStub(aktørId: String) {
 
         val arbeidsforholdWrapper = ArbeidInntektYtelseDTO(
-                arbeidsforhold = listOf(stubbet_arbeidsforhold),
-                inntekter = listOf(
-                        InntektMedArbeidsforholdDTO(
-                                inntekt = InntektDTO(
-                                        virksomhet = VirksomhetDTO(stubbet_arbeidsforhold.arbeidsgiver.identifikator, stubbet_arbeidsforhold.arbeidsgiver.type),
-                                        utbetalingsperiode = YearMonth.now(),
-                                        beløp = BigDecimal.ONE
-                                ),
-                                muligeArbeidsforhold = listOf(stubbet_arbeidsforhold)
-                        )
-                ),
-                ytelser = emptyList()
+            arbeidsforhold = listOf(stubbet_arbeidsforhold),
+            inntekter = listOf(
+                InntektMedArbeidsforholdDTO(
+                    inntekt = InntektDTO(
+                        virksomhet = VirksomhetDTO(
+                            stubbet_arbeidsforhold.arbeidsgiver.identifikator,
+                            stubbet_arbeidsforhold.arbeidsgiver.type
+                        ),
+                        utbetalingsperiode = YearMonth.now(),
+                        beløp = BigDecimal.ONE
+                    ),
+                    muligeArbeidsforhold = listOf(stubbet_arbeidsforhold)
+                )
+            ),
+            ytelser = emptyList()
         )
 
-        stubFor(any(urlPathEqualTo("/api/arbeidsforhold/$aktørId/inntekter"))
-                .willReturn((okJson(defaultObjectMapper.writeValueAsString(arbeidsforholdWrapper)))))
+        stubFor(
+            any(urlPathEqualTo("/api/arbeidsforhold/$aktørId/inntekter"))
+                .willReturn((okJson(defaultObjectMapper.writeValueAsString(arbeidsforholdWrapper))))
+        )
     }
 
     private fun produceOneMessage(topic: String, key: String, message: JsonNode) {
-        val producer = KafkaProducer<String, JsonNode>(producerProperties(), StringSerializer(), JsonNodeSerializer(objectMapper))
+        val producer =
+            KafkaProducer<String, JsonNode>(producerProperties(), StringSerializer(), JsonNodeSerializer(objectMapper))
         producer.send(ProducerRecord(topic, key, message))
             .get(1, TimeUnit.SECONDS)
         producer.flush()

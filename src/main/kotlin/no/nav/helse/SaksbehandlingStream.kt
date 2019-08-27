@@ -70,7 +70,6 @@ class SaksbehandlingStream(val env: Environment) {
                 vedtak) = builder.stream<String, JsonNode>(SAKSKOMPLEKS_TOPIC, Consumed.with(Serdes.String(), JsonNodeSerde(objectMapper))
                 .withOffsetResetPolicy(Topology.AutoOffsetReset.EARLIEST))
                 .mapValues { jsonNode -> Sakskompleks(jsonNode) }
-                .filter { _, sakskompleks -> sakskompleks.søknader.size == 1 }
                 .mapValues { _, sakskompleks ->
                     loggMedSakskompleksId(sakskompleks.id) {
                         sakskompleks.behandle(oppslag, probe)
