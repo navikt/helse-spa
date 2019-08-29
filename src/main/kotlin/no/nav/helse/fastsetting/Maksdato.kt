@@ -25,9 +25,10 @@ fun vurderMaksdato(
             )
             val beregnetMaksdato = maksdato(grunnlag)
 
-            if (beregnetMaksdato.dato < sisteSykepengedag)
+            if (beregnetMaksdato.dato.isBefore(sisteSykepengedag))
+                // § 8-12. Antall sykepengedager er brukt opp eller blir det i sykepengeperioden. Kan være tilfeller der de likevel skal få utbetalt sykepenger (f.eks i deler av perioden)
                 Vurdering.Uavklart(
-                        årsak = Vurdering.Uavklart.Årsak.FALLER_UTENFOR_MVP, begrunnelse = "Maksdato er tidligere enn siste sykdomsdag, " + beregnetMaksdato.begrunnelse, grunnlag = grunnlag)
+                        årsak = Vurdering.Uavklart.Årsak.KREVER_SKJØNNSMESSIG_VURDERING, begrunnelse = "Maksdato er tidligere enn siste sykdomsdag, " + beregnetMaksdato.begrunnelse, grunnlag = grunnlag)
             else
                 Vurdering.Avklart(
                         fastsattVerdi = beregnetMaksdato.dato,

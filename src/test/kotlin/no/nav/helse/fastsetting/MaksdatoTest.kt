@@ -42,7 +42,7 @@ class MaksdatoTest {
 
         when (vurdering) {
             is Vurdering.Avklart -> fail("Vurdering skal være uavklart")
-            is Vurdering.Uavklart -> assertThat(vurdering.årsak).isEqualTo(Vurdering.Uavklart.Årsak.FALLER_UTENFOR_MVP)
+            is Vurdering.Uavklart -> assertThat(vurdering.årsak).isEqualTo(Vurdering.Uavklart.Årsak.KREVER_SKJØNNSMESSIG_VURDERING)
         }
     }
 
