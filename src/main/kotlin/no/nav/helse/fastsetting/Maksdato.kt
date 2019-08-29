@@ -1,9 +1,7 @@
 package no.nav.helse.fastsetting
 
-import no.nav.helse.Grunnlagsdata
+import no.nav.helse.*
 import no.nav.helse.Tidsperiode
-import no.nav.helse.Yrkesstatus
-import no.nav.helse.maksdato
 import no.nav.helse.oppslag.AnvistPeriodeDTO
 import java.time.LocalDate
 
@@ -11,6 +9,7 @@ fun vurderMaksdato(
         alder: Vurdering<Int, Aldersgrunnlag>,
         startSyketilfelle: LocalDate,
         førsteSykepengedag: LocalDate,
+        sisteSykepengedag: LocalDate,
         yrkesstatus: Yrkesstatus,
         sykepengehistorikk: List<AnvistPeriodeDTO>
 ): Vurdering<LocalDate, Grunnlagsdata?> {
@@ -22,15 +21,19 @@ fun vurderMaksdato(
                     førsteSykepengedag = førsteSykepengedag,
                     personensAlder = alder.fastsattVerdi,
                     yrkesstatus = yrkesstatus,
-                    tidligerePerioder = sykepengehistorikk.map { Tidsperiode(it.fom, it.tom) }
+                    tidligerePerioder = sykepengehistorikk.map { Tidsperiode(it.fom, it.tom) }.sortedByDescending { it.tom }
             )
             val beregnetMaksdato = maksdato(grunnlag)
 
-            Vurdering.Avklart(
-                    fastsattVerdi = beregnetMaksdato.dato,
-                    fastsattAv = "SPA",
-                    grunnlag = grunnlag,
-                    begrunnelse = beregnetMaksdato.begrunnelse)
+            if (beregnetMaksdato.dato < sisteSykepengedag)
+                Vurdering.Uavklart(
+                        årsak = Vurdering.Uavklart.Årsak.FALLER_UTENFOR_MVP, begrunnelse = "Maksdato er tidligere enn siste sykdomsdag, " + beregnetMaksdato.begrunnelse, grunnlag = grunnlag)
+            else
+                Vurdering.Avklart(
+                        fastsattVerdi = beregnetMaksdato.dato,
+                        fastsattAv = "SPA",
+                        grunnlag = grunnlag,
+                        begrunnelse = beregnetMaksdato.begrunnelse)
         }
     }
 }
