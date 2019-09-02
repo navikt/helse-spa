@@ -43,7 +43,7 @@ dependencies {
     compile("no.nav.helse.sykepenger.lovverk:sykepenger-beregning:2018-12-20-101.8ef150a")
     compile("no.nav:nare:dfe6569")
 
-    compile("no.nav.helse:maksdato:ae7c5ad")
+    compile("no.nav.helse:maksdato:89af124")
     compile("no.nav:nare-prometheus:0b41ab4")
     compile("com.github.kittinunf.fuel:fuel:$fuelVersion")
 
