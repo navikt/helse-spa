@@ -6,6 +6,8 @@
       </encoder>
    </appender>
 
+   <logger name="no.nav.helse.probe" level="OFF"/>
+
    <root level="INFO">
       <appender-ref ref="STDOUT"/>
    </root>
