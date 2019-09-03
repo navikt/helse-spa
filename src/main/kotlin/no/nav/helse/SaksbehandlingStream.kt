@@ -30,7 +30,7 @@ import org.apache.kafka.streams.kstream.Predicate
 import org.slf4j.MDC
 import java.util.Properties
 
-const val SAKSKOMPLEKS_TOPIC = "privat-sakskompleks" //TODO: Hvor skal denne bo?
+const val SAKSKOMPLEKS_TOPIC = "privat-sakskompleks" //TODO: Må opprettes og flyttes til helse-streams?
 
 class SaksbehandlingStream(val env: Environment) {
 

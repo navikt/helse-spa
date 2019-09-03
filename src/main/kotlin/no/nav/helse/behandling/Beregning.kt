@@ -5,13 +5,12 @@ import no.nav.helse.Behandlingsfeil
 import no.nav.helse.oppslag.getGrunnbeløpForDato
 import no.nav.helse.sykepenger.beregning.Beregningsgrunnlag
 import no.nav.helse.sykepenger.beregning.beregn
-import java.io.IOException
 
 fun sykepengeBeregning(vilkårsprøving: Behandlingsgrunnlag): Either<Behandlingsfeil, Sykepengeberegning> =
     try {
         val beregningsresultat = beregn(lagBeregninggrunnlag(vilkårsprøving))
         val inntektFraInntektsmelding = vilkårsprøving.sakskompleks.inntektsmeldinger.firstOrNull()?.inntekt
-        val beregningsresultat2 =
+        val beregningsresultatFraInntektsmelding =
             beregn(
                 lagBeregninggrunnlag(
                     vilkårsprøving, if (inntektFraInntektsmelding != null) {
@@ -29,10 +28,10 @@ fun sykepengeBeregning(vilkårsprøving: Behandlingsgrunnlag): Either<Behandling
                 avklarteVerdier = vilkårsprøving.avklarteVerdier,
                 vilkårsprøving = vilkårsprøving.vilkårsprøving,
                 beregning = beregningsresultat,
-                beregningFraInntektsmelding = beregningsresultat2
+                beregningFraInntektsmelding = beregningsresultatFraInntektsmelding
             )
         )
-    } catch (e: IOException) {
+    } catch (e: Exception) {
         Either.Left(Behandlingsfeil.beregningsfeil(vilkårsprøving, e))
     }
 

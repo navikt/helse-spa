@@ -15,7 +15,7 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import no.nav.helse.behandling.inntektsmelding.Inntektsmelding
 import no.nav.helse.behandling.sykmelding.SykmeldingMessage
 import no.nav.helse.behandling.søknad.Sykepengesøknad
-import java.time.LocalDate
+import no.nav.helse.serde.safelyUnwrapDate
 
 @JsonSerialize(using = SakskompleksSerializer::class)
 @JsonDeserialize(using = SakskompleksDeserializer::class)
@@ -47,12 +47,3 @@ class SakskompleksDeserializer : StdDeserializer<Sakskompleks>(Sakskompleks::cla
         Sakskompleks(objectMapper.readTree(parser))
 
 }
-
-fun JsonNode.safelyUnwrapDate(): LocalDate? {
-    return if (isNull) {
-        null
-    } else {
-        LocalDate.parse(textValue())
-    }
-}
-
