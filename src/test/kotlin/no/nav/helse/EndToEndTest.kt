@@ -12,7 +12,6 @@ import assertk.assertions.isNull
 import assertk.assertions.isTrue
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.SerializationFeature
-import com.fasterxml.jackson.databind.node.ArrayNode
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
@@ -80,7 +79,6 @@ import org.apache.kafka.common.serialization.Deserializer
 import org.apache.kafka.common.serialization.StringDeserializer
 import org.apache.kafka.common.serialization.StringSerializer
 import org.junit.jupiter.api.AfterAll
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -95,14 +93,13 @@ import java.time.YearMonth
 import java.time.temporal.ChronoUnit
 import java.time.temporal.TemporalAdjusters
 import java.time.temporal.TemporalAdjusters.lastDayOfMonth
-import java.util.UUID
 import java.util.concurrent.TimeUnit
 
 class EndToEndTest {
 
     companion object {
-        private const val username = "srvkafkaclient"
-        private const val password = "kafkaclient"
+        const val username = "srvkafkaclient"
+        const val password = "kafkaclient"
 
         private val objectMapper = jacksonObjectMapper()
             .registerModule(JavaTimeModule())
@@ -195,31 +192,6 @@ class EndToEndTest {
         checkVilkårsprøving(sykepengeVedtak.vilkårsprøving)
         checkBeregning(sykepengeVedtak.beregning)
         checkVedtak(sykepengeVedtak.vedtak)
-    }
-
-    @Test
-    fun `et sakskompleks med flere søknader får ikke automatisk vedtak`() {
-        val aktørId = "11987654321"
-
-        println("Kafka: ${embeddedEnvironment.brokersURL}")
-        println("Zookeeper: ${embeddedEnvironment.serverPark.zookeeper.host}:${embeddedEnvironment.serverPark.zookeeper.port}")
-
-        restStsStub()
-        personStub(aktørId)
-        inntektStub(aktørId)
-        arbeidsforholdStub(aktørId)
-        sykepengehistorikkStub(aktørId)
-        ytelserStub(aktørId)
-
-        val sakskompleksJson = objectMapper.readTree("/sakskompleks/sakskompleks.json".readResource())
-        (sakskompleksJson["søknader"] as ArrayNode).add(originalSoknad.jsonNode)
-        val sakskompleks = Sakskompleks(sakskompleksJson)
-
-        produceOneMessage(SAKSKOMPLEKS_TOPIC, sakskompleks.id, sakskompleks.jsonNode)
-
-        val behandlingsfeil: Behandlingsfeil = ventPåBehandlingsfeil()
-        assertEquals("Sakskompleks faller ut fordi det passer ikke for MVP", behandlingsfeil.feilmelding)
-        assertEquals("71bd853d-36a1-49df-a34c-6e02cf727awd", behandlingsfeil.sakskompleksId)
     }
 
     private fun checkSøknad(innsendtSøknad: SykepengesøknadV2DTO, faktiskSøknad: Sykepengesøknad) {
@@ -425,7 +397,7 @@ class EndToEndTest {
 
     private fun checkBeregning(beregning: Beregningsresultat) {
         // Detaljene i beregningen testes ikke her, men resultatet for dette caset skal være 23 virkedager a 1154,-
-        assert(beregning.dagsatser).hasSize(23)
+        assert(beregning.dagsatser).hasSize(11)
         assert(beregning.dagsatser).each {
             val dagsats = it.actual
             assert(dagsats.dato).isBetween(første_dag_i_syketilfelle, siste_dag_i_syketilfelle)
@@ -438,7 +410,7 @@ class EndToEndTest {
     private fun checkVedtak(vedtak: Vedtak) {
         assert(vedtak.perioder).containsExactly(
             Vedtaksperiode(
-                fom = LocalDate.of(2019, 1, 1),
+                fom = LocalDate.of(2019, 1, 17),
                 tom = LocalDate.of(2019, 1, 31),
                 dagsats = BigDecimal.valueOf(1154L),
                 fordeling = listOf(Fordeling(mottager = "97114455", andel = 100))
@@ -504,8 +476,6 @@ class EndToEndTest {
             val records = resultConsumer.poll(Duration.ofSeconds(1))
 
             if (!records.isEmpty) {
-                assertEquals(1, records.count())
-
                 return records.records(VEDTAK_SYKEPENGER.name).map {
                     it.value()
                 }.first()
@@ -530,8 +500,6 @@ class EndToEndTest {
             val records = resultConsumer.poll(Duration.ofSeconds(1))
 
             if (!records.isEmpty) {
-                assertEquals(1, records.count())
-
                 return records.records(SYKEPENGEBEHANDLINGSFEIL.name).map {
                     it.value()
                 }.first()
@@ -539,31 +507,6 @@ class EndToEndTest {
         }
 
         throw RuntimeException("fant ingen behandlingsfeil etter 20 sekunder")
-    }
-
-    private fun consumerProperties(): MutableMap<String, Any>? {
-        return HashMap<String, Any>().apply {
-            put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, embeddedEnvironment.brokersURL)
-            put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, "SASL_PLAINTEXT")
-            put(SaslConfigs.SASL_MECHANISM, "PLAIN")
-            put(
-                SaslConfigs.SASL_JAAS_CONFIG,
-                "org.apache.kafka.common.security.plain.PlainLoginModule required username=\"$username\" password=\"$password\";"
-            )
-            put(ConsumerConfig.GROUP_ID_CONFIG, "spa-e2e-verification-${UUID.randomUUID()}")
-        }
-    }
-
-    private fun producerProperties(): MutableMap<String, Any>? {
-        return HashMap<String, Any>().apply {
-            put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, embeddedEnvironment.brokersURL)
-            put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, "SASL_PLAINTEXT")
-            put(SaslConfigs.SASL_MECHANISM, "PLAIN")
-            put(
-                SaslConfigs.SASL_JAAS_CONFIG,
-                "org.apache.kafka.common.security.plain.PlainLoginModule required username=\"$username\" password=\"$password\";"
-            )
-        }
     }
 
     private fun restStsStub() {
@@ -744,4 +687,29 @@ class EndToEndTest {
             .flatMap { metricFamily ->
                 metricFamily.samples
             }
+}
+
+private fun consumerProperties(): MutableMap<String, Any>? {
+    return HashMap<String, Any>().apply {
+        put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, EndToEndTest.embeddedEnvironment.brokersURL)
+        put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, "SASL_PLAINTEXT")
+        put(SaslConfigs.SASL_MECHANISM, "PLAIN")
+        put(
+            SaslConfigs.SASL_JAAS_CONFIG,
+            "org.apache.kafka.common.security.plain.PlainLoginModule required username=\"${EndToEndTest.username}\" password=\"${EndToEndTest.password}\";"
+        )
+        put(ConsumerConfig.GROUP_ID_CONFIG, "spa-e2e-verification")
+    }
+}
+
+private fun producerProperties(): MutableMap<String, Any>? {
+    return HashMap<String, Any>().apply {
+        put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, EndToEndTest.embeddedEnvironment.brokersURL)
+        put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, "SASL_PLAINTEXT")
+        put(SaslConfigs.SASL_MECHANISM, "PLAIN")
+        put(
+            SaslConfigs.SASL_JAAS_CONFIG,
+            "org.apache.kafka.common.security.plain.PlainLoginModule required username=\"${EndToEndTest.username}\" password=\"${EndToEndTest.password}\";"
+        )
+    }
 }

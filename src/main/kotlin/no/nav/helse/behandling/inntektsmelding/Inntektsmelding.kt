@@ -12,12 +12,15 @@ import com.fasterxml.jackson.databind.deser.std.StdDeserializer
 import com.fasterxml.jackson.databind.ser.std.StdSerializer
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import java.time.LocalDate
 
 @JsonSerialize(using = InntektsmeldingSerializer::class)
 @JsonDeserialize(using = InntektsmeldingDeserializer::class)
 data class Inntektsmelding(val jsonNode: JsonNode) {
 
     val id = jsonNode["id"].asText()!!
+    val inntekt = jsonNode["inntekt"].asLong()!!
+    val arbeidsgiverperioder: List<Periode> = jsonNode["arbeidsgiverperioder"].map { Periode(it) }
 }
 
 class InntektsmeldingSerializer : StdSerializer<Inntektsmelding>(Inntektsmelding::class.java) {
@@ -35,5 +38,11 @@ class InntektsmeldingDeserializer : StdDeserializer<Inntektsmelding>(Inntektsmel
 
     override fun deserialize(parser: JsonParser?, context: DeserializationContext?) =
         Inntektsmelding(objectMapper.readTree(parser))
+}
 
+@JsonSerialize(using = InntektsmeldingSerializer::class)
+@JsonDeserialize(using = InntektsmeldingDeserializer::class)
+data class Periode(val jsonNode: JsonNode) {
+    val fom: LocalDate = LocalDate.parse(jsonNode["fom"].textValue())
+    val tom: LocalDate = LocalDate.parse(jsonNode["tom"].textValue())
 }

@@ -3,7 +3,6 @@ package no.nav.helse
 import arrow.core.Either
 import no.nav.helse.behandling.AvklarteVerdier
 import no.nav.helse.behandling.Behandlingsgrunnlag
-import no.nav.helse.behandling.Sakskompleks
 import no.nav.helse.behandling.Tpsfakta
 import no.nav.helse.behandling.sykepengeBeregning
 import no.nav.helse.behandling.søknad.Sykepengesøknad
@@ -33,8 +32,8 @@ class BeregningTest {
 
     @Test
     fun `skal beregne for 50% grad`() {
-        val soknad = vilkårsprøvdSøknad(fom, parse("2019-01-02"), 400000, 50)
-        val beregningsresultat = (sykepengeBeregning(soknad) as Either.Right).b.beregning
+        val sakskompleks = vilkårsprøvdSakskompleks(fom, parse("2019-01-02"), 400000, 50)
+        val beregningsresultat = (sykepengeBeregning(sakskompleks) as Either.Right).b.beregning
 
         assertEquals(2, beregningsresultat.dagsatser.size)
         assertEquals((400000 / 260) / 2, beregningsresultat.dagsatser[0].sats)
@@ -42,7 +41,7 @@ class BeregningTest {
 
     @Test
     fun `skal beregne for 100% grad`() {
-        val soknad = vilkårsprøvdSøknad(parse("2019-01-01"), parse("2019-01-02"), 500000, 100)
+        val soknad = vilkårsprøvdSakskompleks(parse("2019-01-01"), parse("2019-01-02"), 500000, 100)
         val beregningsresultat = (sykepengeBeregning(soknad) as Either.Right).b.beregning
 
         assertEquals(2, beregningsresultat.dagsatser.size)
@@ -51,7 +50,7 @@ class BeregningTest {
 
     @Test
     fun `skal skrelle av ved 6G`() {
-        val soknad = vilkårsprøvdSøknad(parse("2019-01-01"), parse("2019-01-02"), 10 * gjeldendeGrunnbeløp, 100)
+        val soknad = vilkårsprøvdSakskompleks(parse("2019-01-01"), parse("2019-01-02"), 10 * gjeldendeGrunnbeløp, 100)
         val beregningsresultat = (sykepengeBeregning(soknad) as Either.Right).b.beregning
 
         assertEquals(2, beregningsresultat.dagsatser.size)
@@ -59,7 +58,7 @@ class BeregningTest {
                 beregningsresultat.dagsatser[0].sats)
     }
 
-    fun vilkårsprøvdSøknad(fom: LocalDate, tom: LocalDate, årslønn: Long, sykmeldingsgrad: Int) =
+    fun vilkårsprøvdSakskompleks(fom: LocalDate, tom: LocalDate, årslønn: Long, sykmeldingsgrad: Int) =
             Behandlingsgrunnlag(
                     Sakskompleks(Sykepengesøknad(SykepengesøknadV2DTO(
                             id = "1",

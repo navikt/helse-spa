@@ -1,15 +1,17 @@
 package no.nav.helse.behandling.mvp
 
-import no.nav.helse.behandling.søknad.Søknadsperiode
+import no.nav.helse.behandling.Sakskompleks
 import no.nav.helse.fastsetting.yearMonth
 import no.nav.helse.oppslag.Inntekt
 import no.nav.helse.sykepenger.beregning.longValueExact
 import java.math.BigDecimal
 import java.math.RoundingMode
-import java.time.LocalDate
+import kotlin.math.abs
 
-fun vurderMVPKriterierForSykepengegrunnlaget(førsteSykdomsdag: LocalDate, perioder: List<Søknadsperiode>, beregningsgrunnlag: List<Inntekt>, sammenligningsgrunnlag: List<Inntekt>): List<MVPFeil> {
+fun vurderMVPKriterierForSykepengegrunnlaget(sakskompleks: Sakskompleks, beregningsgrunnlag: List<Inntekt>, sammenligningsgrunnlag: List<Inntekt>): List<MVPFeil> {
     val feil = mutableListOf<MVPFeil>()
+    val førsteSykdomsdag = sakskompleks.startSyketilfelle
+    val perioder = sakskompleks.søknader[0].soknadsperioder
 
     if (perioder.isEmpty()) {
         feil.add(MVPFeil("Ingen sykdomsperioder", "Søknaden inneholder ingen sykdomsperioder"))
@@ -43,6 +45,10 @@ fun vurderMVPKriterierForSykepengegrunnlaget(førsteSykdomsdag: LocalDate, perio
             }
             .divide(BigDecimal.valueOf(3), RoundingMode.HALF_UP)
             .longValueExact(RoundingMode.HALF_UP)
+
+    if (abs((aktuellMånedsinntekt - sakskompleks.inntektsmeldinger[0].inntekt) / aktuellMånedsinntekt.toDouble()) > 0.05 ) {
+        feil.add(MVPFeil("Avvik over 5%. Beregnet månedsinntekt: $aktuellMånedsinntekt, oppgitt i inntektsmeldingen: ${sakskompleks.inntektsmeldinger[0].inntekt}", "Det skal ikke være mer enn 5% avvik mellom beløpet oppgitt i inntektsmeldingen og beregningsgrunnlaget"))
+    }
 
     val tolvMånederFør = førsteSykdomsdag.minusMonths(12)
             .yearMonth()

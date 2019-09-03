@@ -10,7 +10,7 @@
   "endringAvRefusjon": null,
   "refusjonOpphorer": null,
   "ferie": [],
-  "arbeidsgiverperiode": [
+  "arbeidsgiverperioder": [
     {
       "fom": "2019-01-01",
       "tom": "2019-01-16"

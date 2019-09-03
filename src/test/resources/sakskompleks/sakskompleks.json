@@ -149,14 +149,14 @@
       "arbeidstakerFnr": "00000000000",
       "arbeidsgiver": "orgnummer",
       "foersteFravaersdag": "2019-01-01",
-      "refusjon": 50000,
-      "inntekt": 50000,
+      "refusjon": 25000,
+      "inntekt": 25000,
       "opphoerAvNaturalytelser": [],
       "gjenopptakelseNaturalytelser": [],
       "endringAvRefusjon": null,
       "refusjonOpphorer": null,
       "ferie": [],
-      "arbeidsgiverperiode": [
+      "arbeidsgiverperioder": [
         {
           "fom": "2019-01-01",
           "tom": "2019-01-16"

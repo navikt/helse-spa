@@ -109,6 +109,7 @@ val enkelSykepengeberegning: Sykepengeberegning =
         Sykepengeberegning(
                 sakskompleks = Sakskompleks(originalSoknad),
                 beregning = Beregningsresultat(dagsatser = listOf(Dagsats(dato = LocalDate.now(), sats = 1000L, skalUtbetales = true)), delresultater = emptyList()),
+                beregningFraInntektsmelding = Beregningsresultat(dagsatser = listOf(Dagsats(dato = LocalDate.now(), sats = 1000L, skalUtbetales = true)), delresultater = emptyList()),
                 avklarteVerdier = enkleAvklarteVerdier,
                 faktagrunnlag = faktagrunnlagUtenVerdi,
                 vilkårsprøving = Evaluering.ja("for reasons")

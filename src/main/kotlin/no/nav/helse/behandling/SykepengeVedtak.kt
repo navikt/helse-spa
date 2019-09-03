@@ -12,6 +12,7 @@ data class SykepengeVedtak(
         val avklarteVerdier: AvklarteVerdier,
         val vilkårsprøving: Evaluering,
         val beregning: Beregningsresultat,
+        val beregningFraInntektsmelding: Beregningsresultat,
         val vedtak: Vedtak,
         val behandlingsId: String = UUID.randomUUID().toString()
 )

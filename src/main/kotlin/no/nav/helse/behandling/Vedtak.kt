@@ -12,6 +12,7 @@ fun vedtak(beregning: Sykepengeberegning): Either<Behandlingsfeil, SykepengeVedt
                         vilkårsprøving = beregning.vilkårsprøving,
                         avklarteVerdier = beregning.avklarteVerdier,
                         beregning = beregning.beregning,
+                        beregningFraInntektsmelding = beregning.beregningFraInntektsmelding,
                         vedtak = Vedtak(perioder = beregnVedtaksperioder(beregning))
                 )
         )
@@ -20,7 +21,7 @@ fun beregnVedtaksperioder(sykepengeberegning: Sykepengeberegning): List<Vedtaksp
     // én vedtaksperiode er en sammenhengende rekke dager med samme dagsats og samme fordeling av utbetaling mellom arbeidsgiver og sykemeldt
     // vi regner med én arbeidsgiver og full refusjon i MVP 1 :)
     // dermed ser vi bare på dagsats.
-    return sykepengeberegning.beregning.dagsatser
+    return sykepengeberegning.beregningFraInntektsmelding.dagsatser //Todo: velg riktig beregning
             .sortedBy { it.dato }
             .fold(emptyList()) { resultSoFar, current ->
                 when {

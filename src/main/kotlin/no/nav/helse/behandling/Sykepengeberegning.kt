@@ -8,4 +8,5 @@ data class Sykepengeberegning(
         val faktagrunnlag: Faktagrunnlag,
         val avklarteVerdier: AvklarteVerdier,
         val vilkårsprøving: Evaluering,
-        val beregning: Beregningsresultat)
+        val beregning: Beregningsresultat,
+        val beregningFraInntektsmelding: Beregningsresultat)

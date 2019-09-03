@@ -23,17 +23,18 @@ import no.nav.helse.probe.SaksbehandlingProbe
 fun Sakskompleks.behandle(oppslag: Oppslag, probe: SaksbehandlingProbe): Either<Behandlingsfeil, SykepengeVedtak> =
     mvpFilter().flatMap {
         hentRegisterData(oppslag)
-    }.flatMap { faktagrunnlagResultat ->
-        faktagrunnlagResultat.mvpFilter()
-    }.flatMap { faktagrunnlagResultat ->
-        faktagrunnlagResultat.fastsettFakta()
-    }.flatMap { avklarteFakta ->
-        avklarteFakta.prøvVilkår(probe)
-    }.flatMap { behandlingsgrunnlag ->
-        behandlingsgrunnlag.beregnSykepenger()
-    }.flatMap { sykepengeberegning ->
-        sykepengeberegning.fattVedtak()
     }
+        .flatMap { faktagrunnlagResultat ->
+            faktagrunnlagResultat.mvpFilter()
+        }.flatMap { faktagrunnlagResultat ->
+            faktagrunnlagResultat.fastsettFakta()
+        }.flatMap { avklarteFakta ->
+            avklarteFakta.prøvVilkår(probe)
+        }.flatMap { behandlingsgrunnlag ->
+            behandlingsgrunnlag.beregnSykepenger()
+        }.flatMap { sykepengeberegning ->
+            sykepengeberegning.fattVedtak()
+        }
 
 
 fun Sakskompleks.mvpFilter(): Either<Behandlingsfeil.MVPFilterFeil, Sakskompleks> {

@@ -15,7 +15,7 @@ class VedtaksperiodiseringTest {
         val dag = LocalDate.of(2019, 1, 1)
         val dagsats = 1000L
         val perioder = beregnVedtaksperioder(enkelSykepengeberegning.copy(
-                beregning = Beregningsresultat(dagsatser = listOf(Dagsats(dato = dag, sats = 1000L, skalUtbetales = true)), delresultater = emptyList())
+            beregningFraInntektsmelding = Beregningsresultat(dagsatser = listOf(Dagsats(dato = dag, sats = 1000L, skalUtbetales = true)), delresultater = emptyList())
         ))
         assertEquals(1, perioder.size)
         assertEquals(dag, perioder[0].fom)
@@ -28,7 +28,7 @@ class VedtaksperiodiseringTest {
         val førsteDag = LocalDate.of(2019, 1, 1)
         val dagsats = 1000L
         val perioder = beregnVedtaksperioder(enkelSykepengeberegning.copy(
-                beregning = Beregningsresultat(dagsatser = listOf(
+                beregningFraInntektsmelding = Beregningsresultat(dagsatser = listOf(
                         Dagsats(dato = førsteDag, sats = dagsats, skalUtbetales = true),
                         Dagsats(dato = førsteDag.plusDays(1), sats = dagsats, skalUtbetales = true),
                         Dagsats(dato = førsteDag.plusDays(2), sats = dagsats, skalUtbetales = true),
@@ -49,7 +49,7 @@ class VedtaksperiodiseringTest {
         val førsteDag = LocalDate.of(2019, 1, 1)
         val dagsats = 1000L
         val perioder = beregnVedtaksperioder(enkelSykepengeberegning.copy(
-                beregning = Beregningsresultat(dagsatser = listOf(
+                beregningFraInntektsmelding = Beregningsresultat(dagsatser = listOf(
                         Dagsats(dato = førsteDag, sats = dagsats, skalUtbetales = true),
                         Dagsats(dato = førsteDag.plusDays(1), sats = dagsats, skalUtbetales = true),
                         Dagsats(dato = førsteDag.plusDays(2), sats = dagsats, skalUtbetales = true),
@@ -73,7 +73,7 @@ class VedtaksperiodiseringTest {
         val førsteDag = LocalDate.of(2019, 1, 1)
         val dagsats = 1000L
         val perioder = beregnVedtaksperioder(enkelSykepengeberegning.copy(
-                beregning = Beregningsresultat(dagsatser = listOf(
+                beregningFraInntektsmelding = Beregningsresultat(dagsatser = listOf(
                         Dagsats(dato = førsteDag, sats = dagsats, skalUtbetales = true),
                         Dagsats(dato = førsteDag.plusDays(1), sats = dagsats, skalUtbetales = true),
                         Dagsats(dato = førsteDag.plusDays(6), sats = 1500L, skalUtbetales = true),
@@ -98,7 +98,7 @@ class VedtaksperiodiseringTest {
         val førsteDag = LocalDate.of(2019, 1, 1)
         val dagsats = 1000L
         val perioder = beregnVedtaksperioder(enkelSykepengeberegning.copy(
-                beregning = Beregningsresultat(dagsatser = listOf(
+                beregningFraInntektsmelding = Beregningsresultat(dagsatser = listOf(
                         Dagsats(dato = førsteDag, sats = 1500L, skalUtbetales = true),
                         Dagsats(dato = førsteDag.plusDays(1), sats = dagsats, skalUtbetales = true),
                         Dagsats(dato = førsteDag.plusDays(2), sats = 1500L, skalUtbetales = true),
