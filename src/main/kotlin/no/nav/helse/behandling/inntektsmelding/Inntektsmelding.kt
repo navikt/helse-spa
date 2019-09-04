@@ -20,7 +20,7 @@ data class Inntektsmelding(val jsonNode: JsonNode) {
 
     val id = jsonNode["id"].asText()!!
     val inntekt = jsonNode["inntekt"].asLong()!!
-    val arbeidsgiverperioder: List<Periode> = jsonNode["arbeidsgiverperioder"].map { Periode(it) }
+    val arbeidsgiverperioder: List<Periode> get() = jsonNode["arbeidsgiverperioder"].map { Periode(it) }
 }
 
 class InntektsmeldingSerializer : StdSerializer<Inntektsmelding>(Inntektsmelding::class.java) {

@@ -22,9 +22,9 @@ import no.nav.helse.serde.safelyUnwrapDate
 data class Sakskompleks(val jsonNode: JsonNode) {
     val id = jsonNode["id"].asText()!!
     val aktørId = jsonNode["aktørId"].asText()!!
-    val sykmeldinger = jsonNode["sykmeldinger"].map { SykmeldingMessage(it) }
-    val søknader = jsonNode["søknader"].map { Sykepengesøknad(it) }
-    val inntektsmeldinger = jsonNode["inntektsmeldinger"].map { Inntektsmelding(it) }
+    val sykmeldinger get() = jsonNode["sykmeldinger"].map { SykmeldingMessage(it) }
+    val søknader get() = jsonNode["søknader"].map { Sykepengesøknad(it) }
+    val inntektsmeldinger get() = jsonNode["inntektsmeldinger"].map { Inntektsmelding(it) }
     val orgnummer get() = jsonNode["orgnummer"].asText()
     val startSyketilfelle get() = jsonNode["syketilfelleStartdato"].safelyUnwrapDate()!!
     val sluttSyketilfelle get() = jsonNode["syketilfelleSluttdato"].safelyUnwrapDate()!!
