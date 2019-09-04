@@ -38,17 +38,25 @@ fun Sakskompleks.behandle(oppslag: Oppslag, probe: SaksbehandlingProbe): Either<
 
 
 fun Sakskompleks.mvpFilter(): Either<Behandlingsfeil.MVPFilterFeil, Sakskompleks> {
-    return if (søknader.size == 1 && søknader[0].type == "ARBEIDSTAKERE") {
-        right()
-    } else {
-        mvpFilter(
-            this, listOf(
-                MVPFeil(
-                    "Sakskompleks inneholder ${søknader.size} søknader med typene [${søknader.joinToString { it.type }}]",
-                    "Et sakskompleks må inneholde nøyaktig en søknad med typen ARBEIDSTAKERE"
+    return when {
+        søknader.size != 1 ->
+            mvpFilter(
+                this, listOf(
+                    MVPFeil(
+                        "Flere søknader",
+                        "Søknaden inneholder mer enn én søknad (${søknader.size})"
+                    )
                 )
-            )
-        ).left()
+            ).left()
+
+        søknader[0].type != "ARBEIDSTAKERE" ->
+            mvpFilter(
+                this, listOf(
+                    MVPFeil("Søknadstype - ${søknader[0].type}", "Søknaden er av feil type")
+                )
+            ).left()
+
+        else -> right()
     }
 }
 

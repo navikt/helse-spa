@@ -44,7 +44,7 @@ internal class SaksbehandlingKtTest {
         assertTrue(mvpFilter.isLeft())
         mvpFilter.mapLeft { left ->
             assertEquals(
-                "Et sakskompleks må inneholde nøyaktig en søknad med typen ARBEIDSTAKERE",
+                "Søknaden inneholder mer enn én søknad (2)",
                 left.mvpFeil[0].beskrivelse
             )
         }
@@ -62,7 +62,7 @@ internal class SaksbehandlingKtTest {
         assertTrue(mvpFilter.isLeft())
         mvpFilter.mapLeft { left ->
             assertEquals(
-                "Et sakskompleks må inneholde nøyaktig en søknad med typen ARBEIDSTAKERE",
+                "Søknaden er av feil type",
                 left.mvpFeil[0].beskrivelse
             )
         }
