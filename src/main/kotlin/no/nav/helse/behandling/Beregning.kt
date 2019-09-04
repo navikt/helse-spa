@@ -9,17 +9,8 @@ import no.nav.helse.sykepenger.beregning.beregn
 fun sykepengeBeregning(vilkårsprøving: Behandlingsgrunnlag): Either<Behandlingsfeil, Sykepengeberegning> =
     try {
         val beregningsresultat = beregn(lagBeregninggrunnlag(vilkårsprøving))
-        val inntektFraInntektsmelding = vilkårsprøving.sakskompleks.inntektsmeldinger.firstOrNull()?.inntekt
         val beregningsresultatFraInntektsmelding =
-            beregn(
-                lagBeregninggrunnlag(
-                    vilkårsprøving, if (inntektFraInntektsmelding != null) {
-                        inntektFraInntektsmelding * 12
-                    } else {
-                        null
-                    }
-                )
-            )
+            beregn(lagBeregninggrunnlag(vilkårsprøving, vilkårsprøving.sakskompleks.inntektsmeldinger.firstOrNull()?.årsinntekt))
 
         Either.Right(
             Sykepengeberegning(
@@ -35,7 +26,7 @@ fun sykepengeBeregning(vilkårsprøving: Behandlingsgrunnlag): Either<Behandling
         Either.Left(Behandlingsfeil.beregningsfeil(vilkårsprøving, e))
     }
 
-private fun lagBeregninggrunnlag(vilkårsprøving: Behandlingsgrunnlag, fastInntekt: Long? = null): Beregningsgrunnlag =
+private fun lagBeregninggrunnlag(vilkårsprøving: Behandlingsgrunnlag, inntektFraInntektsmeldingen: Long? = null): Beregningsgrunnlag =
     Beregningsgrunnlag(
         fom = vilkårsprøving.sakskompleks.inntektsmeldinger.flatMap { it.arbeidsgiverperioder }.maxBy { it.tom }?.tom?.plusDays(
             1
@@ -46,7 +37,7 @@ private fun lagBeregninggrunnlag(vilkårsprøving: Behandlingsgrunnlag, fastInnt
             if (it.size == 1) it[0].sykmeldingsgrad else throw Exception("takler bare én periode per nå")
         },
         sykepengegrunnlag = no.nav.helse.sykepenger.beregning.Sykepengegrunnlag(
-            fastsattInntekt = fastInntekt
+            fastsattInntekt = inntektFraInntektsmeldingen
                 ?: vilkårsprøving.avklarteVerdier.sykepengegrunnlag.fastsattVerdi.sykepengegrunnlagNårTrygdenYter.fastsattVerdi,
             grunnbeløp = getGrunnbeløpForDato(vilkårsprøving.sakskompleks.søknader[0].fom)
         ),

@@ -19,8 +19,10 @@ import java.time.LocalDate
 data class Inntektsmelding(val jsonNode: JsonNode) {
 
     val id = jsonNode["id"].asText()!!
-    val inntekt = jsonNode["inntekt"].asLong()!!
+    val inntekt = jsonNode["inntekt"].asLong()
     val arbeidsgiverperioder: List<Periode> get() = jsonNode["arbeidsgiverperioder"].map { Periode(it) }
+
+    val årsinntekt get() = inntekt * 12
 }
 
 class InntektsmeldingSerializer : StdSerializer<Inntektsmelding>(Inntektsmelding::class.java) {
