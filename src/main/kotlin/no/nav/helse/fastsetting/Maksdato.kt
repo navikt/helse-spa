@@ -20,7 +20,7 @@ fun vurderMaksdato(
                     førsteSykepengedag = førsteSykepengedag,
                     personensAlder = alder.fastsattVerdi,
                     yrkesstatus = yrkesstatus,
-                    tidligerePerioder = sykepengehistorikk.map { Tidsperiode(it.fom, it.tom) }
+                    tidligerePerioder = sykepengehistorikk.map { Tidsperiode(it.fom, it.tom) }.distinct()
             )
             val beregnetMaksdato = maksdato(grunnlag)
 

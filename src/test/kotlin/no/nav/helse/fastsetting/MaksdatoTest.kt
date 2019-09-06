@@ -27,8 +27,36 @@ class MaksdatoTest {
         }
     }
 
+    @Test
+    fun `Tidligere sykepengeperioder skal ikke inneholde duplikater`() {
+
+        val alderVurdering = Vurdering.Avklart(39, begrunnelse_p_8_51, Aldersgrunnlag(LocalDate.of(1978, 5, 14)), "SPA")
+        val fom = LocalDate.of(2019, 6, 14)
+        val startSyketilfelle = LocalDate.of(2019, 6, 14)
+        val vurdering = vurderMaksdato(alderVurdering,
+                startSyketilfelle, fom,
+                Yrkesstatus.ARBEIDSTAKER,
+                sykepengehistorikkMedDuplikater())
+
+        when (vurdering) {
+            is Vurdering.Uavklart -> fail("Vurdering skal være avklart")
+            is Vurdering.Avklart -> assertThat(vurdering.grunnlag?.tidligerePerioder).isEqualTo(sykepengehistorikkUtenDuplikater())
+        }
+    }
+
     private fun sykepengehistorikkDerSykepengedagerIkkeErOppbrukt(): List<AnvistPeriodeDTO> =
             listOf(AnvistPeriodeDTO(of(2019, 2, 15), of(2019, 3, 11)),
                     AnvistPeriodeDTO(of(2019, 3, 12), of(2019, 3, 31)))
+
+    private fun sykepengehistorikkMedDuplikater(): List<AnvistPeriodeDTO> =
+            listOf(AnvistPeriodeDTO(of(2019, 2, 15), of(2019, 3, 11)),
+                    AnvistPeriodeDTO(of(2019, 2, 15), of(2019, 3, 11)),
+                    AnvistPeriodeDTO(of(2019, 3, 12), of(2019, 3, 31)),
+                    AnvistPeriodeDTO(of(2019, 3, 12), of(2019, 3, 31)))
+
+    private fun sykepengehistorikkUtenDuplikater(): List<Tidsperiode> =
+            listOf(Tidsperiode(of(2019, 2, 15), of(2019, 3, 11)),
+                    Tidsperiode(of(2019, 3, 12), of(2019, 3, 31)))
+
 
 }
