@@ -2,8 +2,10 @@ package no.nav.helse.behandling
 
 import arrow.core.Either
 import no.nav.helse.Behandlingsfeil
+import no.nav.helse.behandling.søknad.Fraværstype
 import no.nav.helse.oppslag.getGrunnbeløpForDato
 import no.nav.helse.sykepenger.beregning.Beregningsgrunnlag
+import no.nav.helse.sykepenger.beregning.Ferie
 import no.nav.helse.sykepenger.beregning.beregn
 
 fun sykepengeBeregning(vilkårsprøving: Behandlingsgrunnlag): Either<Behandlingsfeil, Sykepengeberegning> =
@@ -22,7 +24,7 @@ fun sykepengeBeregning(vilkårsprøving: Behandlingsgrunnlag): Either<Behandling
 private fun lagBeregninggrunnlag(vilkårsprøving: Behandlingsgrunnlag) : Beregningsgrunnlag =
         Beregningsgrunnlag(
                 fom = vilkårsprøving.originalSøknad.fom, // er dette første dag etter arbeidsgiverperiode ?
-                ferie = null,
+                ferie = vilkårsprøving.originalSøknad.fravær.filter { it.type == Fraværstype.FERIE }.map { Ferie(it.fom, it.tom) },
                 permisjon = null,
                 sykmeldingsgrad = vilkårsprøving.originalSøknad.soknadsperioder.let {
                     if (it.size == 1) it[0].sykmeldingsgrad else throw Exception("takler bare én periode per nå")
