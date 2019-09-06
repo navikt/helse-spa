@@ -27,6 +27,14 @@ fun sjekkSvarISøknaden(søknad: Sykepengesøknad): List<MVPFeil> {
             feil.add(MVPFeil("Har utenlandsopphold", "Søker har opplyst at han/hun har utenlandsopphold"))
         }
 
+        if (arbeidGjenopptatt != null) {
+            feil.add(MVPFeil("Tilbake i jobb før tiden", "Søker har opplyst at han/hun har vært tilbake i jobb før tiden"))
+        }
+
+        if (harKorrigertArbeidstid) {
+            feil.add(MVPFeil("Korrigert arbeidstid", "Søker har opplyst at han/hun har jobbet mer enn en periode i sykmeldingen tilsier"))
+        }
+
         feil
     }
 }
