@@ -40,7 +40,7 @@ dependencies {
     compile("com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion")
     compile("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion")
     compile("no.nav.helse.sykepenger.lovverk:sykepenger-inngangsvilkar:2018-12-20-101.4f8f899")
-    compile("no.nav.helse.sykepenger.lovverk:sykepenger-beregning:2018-12-20-101.8ef150a")
+    compile("no.nav.helse.sykepenger.lovverk:sykepenger-beregning:2018-12-20-101.1e2f74a")
     compile("no.nav:nare:dfe6569")
 
     compile("no.nav.helse:maksdato:89af124")
