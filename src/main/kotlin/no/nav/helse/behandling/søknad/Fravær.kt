@@ -16,8 +16,10 @@ import java.time.LocalDate
 @JsonDeserialize(using = FraværDeserializer::class)
 data class Fravær(val jsonNode: JsonNode) {
 
-    val fom = with(jsonNode.get("fom")) { LocalDate.parse(textValue())!! }
-    val tom = with(jsonNode.get("tom")) { LocalDate.parse(textValue())!! }
+    val fom = LocalDate.parse(jsonNode.get("fom").textValue())
+    val tom = jsonNode.get("tom").textValue()?.let {
+        LocalDate.parse(it)
+    }
     val type get() = Fraværstype.valueOf(jsonNode.get("type").textValue())
 }
 

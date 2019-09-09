@@ -15,8 +15,8 @@ import java.time.LocalDate
 @JsonSerialize(using = SøknadsperiodeSerializer::class)
 @JsonDeserialize(using = SøknadsperiodeDeserializer::class)
 data class Søknadsperiode(val jsonNode: JsonNode) {
-    val fom = with(jsonNode.get("fom")) { LocalDate.parse(textValue())!! }
-    val tom = with(jsonNode.get("tom")) { LocalDate.parse(textValue())!! }
+    val fom = LocalDate.parse(jsonNode.get("fom").textValue())
+    val tom = LocalDate.parse(jsonNode.get("tom").textValue())
     val sykmeldingsgrad get() = jsonNode.get("sykmeldingsgrad").asInt()
     val faktiskGrad
         get() = jsonNode.get("faktiskGrad")?.let {
