@@ -2,7 +2,6 @@ package no.nav.helse.behandling
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory
 import com.fasterxml.jackson.databind.node.ObjectNode
-import com.fasterxml.jackson.module.kotlin.readValue
 import no.nav.helse.behandling.mvp.readResource
 import no.nav.helse.behandling.søknad.Sykepengesøknad
 import no.nav.helse.streams.defaultObjectMapper
@@ -17,8 +16,7 @@ class SykepengesøknadTest {
 
     @Test
     fun `serialisering av en søknad skal serialisere jsonNode`() {
-        val søknadJson = defaultObjectMapper.readTree(SykepengesøknadTest::class.java
-                .classLoader.getResource("søknader/arbeidstaker_sendt_nav.json").readText())
+        val søknadJson = defaultObjectMapper.readTree("/søknader/arbeidstaker_sendt_nav.json".readResource())
 
         val søknad = Sykepengesøknad(søknadJson)
 
@@ -27,8 +25,7 @@ class SykepengesøknadTest {
 
     @Test
     fun `deserialisering av en søknad skal deserialisere jsonNode`() {
-        val søknad = defaultObjectMapper.readValue<Sykepengesøknad>(SykepengesøknadTest::class.java
-                .classLoader.getResource("søknader/arbeidstaker_sendt_nav.json").readText())
+        val søknad = Sykepengesøknad(defaultObjectMapper.readTree("/søknader/arbeidstaker_sendt_nav.json".readResource()))
 
         assertEquals("1c6d9930-ce09-49dc-bcb3-b6fee2ff4e32", søknad.id)
     }
