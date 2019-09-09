@@ -29,7 +29,7 @@ class Oppslag(val sparkelBaseUrl: String, val stsClient: StsRestClient) {
                                                             tps = tpsfakta,
                                                             beregningsperiode = beregningsperiode,
                                                             sammenligningsperiode = sammenligningsperiode,
-                                                            sykepengehistorikk = sykepengehistorikk,
+                                                            sykepengehistorikk = sykepengehistorikk.distinct(),
                                                             arbeidInntektYtelse = arbeidInntektYtelse,
                                                             ytelser = ytelser
                                                     ))
