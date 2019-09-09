@@ -71,15 +71,7 @@ data class Sykepengesøknad(val jsonNode: JsonNode) {
 
     val fravær
         get() = with(jsonNode.get("fravar")) {
-            map { fraværNode ->
-                Fravær(
-                    fom = LocalDate.parse(fraværNode.get("fom").textValue()),
-                    tom = fraværNode.get("tom").textValue()?.let {
-                        LocalDate.parse(it)
-                    },
-                    type = Fraværstype.valueOf(fraværNode.get("type").textValue())
-                )
-            }
+            map { Fravær(it) }
         }
 
     val andreInntektskilder
