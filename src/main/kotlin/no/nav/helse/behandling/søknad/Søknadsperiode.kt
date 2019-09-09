@@ -12,8 +12,8 @@ import com.fasterxml.jackson.databind.ser.std.StdSerializer
 import no.nav.helse.streams.defaultObjectMapper
 import java.time.LocalDate
 
-@JsonSerialize(using = Søknadsperiode.SøknadsperiodeSerializer::class)
-@JsonDeserialize(using = Søknadsperiode.SøknadsperiodeDeserializer::class)
+@JsonSerialize(using = SøknadsperiodeSerializer::class)
+@JsonDeserialize(using = SøknadsperiodeDeserializer::class)
 data class Søknadsperiode(val jsonNode: JsonNode) {
     val fom = with(jsonNode.get("fom")) { LocalDate.parse(textValue())!! }
     val tom = with(jsonNode.get("tom")) { LocalDate.parse(textValue())!! }
@@ -43,15 +43,15 @@ data class Søknadsperiode(val jsonNode: JsonNode) {
                 it.asInt()
             }
         }
+}
 
-    class SøknadsperiodeSerializer : StdSerializer<Søknadsperiode>(Søknadsperiode::class.java) {
-        override fun serialize(søknad: Søknadsperiode?, gen: JsonGenerator?, provider: SerializerProvider?) {
-            gen?.writeObject(søknad?.jsonNode)
-        }
+class SøknadsperiodeSerializer : StdSerializer<Søknadsperiode>(Søknadsperiode::class.java) {
+    override fun serialize(søknad: Søknadsperiode?, gen: JsonGenerator?, provider: SerializerProvider?) {
+        gen?.writeObject(søknad?.jsonNode)
     }
+}
 
-    class SøknadsperiodeDeserializer : StdDeserializer<Søknadsperiode>(Søknadsperiode::class.java) {
-        override fun deserialize(parser: JsonParser?, context: DeserializationContext?) =
-            Søknadsperiode(defaultObjectMapper.readTree(parser))
-    }
+class SøknadsperiodeDeserializer : StdDeserializer<Søknadsperiode>(Søknadsperiode::class.java) {
+    override fun deserialize(parser: JsonParser?, context: DeserializationContext?) =
+        Søknadsperiode(defaultObjectMapper.readTree(parser))
 }

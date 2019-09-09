@@ -75,14 +75,7 @@ data class Sykepengesøknad(val jsonNode: JsonNode) {
         }
 
     val andreInntektskilder
-        get() = with(jsonNode.get("andreInntektskilder")) {
-            map { annenInntektskildeNode ->
-                Inntektskilde(
-                    type = annenInntektskildeNode.get("type").textValue(),
-                    sykemeldt = annenInntektskildeNode.get("sykmeldt").asBoolean()
-                )
-            }
-        }
+        get() = with(jsonNode.get("andreInntektskilder")) { map { Inntektskilde(it) } }
 
     val arbeidGjenopptatt
         get() = jsonNode.get("arbeidGjenopptatt")?.let { arbeidGjenopptattNode ->
@@ -100,7 +93,11 @@ data class Sykepengesøknad(val jsonNode: JsonNode) {
         version = when {
             jsonNode.has("soknadstype") -> Version.Version1
             jsonNode.has("type") -> Version.Version2
-            else -> throw IllegalArgumentException("was expecting a sykepengesøknad: ${defaultObjectMapper.writeValueAsString(jsonNode)}")
+            else -> throw IllegalArgumentException(
+                "was expecting a sykepengesøknad: ${defaultObjectMapper.writeValueAsString(
+                    jsonNode
+                )}"
+            )
         }
     }
 
