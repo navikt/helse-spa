@@ -67,18 +67,7 @@ data class Sykepengesøknad(val jsonNode: JsonNode) {
         }
 
     val soknadsperioder
-        get() = with(jsonNode.get("soknadsperioder")) {
-            map { søknadsperiodeNode ->
-                Søknadsperiode(
-                    fom = LocalDate.parse(søknadsperiodeNode.get("fom").textValue()),
-                    tom = LocalDate.parse(søknadsperiodeNode.get("tom").textValue()),
-                    sykmeldingsgrad = søknadsperiodeNode.get("sykmeldingsgrad").asInt(),
-                    faktiskGrad = søknadsperiodeNode.get("faktiskGrad")?.let { if (it.isNull) { null } else { it.asInt() } },
-                    avtaltTimer = søknadsperiodeNode.get("avtaltTimer")?.let { if (it.isNull) { null } else { it.asInt() } },
-                    faktiskTimer = søknadsperiodeNode.get("faktiskTimer")?.let { if (it.isNull) { null } else { it.asInt() } }
-                )
-            }
-        }
+        get() = with(jsonNode.get("soknadsperioder")) { map { Søknadsperiode(it) } }
 
     val fravær
         get() = with(jsonNode.get("fravar")) {
