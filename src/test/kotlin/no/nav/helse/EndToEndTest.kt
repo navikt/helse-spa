@@ -61,7 +61,7 @@ class EndToEndTest {
                 autoStart = false,
                 withSchemaRegistry = false,
                 withSecurity = true,
-                topics = listOf(
+                topicNames = listOf(
                         SYKEPENGESØKNADER_INN.name,
                         VEDTAK_SYKEPENGER.name,
                         SYKEPENGEBEHANDLINGSFEIL.name
