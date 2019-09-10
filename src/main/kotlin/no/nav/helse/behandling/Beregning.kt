@@ -7,6 +7,7 @@ import no.nav.helse.oppslag.getGrunnbeløpForDato
 import no.nav.helse.sykepenger.beregning.Beregningsgrunnlag
 import no.nav.helse.sykepenger.beregning.Ferie
 import no.nav.helse.sykepenger.beregning.beregn
+import java.lang.RuntimeException
 
 fun sykepengeBeregning(vilkårsprøving: Behandlingsgrunnlag): Either<Behandlingsfeil, Sykepengeberegning> =
         try {
@@ -24,7 +25,7 @@ fun sykepengeBeregning(vilkårsprøving: Behandlingsgrunnlag): Either<Behandling
 private fun lagBeregninggrunnlag(vilkårsprøving: Behandlingsgrunnlag) : Beregningsgrunnlag =
         Beregningsgrunnlag(
                 fom = vilkårsprøving.originalSøknad.fom, // er dette første dag etter arbeidsgiverperiode ?
-                ferie = vilkårsprøving.originalSøknad.fravær.filter { it.type == Fraværstype.FERIE }.map { if (it.tom != null) Ferie(it.fom, it.tom) else throw Exception("Ferie mangler tom-dato") },
+                ferie = vilkårsprøving.originalSøknad.fravær.filter { it.type == Fraværstype.FERIE }.map { Ferie(it.fom, it.tom ?: throw RuntimeException("Ferie mangler tom-dato")) },
                 permisjon = emptyList(),
                 sykmeldingsgrad = vilkårsprøving.originalSøknad.soknadsperioder.let {
                     if (it.size == 1) it[0].sykmeldingsgrad else throw Exception("takler bare én periode per nå")
