@@ -58,7 +58,17 @@ class BeregningTest {
                 beregningsresultat.dagsatser[0].sats)
     }
 
-    fun vilkårsprøvdSøknad(fom: LocalDate, tom: LocalDate, årslønn: Long, sykmeldingsgrad: Int) =
+    @Test
+    fun `skal ikke utbetale dagsats ved ferie`() {
+        val fravær = listOf(FravarDTO(parse("2019-01-04"), parse("2019-01-08"), FravarstypeDTO.FERIE))
+        val soknad = vilkårsprøvdSøknad(parse("2019-01-01"), parse("2019-01-10"), 500000, 100, fravær)
+        val beregningsresultat = (sykepengeBeregning(soknad) as Either.Right).b.beregning
+
+        assertEquals(8, beregningsresultat.dagsatser.size)
+        assertEquals(5, beregningsresultat.dagsatser.filter { it.skalUtbetales }.size)
+    }
+
+    fun vilkårsprøvdSøknad(fom: LocalDate, tom: LocalDate, årslønn: Long, sykmeldingsgrad: Int, fravær: List<FravarDTO> = emptyList()) =
             Behandlingsgrunnlag(
                     originalSøknad = Sykepengesøknad(SykepengesøknadV2DTO(
                             id = "1",
@@ -73,7 +83,7 @@ class BeregningTest {
                             startSyketilfelle = parse("2018-12-01"),
                             status = SoknadsstatusDTO.SENDT,
                             andreInntektskilder = emptyList(),
-                            fravar = emptyList()).asJsonNode()),
+                            fravar = fravær).asJsonNode()),
                     faktagrunnlag = faktagrunnlagUtenVerdi,
                     avklarteVerdier = AvklarteVerdier(
                             medlemsskap = Avklart(fastsattVerdi = true, begrunnelse = "derfor", fastsattAv = "test", grunnlag = Tpsfakta(LocalDate.parse("1980-01-01"), "NOR", "NOR", "BOSA", null)),
