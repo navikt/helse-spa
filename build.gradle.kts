@@ -17,7 +17,7 @@ val wireMockVersion = "2.19.0"
 val mockkVersion="1.9"
 
 plugins {
-    kotlin("jvm") version "1.3.20"
+    kotlin("jvm") version "1.3.50"
 }
 
 buildscript {
@@ -109,5 +109,5 @@ tasks.withType<Test> {
 }
 
 tasks.withType<Wrapper> {
-    gradleVersion = "5.1.1"
+    gradleVersion = "5.6.1"
 }
