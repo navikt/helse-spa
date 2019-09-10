@@ -8,12 +8,16 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import no.nav.helse.behandling.Oppslag
 import no.nav.helse.behandling.Sakskompleks
 import no.nav.helse.behandling.SykepengeVedtak
+import no.nav.helse.behandling.søknad.Sykepengesøknad
+import no.nav.helse.behandling.søknad.tilSakskompleks
 import no.nav.helse.oppslag.StsRestClient
 import no.nav.helse.probe.SaksbehandlingProbe
 import no.nav.helse.serde.JsonNodeSerde
 import no.nav.helse.streams.StreamConsumer
+import no.nav.helse.streams.Topics
 import no.nav.helse.streams.Topics.SYKEPENGEBEHANDLINGSFEIL
 import no.nav.helse.streams.Topics.VEDTAK_SYKEPENGER
+import no.nav.helse.streams.consumeTopic
 import no.nav.helse.streams.defaultObjectMapper
 import no.nav.helse.streams.streamConfig
 import no.nav.helse.streams.toTopic
@@ -66,8 +70,63 @@ class SaksbehandlingStream(val env: Environment) {
         fun topology(oppslag: Oppslag, probe: SaksbehandlingProbe): Topology {
             val builder = StreamsBuilder()
 
-            val (feilendeSakskompleks,
-                vedtak) = builder.stream<String, JsonNode>(SAKSKOMPLEKS_TOPIC, Consumed.with(Serdes.String(), JsonNodeSerde(objectMapper))
+            val (behandlingsfeilFraSøknader,
+                vedtakFraSøknader) = builder.consumeTopic(Topics.SYKEPENGESØKNADER_INN)
+                .peek { søknadId, _ ->
+                    loggMedSøknadId(søknadId) {
+                        probe.mottattSøknadUansettStatusOgType(søknadId)
+                    }
+                }
+                .mapValues { søknadId, jsonNode ->
+                    loggMedSøknadId(søknadId) {
+                        Sykepengesøknad(jsonNode)
+                    }
+                }
+                .filter { _, søknad ->
+                    søknad.status != "UKJENT"
+                }
+                .peek { søknadId, søknad ->
+                    loggMedSøknadId(søknadId) {
+                        probe.mottattSøknadUansettType(søknad.id, søknad.status)
+                    }
+                }
+                .filter { _, søknad ->
+                    søknad.type == "OPPHOLD_UTLAND" ||
+                            søknad.type == "SELVSTENDIGE_OG_FRILANSERE" ||
+                            søknad.type == "ARBEIDSTAKERE"
+                }
+                .peek { søknadId, søknad ->
+                    loggMedSøknadId(søknadId) {
+                        probe.mottattSøknad(søknad.id, søknad.status, søknad.type)
+                    }
+                }
+                .filter { _, søknad ->
+                    søknad.sendtTilNAV
+                }
+                .peek { søknadId, søknad ->
+                    loggMedSøknadId(søknadId) {
+                        probe.mottattSøknadSendtNAV(søknadId, søknad.type)
+                    }
+                }
+                .mapValues { _, søknad ->
+                    loggMedSøknadId(søknad.id) {
+                        søknad.tilSakskompleks()
+                    }
+                }
+                .mapValues { _, søknad ->
+                    loggMedSøknadId(søknad.id) {
+                        søknad.behandle(oppslag, probe)
+                    }
+                }.branch(
+                    Predicate { _, søknad -> søknad is Either.Left },
+                    Predicate { _, søknad -> søknad is Either.Right }
+                )
+
+            sendTilFeilkø(probe, behandlingsfeilFraSøknader)
+            sendTilVedtakskø(probe, vedtakFraSøknader)
+
+            val (behandlingsfeilFraSakskompleks,
+                vedtakFraSakskompleks) = builder.stream<String, JsonNode>(SAKSKOMPLEKS_TOPIC, Consumed.with(Serdes.String(), JsonNodeSerde(objectMapper))
                 .withOffsetResetPolicy(Topology.AutoOffsetReset.EARLIEST))
                 .mapValues { jsonNode -> Sakskompleks(jsonNode) }
                 .mapValues { _, sakskompleks ->
@@ -79,8 +138,8 @@ class SaksbehandlingStream(val env: Environment) {
                     Predicate { _, søknad -> søknad is Either.Right }
                 )
 
-            sendTilFeilkø(probe, feilendeSakskompleks)
-            sendTilVedtakskø(probe, vedtak)
+            sendTilFeilkø(probe, behandlingsfeilFraSakskompleks)
+            sendTilVedtakskø(probe, vedtakFraSakskompleks)
 
             return builder.build()
         }
@@ -132,6 +191,15 @@ private fun <T> loggMedSakskompleksId(sakskompleksId: String, block: () -> T): T
         return block()
     } finally {
         MDC.remove("sakskompleksId")
+    }
+}
+
+private fun <T> loggMedSøknadId(søknadsId: String, block: () -> T): T {
+    try {
+        MDC.put("søknadsId", søknadsId)
+        return block()
+    } finally {
+        MDC.remove("søknadsId")
     }
 }
 

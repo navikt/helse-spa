@@ -34,7 +34,12 @@ import no.nav.helse.behandling.Tpsfakta
 import no.nav.helse.behandling.Vedtak
 import no.nav.helse.behandling.Vedtaksperiode
 import no.nav.helse.behandling.søknad.Sykepengesøknad
+import no.nav.helse.dto.ArbeidsgiverDTO
+import no.nav.helse.dto.SoknadsperiodeDTO
+import no.nav.helse.dto.SoknadsstatusDTO
+import no.nav.helse.dto.SoknadstypeDTO
 import no.nav.helse.dto.SykepengesøknadV2DTO
+import no.nav.helse.dto.asJsonNode
 import no.nav.helse.fastsetting.Alder
 import no.nav.helse.fastsetting.Aldersgrunnlag
 import no.nav.helse.fastsetting.Opptjeningsgrunnlag
@@ -183,15 +188,25 @@ class EndToEndTest {
         val sakskompleks = Sakskompleks(sakskompleksJson)
 
         produceOneMessage(SAKSKOMPLEKS_TOPIC, sakskompleks.id, sakskompleks.jsonNode)
+        val innsendtSøknad = produserSykepengesøknadV2(aktørId)
 
-        val sykepengeVedtak: SykepengeVedtak = ventPåVedtak()
+        val sykepengeVedtak: List<SykepengeVedtak> = ventPåVedtak(2)
+            .sortedBy { it.vedtak.perioder[0].fom }
 
-        //TODO checkSakskompleks()
-        checkFaktagrunnlag(sykepengeVedtak.faktagrunnlag)
-        checkAvklarteVerdier(sykepengeVedtak.faktagrunnlag, sykepengeVedtak.avklarteVerdier)
-        checkVilkårsprøving(sykepengeVedtak.vilkårsprøving)
-        checkBeregning(sykepengeVedtak.beregning)
-        checkVedtak(sykepengeVedtak.vedtak)
+        // Sjekk vedtak 1 - søknad omgjort til sakskompleks
+        checkSøknad(innsendtSøknad, sykepengeVedtak[0].sakskompleks.søknader[0])
+        checkFaktagrunnlag(sykepengeVedtak[0].faktagrunnlag)
+        checkAvklarteVerdier(sykepengeVedtak[0].faktagrunnlag, sykepengeVedtak[0].avklarteVerdier)
+        checkVilkårsprøving(sykepengeVedtak[0].vilkårsprøving)
+        checkBeregningUtenInntektsmelding(sykepengeVedtak[0].beregning)
+        checkVedtakUtenInntektsmelding(sykepengeVedtak[0].vedtak)
+
+        // Sjekk vedtak 2 - sakskompleks med sykmelding, søknad og inntektsmelding
+        checkFaktagrunnlag(sykepengeVedtak[1].faktagrunnlag)
+        checkAvklarteVerdier(sykepengeVedtak[1].faktagrunnlag, sykepengeVedtak[1].avklarteVerdier)
+        checkVilkårsprøving(sykepengeVedtak[1].vilkårsprøving)
+        checkBeregningMedInntektsmelding(sykepengeVedtak[1].beregningFraInntektsmelding)
+        checkVedtak(sykepengeVedtak[1].vedtak)
     }
 
     private fun checkSøknad(innsendtSøknad: SykepengesøknadV2DTO, faktiskSøknad: Sykepengesøknad) {
@@ -395,9 +410,21 @@ class EndToEndTest {
         assert(vilkårsprøving.resultat).isEqualTo(Resultat.JA)
     }
 
-    private fun checkBeregning(beregning: Beregningsresultat) {
-        // Detaljene i beregningen testes ikke her, men resultatet for dette caset skal være 23 virkedager a 1154,-
+    private fun checkBeregningMedInntektsmelding(beregning: Beregningsresultat) {
+        // Detaljene i beregningen testes ikke her, men resultatet for dette caset skal være 11 virkedager a 1195,-
         assert(beregning.dagsatser).hasSize(11)
+        assert(beregning.dagsatser).each {
+            val dagsats = it.actual
+            assert(dagsats.dato).isBetween(første_dag_i_syketilfelle, siste_dag_i_syketilfelle)
+            assert(dagsats.dato.dayOfWeek).isNotIn(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY)
+            assert(dagsats.sats).isEqualTo(1195L)
+            assert(dagsats.skalUtbetales).isTrue()
+        }
+    }
+
+    private fun checkBeregningUtenInntektsmelding(beregning: Beregningsresultat) {
+        // Detaljene i beregningen testes ikke her, men resultatet for dette caset skal være 23 virkedager a 1154,-
+        assert(beregning.dagsatser).hasSize(23)
         assert(beregning.dagsatser).each {
             val dagsats = it.actual
             assert(dagsats.dato).isBetween(første_dag_i_syketilfelle, siste_dag_i_syketilfelle)
@@ -411,6 +438,17 @@ class EndToEndTest {
         assert(vedtak.perioder).containsExactly(
             Vedtaksperiode(
                 fom = LocalDate.of(2019, 1, 17),
+                tom = LocalDate.of(2019, 1, 31),
+                dagsats = BigDecimal.valueOf(1195L),
+                fordeling = listOf(Fordeling(mottager = "97114455", andel = 100))
+            )
+        )
+    }
+
+    private fun checkVedtakUtenInntektsmelding(vedtak: Vedtak) {
+        assert(vedtak.perioder).containsExactly(
+            Vedtaksperiode(
+                fom = LocalDate.of(2019, 1, 1),
                 tom = LocalDate.of(2019, 1, 31),
                 dagsats = BigDecimal.valueOf(1154L),
                 fordeling = listOf(Fordeling(mottager = "97114455", andel = 100))
@@ -441,27 +479,7 @@ class EndToEndTest {
 
     }
 
-    class BehandlingsfeilDeserializer : Deserializer<Behandlingsfeil> {
-        private val log = LoggerFactory.getLogger("BehandlingsfeilDeserializer")
-
-        override fun configure(configs: MutableMap<String, *>?, isKey: Boolean) {}
-
-        override fun deserialize(topic: String?, data: ByteArray?): Behandlingsfeil? {
-            return data?.let {
-                try {
-                    defaultObjectMapper.readValue<Behandlingsfeil.MVPFilterFeil>(it)
-                } catch (e: Exception) {
-                    log.warn("Not a valid json", e)
-                    null
-                }
-            }
-        }
-
-        override fun close() {}
-
-    }
-
-    private fun ventPåVedtak(): SykepengeVedtak {
+    private fun ventPåVedtak(forventet: Int): List<SykepengeVedtak> {
         val resultConsumer = KafkaConsumer<String, SykepengeVedtak>(
             consumerProperties(),
             StringDeserializer(),
@@ -471,42 +489,53 @@ class EndToEndTest {
 
         val end = System.currentTimeMillis() + 20 * 1000
 
+        val vedtak = mutableListOf<SykepengeVedtak>()
+
         while (System.currentTimeMillis() < end) {
-            resultConsumer.seekToBeginning(resultConsumer.assignment())
             val records = resultConsumer.poll(Duration.ofSeconds(1))
 
+            resultConsumer.seekToBeginning(resultConsumer.assignment())
+
             if (!records.isEmpty) {
-                return records.records(VEDTAK_SYKEPENGER.name).map {
-                    it.value()
-                }.first()
+                records.records(VEDTAK_SYKEPENGER.name).forEach { record ->
+                    if (!vedtak.any { v -> v.sakskompleks.id == record.value().sakskompleks.id }) {
+                        vedtak.add(record.value())
+                    }
+                }
+            }
+
+            if (vedtak.size == forventet) {
+                return vedtak
             }
         }
 
-        throw RuntimeException("fant ingen vedtak etter 20 sekunder")
+        throw RuntimeException("fant ikke $forventet vedtak etter 20 sekunder")
     }
 
-    private fun ventPåBehandlingsfeil(): Behandlingsfeil {
-        val resultConsumer = KafkaConsumer<String, Behandlingsfeil>(
-            consumerProperties(),
-            StringDeserializer(),
-            BehandlingsfeilDeserializer()
+    private fun produserSykepengesøknadV2(aktørId: String): SykepengesøknadV2DTO {
+        val søknad = SykepengesøknadV2DTO(
+            id = "1",
+            aktorId = aktørId,
+            type = SoknadstypeDTO.ARBEIDSTAKERE,
+            status = SoknadsstatusDTO.SENDT,
+            arbeidsgiver = ArbeidsgiverDTO(navn = "MATBUTIKKEN", orgnummer = stubbet_arbeidsforhold.arbeidsgiver.identifikator),
+            fom = første_dag_i_syketilfelle,
+            tom = siste_dag_i_syketilfelle,
+            startSyketilfelle = første_dag_i_syketilfelle,
+            sendtNav = parse("2019-01-17").atStartOfDay(),
+            soknadsperioder = listOf(
+                SoknadsperiodeDTO(
+                    fom = første_dag_i_syketilfelle,
+                    tom = siste_dag_i_syketilfelle,
+                    sykmeldingsgrad = 100
+                )
+            ),
+            soktUtenlandsopphold = false,
+            andreInntektskilder = emptyList(),
+            fravar = emptyList()
         )
-        resultConsumer.subscribe(listOf(SYKEPENGEBEHANDLINGSFEIL.name))
-
-        val end = System.currentTimeMillis() + 20 * 1000
-
-        while (System.currentTimeMillis() < end) {
-            resultConsumer.seekToBeginning(resultConsumer.assignment())
-            val records = resultConsumer.poll(Duration.ofSeconds(1))
-
-            if (!records.isEmpty) {
-                return records.records(SYKEPENGEBEHANDLINGSFEIL.name).map {
-                    it.value()
-                }.first()
-            }
-        }
-
-        throw RuntimeException("fant ingen behandlingsfeil etter 20 sekunder")
+        produceOneMessage(SYKEPENGESØKNADER_INN.name, "key", søknad.asJsonNode())
+        return søknad
     }
 
     private fun restStsStub() {

@@ -46,7 +46,7 @@ fun vurderMVPKriterierForSykepengegrunnlaget(sakskompleks: Sakskompleks, beregni
             .divide(BigDecimal.valueOf(3), RoundingMode.HALF_UP)
             .longValueExact(RoundingMode.HALF_UP)
 
-    if (abs((aktuellMånedsinntekt - sakskompleks.inntektsmeldinger[0].inntekt) / aktuellMånedsinntekt.toDouble()) > 0.05 ) {
+    if (sakskompleks.inntektsmeldinger.isNotEmpty() && abs((aktuellMånedsinntekt - sakskompleks.inntektsmeldinger[0].inntekt) / aktuellMånedsinntekt.toDouble()) > 0.05 ) {
         feil.add(MVPFeil("Avvik over 5%. Beregnet månedsinntekt: $aktuellMånedsinntekt, oppgitt i inntektsmeldingen: ${sakskompleks.inntektsmeldinger[0].inntekt}", "Det skal ikke være mer enn 5% avvik mellom beløpet oppgitt i inntektsmeldingen og beregningsgrunnlaget"))
     }
 
