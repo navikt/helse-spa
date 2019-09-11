@@ -3,7 +3,7 @@ name: Bygg og deploy
 on:
   push:
     branches:
-    - master
+    - fixup-workflow
 
 jobs:
   build:
@@ -38,9 +38,7 @@ jobs:
     - name: test and build
       run: ./gradlew test build
     - name: build docker image
-      run: docker build . --pull -t ${DOCKER_IMAGE}:$(echo $GITHUB_SHA | cut -c1-7)
-      env:
-        DOCKER_IMAGE: navikt/spa
+      run: docker build . --pull -t $(cat .docker_image):$(cat .docker_tag)
     - name: push docker image
       run: |
         echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin
@@ -48,14 +46,8 @@ jobs:
       env:
         DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
         DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-  deploy:
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-    - uses: actions/checkout@v1
     - name: deploy to preprod
       env:
-        DOCKER_IMAGE: navikt/spa
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         NAV_CLUSTER: dev-fss
         NAISERATOR_FILE: deploy/preprod.json
