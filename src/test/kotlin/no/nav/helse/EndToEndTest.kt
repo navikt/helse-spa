@@ -11,6 +11,7 @@ import com.github.tomakehurst.wiremock.client.WireMock.okJson
 import com.github.tomakehurst.wiremock.client.WireMock.stubFor
 import com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
+import kafka.server.KafkaConfig
 import no.nav.common.JAASCredential
 import no.nav.common.KafkaEnvironment
 import no.nav.helse.behandling.*
@@ -65,7 +66,8 @@ class EndToEndTest {
                         SYKEPENGESØKNADER_INN.name,
                         VEDTAK_SYKEPENGER.name,
                         SYKEPENGEBEHANDLINGSFEIL.name
-                )
+                ),
+                brokerConfigOverrides = mapOf(KafkaConfig.ZkConnectionTimeoutMsProp() to "10000").toProperties()
         )
 
         val server: WireMockServer = WireMockServer(WireMockConfiguration.options().dynamicPort())

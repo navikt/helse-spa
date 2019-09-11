@@ -4,7 +4,7 @@ val slf4jVersion = "1.7.25"
 val ktorVersion = "1.1.2"
 val prometheusVersion = "0.5.0"
 val gsonVersion = "2.7"
-val navStreamsVersion = "d392648"
+val navStreamsVersion = "1a24b7e"
 val fuelVersion = "1.15.1"
 val arrowVersion = "0.9.0"
 
@@ -53,7 +53,7 @@ dependencies {
         exclude(group = "junit")
     }
     testCompile("io.mockk:mockk:$mockkVersion")
-    testCompile("no.nav:kafka-embedded-env:2.2.3")
+    testCompile("no.nav:kafka-embedded-env:2.1.1")
     testCompile("org.junit.jupiter:junit-jupiter-api:$junitJupiterVersion")
     testCompile("org.junit.jupiter:junit-jupiter-params:$junitJupiterVersion")
     testCompile("org.assertj:assertj-core:$assertJVersion")
@@ -64,12 +64,6 @@ dependencies {
 repositories {
     jcenter()
     mavenCentral()
-    maven("https://maven.pkg.github.com/navikt/helse-streams") {
-        credentials {
-            username = System.getProperty("githubUsername") ?: "x-access-token"
-            password = System.getProperty("githubPassword") ?: System.getenv("GITHUB_TOKEN")
-        }
-    }
     maven("http://packages.confluent.io/maven/")
     maven("https://dl.bintray.com/kotlin/ktor")
     mavenLocal()
