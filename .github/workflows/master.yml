@@ -32,6 +32,9 @@ jobs:
       run: |
         echo $DOCKER_IMAGE > .docker_image
         echo $(echo $GITHUB_SHA | cut -c1-7) > .docker_tag
+    - uses: actions/setup-java@v1
+      with:
+        java-version: '11.x'
     - name: test and build
       run: ./gradlew test build
     - name: build docker image
