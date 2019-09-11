@@ -17,7 +17,7 @@ val wireMockVersion = "2.19.0"
 val mockkVersion="1.9"
 
 plugins {
-    kotlin("jvm") version "1.3.20"
+    kotlin("jvm") version "1.3.50"
 }
 
 buildscript {
@@ -40,7 +40,7 @@ dependencies {
     compile("com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion")
     compile("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion")
     compile("no.nav.helse.sykepenger.lovverk:sykepenger-inngangsvilkar:2018-12-20-101.4f8f899")
-    compile("no.nav.helse.sykepenger.lovverk:sykepenger-beregning:2018-12-20-101.8ef150a")
+    compile("no.nav.helse.sykepenger.lovverk:sykepenger-beregning:2018-12-20-101.1e2f74a")
     compile("no.nav:nare:dfe6569")
 
     compile("no.nav.helse:maksdato:89af124")
@@ -53,7 +53,7 @@ dependencies {
         exclude(group = "junit")
     }
     testCompile("io.mockk:mockk:$mockkVersion")
-    testCompile ("no.nav:kafka-embedded-env:2.0.1")
+    testCompile("no.nav:kafka-embedded-env:2.1.1")
     testCompile("org.junit.jupiter:junit-jupiter-api:$junitJupiterVersion")
     testCompile("org.junit.jupiter:junit-jupiter-params:$junitJupiterVersion")
     testCompile("org.assertj:assertj-core:$assertJVersion")
@@ -109,5 +109,5 @@ tasks.withType<Test> {
 }
 
 tasks.withType<Wrapper> {
-    gradleVersion = "5.1.1"
+    gradleVersion = "5.6.1"
 }

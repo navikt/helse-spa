@@ -71,38 +71,27 @@ data class Sykepengesøknad(val jsonNode: JsonNode) {
         }
 
     val soknadsperioder
-        get() = with(jsonNode.get("soknadsperioder")) {
-            map { søknadsperiodeNode ->
-                Søknadsperiode(
-                    fom = LocalDate.parse(søknadsperiodeNode.get("fom").textValue()),
-                    tom = LocalDate.parse(søknadsperiodeNode.get("tom").textValue()),
-                    sykmeldingsgrad = søknadsperiodeNode.get("sykmeldingsgrad").asInt()
-                )
-            }
-        }
+        get() = with(jsonNode.get("soknadsperioder")) { map { Søknadsperiode(it) } }
 
     val fravær
         get() = with(jsonNode.get("fravar")) {
-            map { fraværNode ->
-                Fravær(
-                    fom = LocalDate.parse(fraværNode.get("fom").textValue()),
-                    tom = fraværNode.get("tom").textValue()?.let {
-                        LocalDate.parse(it)
-                    },
-                    type = Fraværstype.valueOf(fraværNode.get("type").textValue())
-                )
-            }
+            map { Fravær(it) }
         }
 
     val andreInntektskilder
-        get() = with(jsonNode.get("andreInntektskilder")) {
-            map { annenInntektskildeNode ->
-                Inntektskilde(
-                    type = annenInntektskildeNode.get("type").textValue(),
-                    sykemeldt = annenInntektskildeNode.get("sykmeldt").asBoolean()
-                )
+        get() = with(jsonNode.get("andreInntektskilder")) { map { Inntektskilde(it) } }
+
+    val arbeidGjenopptatt
+        get() = jsonNode.get("arbeidGjenopptatt")?.let { arbeidGjenopptattNode ->
+            if (arbeidGjenopptattNode.isNull) {
+                null
+            } else {
+                LocalDate.parse(arbeidGjenopptattNode.textValue())
             }
         }
+
+    val harKorrigertArbeidstid
+        get() = soknadsperioder.any { sp -> sp.avtaltTimer != null || sp.faktiskGrad != null || sp.faktiskTimer != null }
 
     init {
         version = when {

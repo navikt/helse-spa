@@ -97,7 +97,6 @@ fun vurderFakta(fakta: FaktagrunnlagResultat): Either<Behandlingsfeil, AvklarteF
     val maksdato = vurderMaksdato(alder,
             fakta.sakskompleks.startSyketilfelle,
             fakta.sakskompleks.søknader[0].fom,
-            fakta.sakskompleks.søknader[0].tom,
             Yrkesstatus.ARBEIDSTAKER,
             fakta.faktagrunnlag.sykepengehistorikk).also {
         if (it is Vurdering.Uavklart) {

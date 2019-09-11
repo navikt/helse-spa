@@ -23,6 +23,7 @@ import com.github.tomakehurst.wiremock.client.WireMock.stubFor
 import com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import io.prometheus.client.CollectorRegistry
+import kafka.server.KafkaConfig
 import no.nav.common.JAASCredential
 import no.nav.common.KafkaEnvironment
 import no.nav.helse.behandling.AvklarteVerdier
@@ -111,16 +112,18 @@ class EndToEndTest {
             .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
 
         val embeddedEnvironment = KafkaEnvironment(
-            users = listOf(JAASCredential(username, password)),
-            autoStart = false,
-            withSchemaRegistry = false,
-            withSecurity = true,
-            topics = listOf(
-                SYKEPENGESØKNADER_INN.name,
-                VEDTAK_SYKEPENGER.name,
-                SYKEPENGEBEHANDLINGSFEIL.name,
-                SAKSKOMPLEKS_TOPIC
-            )
+                users = listOf(JAASCredential(username, password)),
+                autoStart = false,
+                withSchemaRegistry = false,
+                withSecurity = true,
+                topicNames = listOf(
+                        SYKEPENGESØKNADER_INN.name,
+                        VEDTAK_SYKEPENGER.name,
+                        SYKEPENGEBEHANDLINGSFEIL.name,
+                        SAKSKOMPLEKS_TOPIC
+
+                ),
+                brokerConfigOverrides = mapOf(KafkaConfig.ZkConnectionTimeoutMsProp() to "10000").toProperties()
         )
 
         val server: WireMockServer = WireMockServer(WireMockConfiguration.options().dynamicPort())
