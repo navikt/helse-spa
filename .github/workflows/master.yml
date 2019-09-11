@@ -57,7 +57,8 @@ jobs:
         ALERTS=$(jq '' -c $ALERTS_FILE)
         DEPLOY_PAYLOAD=$(jq ".payload.kubernetes.resources += [$NAISERATOR, $ALERTS]" deploy/deployreq.json)
         DEPLOY_PAYLOAD=$(echo $DEPLOY_PAYLOAD | jq '.environment = "'$NAV_CLUSTER'"')
-        DEPLOY_PAYLOAD=$(echo $DEPLOY_PAYLOAD | jq '.ref = "'$(cat .docker_tag)'"')curl -i -n --fail \
+        DEPLOY_PAYLOAD=$(echo $DEPLOY_PAYLOAD | jq '.ref = "'$(cat .docker_tag)'"')
+        curl -i -n --fail \
            -X POST \
            -u x-access-token:$GITHUB_TOKEN \
            -d "$DEPLOY_PAYLOAD" \
