@@ -6,6 +6,7 @@ import no.nav.helse.behandling.Behandlingsgrunnlag
 import no.nav.helse.behandling.Tpsfakta
 import no.nav.helse.behandling.sykepengeBeregning
 import no.nav.helse.behandling.søknad.Sykepengesøknad
+import no.nav.helse.behandling.søknad.tilSakskompleks
 import no.nav.helse.dto.*
 import no.nav.helse.fastsetting.Aldersgrunnlag
 import no.nav.helse.fastsetting.Opptjeningsgrunnlag
@@ -70,7 +71,7 @@ class BeregningTest {
 
     fun vilkårsprøvdSakskompleks(fom: LocalDate, tom: LocalDate, årslønn: Long, sykmeldingsgrad: Int, fravær: List<FravarDTO> = emptyList()) =
             Behandlingsgrunnlag(
-                    Sakskompleks(Sykepengesøknad(SykepengesøknadV2DTO(
+                    Sykepengesøknad(SykepengesøknadV2DTO(
                             id = "1",
                             aktorId = "123123",
                             type = SoknadstypeDTO.ARBEIDSTAKERE,
@@ -83,7 +84,7 @@ class BeregningTest {
                             startSyketilfelle = parse("2018-12-01"),
                             status = SoknadsstatusDTO.SENDT,
                             andreInntektskilder = emptyList(),
-                            fravar = fravær).asJsonNode())),
+                            fravar = fravær).asJsonNode()).tilSakskompleks(),
                     faktagrunnlag = faktagrunnlagUtenVerdi,
                     avklarteVerdier = AvklarteVerdier(
                             medlemsskap = Avklart(fastsattVerdi = true, begrunnelse = "derfor", fastsattAv = "test", grunnlag = Tpsfakta(LocalDate.parse("1980-01-01"), "NOR", "NOR", "BOSA", null)),

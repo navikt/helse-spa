@@ -1,8 +1,8 @@
 package no.nav.helse.fastsetting
 
-import no.nav.helse.Sakskompleks
 import no.nav.helse.behandling.Faktagrunnlag
 import no.nav.helse.behandling.FaktagrunnlagResultat
+import no.nav.helse.behandling.søknad.tilSakskompleks
 import no.nav.helse.oppslag.arbeidinntektytelse.dto.*
 import no.nav.helse.originalSoknad
 import no.nav.helse.tpsFaktaUtenVerdi
@@ -43,7 +43,7 @@ class ArbeidsforholdTest {
                         arena = emptyList()
                 )
         )
-        val vurdering = vurderArbeidsforhold(FaktagrunnlagResultat(Sakskompleks(originalSoknad), faktagrunnlag))
+        val vurdering = vurderArbeidsforhold(FaktagrunnlagResultat(originalSoknad.tilSakskompleks(), faktagrunnlag))
         if (vurdering is Vurdering.Avklart) assertThat(vurdering.fastsattVerdi).isEqualTo(arbeidsforhold[0]) else fail("Feil vurdering!")
 
     }
@@ -76,7 +76,7 @@ class ArbeidsforholdTest {
                         arena = emptyList()
                 )
         )
-        val vurdering = vurderArbeidsforhold(FaktagrunnlagResultat(Sakskompleks(originalSoknad), faktagrunnlag))
+        val vurdering = vurderArbeidsforhold(FaktagrunnlagResultat(originalSoknad.tilSakskompleks(), faktagrunnlag))
         if (vurdering is Vurdering.Uavklart) assertThat(vurdering.årsak== Vurdering.Uavklart.Årsak.HAR_IKKE_DATA).isTrue() else fail("Feil vurdering!")
 
     }
@@ -112,7 +112,7 @@ class ArbeidsforholdTest {
                         arena = emptyList()
                 )
         )
-        val vurdering = vurderArbeidsforhold(FaktagrunnlagResultat(Sakskompleks(originalSoknad), faktagrunnlag))
+        val vurdering = vurderArbeidsforhold(FaktagrunnlagResultat(originalSoknad.tilSakskompleks(), faktagrunnlag))
         if (vurdering is Vurdering.Avklart) assertThat(vurdering.fastsattVerdi).isEqualTo(arbeidsforhold[0]) else fail("Feil vurdering!")
 
     }
