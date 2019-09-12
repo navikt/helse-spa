@@ -33,7 +33,7 @@ private fun lagBeregninggrunnlag(vilkårsprøving: Behandlingsgrunnlag, inntektF
     Beregningsgrunnlag(
         fom = vilkårsprøving.sakskompleks.inntektsmeldinger.flatMap { it.arbeidsgiverperioder }.maxBy { it.tom }?.tom?.plusDays(
             1
-        ) ?: vilkårsprøving.sakskompleks.søknader[0].fom, //TODO: Hvordan håndtere at vi mangler inntektsmeldingen?
+        ) ?: vilkårsprøving.sakskompleks.søknader[0].fom,
         ferie = vilkårsprøving.sakskompleks.søknader[0].fravær.filter { it.type == Fraværstype.FERIE }.map { Ferie(it.fom, it.tom ?: throw RuntimeException("Ferie mangler tom-dato")) },
         permisjon = emptyList(),
         sykmeldingsgrad = vilkårsprøving.sakskompleks.søknader[0].soknadsperioder.let {
