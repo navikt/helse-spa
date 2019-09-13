@@ -192,9 +192,11 @@ class EndToEndTest {
 
         produceOneMessage(SakskompleksTopic, sakskompleks.id, sakskompleks.jsonNode)
         val innsendtSøknad = produserSykepengesøknadV2(aktørId)
+        produceOneMessage(SYKEPENGESØKNADER_INN.name, "key1", objectMapper.readTree("/søknader/frilanser_sendt_nav.json".readResource()))
 
         val sykepengeVedtak: List<SykepengeVedtak> = ventPåVedtak(2)
             .sortedBy { it.vedtak.perioder[0].fom }
+        val behandlingsfeil = ventPåBehandlingsfeil(1)
 
         // Sjekk vedtak 1 - søknad omgjort til sakskompleks
         checkSøknad(innsendtSøknad, sykepengeVedtak[0].sakskompleks.søknader[0])
@@ -210,6 +212,10 @@ class EndToEndTest {
         checkVilkårsprøving(sykepengeVedtak[1].vilkårsprøving)
         checkBeregningMedInntektsmelding(sykepengeVedtak[1].beregningFraInntektsmelding)
         checkVedtak(sykepengeVedtak[1].vedtak)
+
+        // Sjekk vedtak 3 - frilansersøknad
+        assert(behandlingsfeil.size).isEqualTo(1)
+        assert(behandlingsfeil[0].mvpFeil[0].årsak).isEqualTo("Søknadstype - SELVSTENDIGE_OG_FRILANSERE")
     }
 
     private fun checkSøknad(innsendtSøknad: SykepengesøknadV2DTO, faktiskSøknad: Sykepengesøknad) {
@@ -479,6 +485,25 @@ class EndToEndTest {
         }
 
         override fun close() {}
+    }
+
+    class MVPFilterFeilDeserializer : Deserializer<Behandlingsfeil.MVPFilterFeil> {
+        private val log = LoggerFactory.getLogger("SykepengeVedtakDeserializer")
+
+        override fun configure(configs: MutableMap<String, *>?, isKey: Boolean) {}
+
+        override fun deserialize(topic: String?, data: ByteArray?): Behandlingsfeil.MVPFilterFeil? {
+            return data?.let {
+                try {
+                    defaultObjectMapper.readValue<Behandlingsfeil.MVPFilterFeil>(it)
+                } catch (e: Exception) {
+                    log.warn("Not a valid json", e)
+                    null
+                }
+            }
+        }
+
+        override fun close() {}
 
     }
 
@@ -513,6 +538,39 @@ class EndToEndTest {
         }
 
         throw RuntimeException("fant ikke $forventet vedtak etter 20 sekunder")
+    }
+
+    private fun ventPåBehandlingsfeil(forventet: Int): List<Behandlingsfeil.MVPFilterFeil> {
+        val resultConsumer = KafkaConsumer<String, Behandlingsfeil.MVPFilterFeil>(
+            consumerProperties(),
+            StringDeserializer(),
+            MVPFilterFeilDeserializer()
+        )
+        resultConsumer.subscribe(listOf(SYKEPENGEBEHANDLINGSFEIL.name))
+
+        val end = System.currentTimeMillis() + 20 * 1000
+
+        val feil = mutableListOf<Behandlingsfeil.MVPFilterFeil>()
+
+        while (System.currentTimeMillis() < end) {
+            val records = resultConsumer.poll(Duration.ofSeconds(1))
+
+            resultConsumer.seekToBeginning(resultConsumer.assignment())
+
+            if (!records.isEmpty) {
+                records.records(SYKEPENGEBEHANDLINGSFEIL.name).forEach { record ->
+                    if (!feil.any { v -> v.sakskompleksId == record.value().sakskompleksId }) {
+                        feil.add(record.value())
+                    }
+                }
+            }
+
+            if (feil.size == forventet) {
+                return feil
+            }
+        }
+
+        throw RuntimeException("fant ikke $forventet behandlingsfeil etter 20 sekunder")
     }
 
     private fun produserSykepengesøknadV2(aktørId: String): SykepengesøknadV2DTO {
@@ -730,7 +788,7 @@ private fun consumerProperties(): MutableMap<String, Any>? {
             SaslConfigs.SASL_JAAS_CONFIG,
             "org.apache.kafka.common.security.plain.PlainLoginModule required username=\"${EndToEndTest.username}\" password=\"${EndToEndTest.password}\";"
         )
-        put(ConsumerConfig.GROUP_ID_CONFIG, "spa-e2e-verification")
+        put(ConsumerConfig.GROUP_ID_CONFIG, "spa-e2e-verification-${Math.random()}")
     }
 }
 

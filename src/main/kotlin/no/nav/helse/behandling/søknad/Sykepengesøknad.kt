@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import no.nav.helse.behandling.Sakskompleks
 import no.nav.helse.behandling.inntektsmelding.Inntektsmelding
 import no.nav.helse.behandling.sykmelding.Sykmelding
+import no.nav.helse.serde.safelyUnwrapDate
 import no.nav.helse.streams.defaultObjectMapper
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -58,9 +59,11 @@ data class Sykepengesøknad(val jsonNode: JsonNode) {
         }
 
     val startSyketilfelle
-        get() = with(jsonNode.get("startSyketilfelle")) {
-            LocalDate.parse(textValue())!!
-        }
+        get() =
+            when (version) {
+                is Version.Version1 -> jsonNode.get("startSykeforlop").safelyUnwrapDate()!!
+                is Version.Version2 -> jsonNode.get("startSyketilfelle").safelyUnwrapDate()!!
+            }
 
     val sendtNav
         get() = jsonNode.get("sendtNav").textValue()?.let {

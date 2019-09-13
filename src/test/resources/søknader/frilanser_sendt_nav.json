@@ -1,0 +1,25 @@
+{
+  "id": "68da259c-ff7f-47cf-8fa0-c348ae95e220",
+  "aktorId": "1234567890123",
+  "sykmeldingId": "71bd853d-36a1-49df-a34c-6e02cf727cfa",
+  "soknadstype": "SELVSTENDIGE_OG_FRILANSERE",
+  "status": "SENDT",
+  "fom": "2019-06-01",
+  "tom": "2019-06-14",
+  "opprettetDato": "2019-06-01T00:00:00.000",
+  "innsendtDato": "2019-06-01",
+  "startSykeforlop": "2019-06-01",
+  "sykmeldingUtskrevet": "2019-06-01",
+  "arbeidsgiver": null,
+  "korrigerer": null,
+  "korrigertAv": null,
+  "arbeidssituasjon": "FRILANSER",
+  "soknadPerioder": [
+    {
+      "fom": "2019-06-01",
+      "tom": "2019-06-14",
+      "grad": 100
+    }
+  ],
+  "sporsmal": null
+}
