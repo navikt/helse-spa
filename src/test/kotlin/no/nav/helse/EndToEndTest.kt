@@ -120,7 +120,7 @@ class EndToEndTest {
                         SYKEPENGESØKNADER_INN.name,
                         VEDTAK_SYKEPENGER.name,
                         SYKEPENGEBEHANDLINGSFEIL.name,
-                        SAKSKOMPLEKS_TOPIC
+                        SakskompleksTopic
 
                 ),
                 brokerConfigOverrides = mapOf(KafkaConfig.ZkConnectionTimeoutMsProp() to "10000").toProperties()
@@ -190,7 +190,7 @@ class EndToEndTest {
         val sakskompleksJson = objectMapper.readTree("/sakskompleks/sakskompleks.json".readResource())
         val sakskompleks = Sakskompleks(sakskompleksJson)
 
-        produceOneMessage(SAKSKOMPLEKS_TOPIC, sakskompleks.id, sakskompleks.jsonNode)
+        produceOneMessage(SakskompleksTopic, sakskompleks.id, sakskompleks.jsonNode)
         val innsendtSøknad = produserSykepengesøknadV2(aktørId)
 
         val sykepengeVedtak: List<SykepengeVedtak> = ventPåVedtak(2)
@@ -215,7 +215,7 @@ class EndToEndTest {
     private fun checkSøknad(innsendtSøknad: SykepengesøknadV2DTO, faktiskSøknad: Sykepengesøknad) {
         assert(innsendtSøknad.aktorId).isEqualTo(faktiskSøknad.aktorId)
         assert(innsendtSøknad.status.name).isEqualTo(faktiskSøknad.status)
-        assert(innsendtSøknad.arbeidsgiver.orgnummer).isEqualTo(faktiskSøknad.arbeidsgiver.orgnummer)
+        assert(innsendtSøknad.arbeidsgiver.orgnummer).isEqualTo(faktiskSøknad.arbeidsgiver!!.orgnummer)
         assert(innsendtSøknad.soktUtenlandsopphold).isEqualTo(faktiskSøknad.soktUtenlandsopphold)
         assert(innsendtSøknad.fom).isEqualTo(første_dag_i_syketilfelle)
         assert(innsendtSøknad.tom).isEqualTo(faktiskSøknad.tom)

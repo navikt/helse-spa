@@ -35,10 +35,14 @@ data class Sykepengesøknad(val jsonNode: JsonNode) {
 
     val arbeidsgiver
         get() = with(jsonNode.path("arbeidsgiver")) {
-            ArbeidsgiverFraSøknad(
-                navn = get("navn").textValue(),
-                orgnummer = get("orgnummer").textValue()
-            )
+            if (isNull) {
+                null
+            } else {
+                ArbeidsgiverFraSøknad(
+                    navn = get("navn").textValue(),
+                    orgnummer = get("orgnummer").textValue()
+                )
+            }
         }
 
     val soktUtenlandsopphold get() = jsonNode.get("soktUtenlandsopphold").booleanValue()
@@ -114,13 +118,13 @@ data class Sykepengesøknad(val jsonNode: JsonNode) {
 fun Sykepengesøknad.tilSakskompleks(): Sakskompleks =
     Sakskompleks(
         defaultObjectMapper.valueToTree(
-            mapOf<String, Any>(
+            mapOf(
                 "id" to UUID.randomUUID(),
                 "aktørId" to aktorId,
                 "sykmeldinger" to emptyList<Sykmelding>(),
                 "søknader" to listOf(this),
                 "inntektsmeldinger" to emptyList<Inntektsmelding>(),
-                "orgnummer" to arbeidsgiver.orgnummer,
+                "orgnummer" to arbeidsgiver?.orgnummer,
                 "syketilfelleStartdato" to startSyketilfelle,
                 "syketilfelleSluttdato" to tom
             )

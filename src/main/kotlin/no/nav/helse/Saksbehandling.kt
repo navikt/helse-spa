@@ -39,12 +39,22 @@ fun Sakskompleks.behandle(oppslag: Oppslag, probe: SaksbehandlingProbe): Either<
 
 fun Sakskompleks.mvpFilter(): Either<Behandlingsfeil.MVPFilterFeil, Sakskompleks> {
     return when {
+        søknader.isEmpty() ->
+            mvpFilter(
+                this, listOf(
+                    MVPFeil(
+                        "Ingen søknader",
+                        "Sakskompleks inneholder ingen søknader"
+                    )
+                )
+            ).left()
+
         søknader.size != 1 ->
             mvpFilter(
                 this, listOf(
                     MVPFeil(
                         "Flere søknader",
-                        "Søknaden inneholder mer enn én søknad (${søknader.size})"
+                        "Sakskompleks inneholder mer enn én søknad (${søknader.size})"
                     )
                 )
             ).left()

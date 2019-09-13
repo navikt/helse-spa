@@ -34,7 +34,7 @@ import org.apache.kafka.streams.kstream.Predicate
 import org.slf4j.MDC
 import java.util.Properties
 
-const val SAKSKOMPLEKS_TOPIC = "privat-helse-sakskompleks" //TODO: Dra denne ut i streams?
+const val SakskompleksTopic = "privat-helse-sakskompleks"
 
 class SaksbehandlingStream(val env: Environment) {
 
@@ -113,20 +113,20 @@ class SaksbehandlingStream(val env: Environment) {
                         søknad.tilSakskompleks()
                     }
                 }
-                .mapValues { _, søknad ->
-                    loggMedSøknadId(søknad.id) {
-                        søknad.behandle(oppslag, probe)
+                .mapValues { _, sakskompleks ->
+                    loggMedSøknadId(sakskompleks.id) {
+                        sakskompleks.behandle(oppslag, probe)
                     }
                 }.branch(
-                    Predicate { _, søknad -> søknad is Either.Left },
-                    Predicate { _, søknad -> søknad is Either.Right }
+                    Predicate { _, mvpfeil -> mvpfeil is Either.Left },
+                    Predicate { _, sakskompleks -> sakskompleks is Either.Right }
                 )
 
             sendTilFeilkø(probe, behandlingsfeilFraSøknader)
             sendTilVedtakskø(probe, vedtakFraSøknader)
 
             val (behandlingsfeilFraSakskompleks,
-                vedtakFraSakskompleks) = builder.stream<String, JsonNode>(SAKSKOMPLEKS_TOPIC, Consumed.with(Serdes.String(), JsonNodeSerde(objectMapper))
+                vedtakFraSakskompleks) = builder.stream<String, JsonNode>(SakskompleksTopic, Consumed.with(Serdes.String(), JsonNodeSerde(objectMapper))
                 .withOffsetResetPolicy(Topology.AutoOffsetReset.EARLIEST))
                 .mapValues { jsonNode -> Sakskompleks(jsonNode) }
                 .mapValues { _, sakskompleks ->
@@ -134,8 +134,8 @@ class SaksbehandlingStream(val env: Environment) {
                         sakskompleks.behandle(oppslag, probe)
                     }
                 }.branch(
-                    Predicate { _, søknad -> søknad is Either.Left },
-                    Predicate { _, søknad -> søknad is Either.Right }
+                    Predicate { _, mvpfeil -> mvpfeil is Either.Left },
+                    Predicate { _, sakskompleks -> sakskompleks is Either.Right }
                 )
 
             sendTilFeilkø(probe, behandlingsfeilFraSakskompleks)
@@ -196,10 +196,10 @@ private fun <T> loggMedSakskompleksId(sakskompleksId: String, block: () -> T): T
 
 private fun <T> loggMedSøknadId(søknadsId: String, block: () -> T): T {
     try {
-        MDC.put("søknadsId", søknadsId)
+        MDC.put("soknadsId", søknadsId)
         return block()
     } finally {
-        MDC.remove("søknadsId")
+        MDC.remove("soknadsId")
     }
 }
 

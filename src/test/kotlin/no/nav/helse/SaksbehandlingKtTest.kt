@@ -34,7 +34,7 @@ internal class SaksbehandlingKtTest {
     }
 
     @Test
-    fun `sakskompleks med flere arbeidstakersøknader er utafor MVP`() {
+    fun `sakskompleks med flere arbeidstakersøknader er utenfor MVP`() {
         val sakskompleksJson = objectMapper.readTree("/sakskompleks/sakskompleks.json".readResource()) as ObjectNode
         val søknader = sakskompleksJson["søknader"] as ArrayNode
         søknader.add(sakskompleksJson["søknader"][0])
@@ -44,14 +44,31 @@ internal class SaksbehandlingKtTest {
         assertTrue(mvpFilter.isLeft())
         mvpFilter.mapLeft { left ->
             assertEquals(
-                "Søknaden inneholder mer enn én søknad (2)",
+                "Sakskompleks inneholder mer enn én søknad (2)",
                 left.mvpFeil[0].beskrivelse
             )
         }
     }
 
     @Test
-    fun `sakskompleks med andre søknadstyper er utafor MVP`() {
+    fun `sakskompleks uten søknader er utenfor MVP`() {
+        val sakskompleksJson = objectMapper.readTree("/sakskompleks/sakskompleks.json".readResource()) as ObjectNode
+        val søknader = sakskompleksJson["søknader"] as ArrayNode
+        søknader.removeAll()
+        val sakskompleks = no.nav.helse.behandling.Sakskompleks(sakskompleksJson)
+        val mvpFilter = sakskompleks.mvpFilter()
+
+        assertTrue(mvpFilter.isLeft())
+        mvpFilter.mapLeft { left ->
+            assertEquals(
+                "Sakskompleks inneholder ingen søknader",
+                left.mvpFeil[0].beskrivelse
+            )
+        }
+    }
+
+    @Test
+    fun `sakskompleks med andre søknadstyper er utenfor MVP`() {
         val sakskompleksJson = objectMapper.readTree("/sakskompleks/sakskompleks.json".readResource()) as ObjectNode
         val søknad = sakskompleksJson["søknader"][0] as ObjectNode
         søknad.replace("type", JsonNodeFactory.instance.textNode("FRILANSER"))

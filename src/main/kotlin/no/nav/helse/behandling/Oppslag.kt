@@ -45,7 +45,7 @@ class Oppslag(val sparkelBaseUrl: String, val stsClient: StsRestClient) {
 
     private fun Sakskompleks.markerFeil(ex: Throwable) = Behandlingsfeil.registerFeil(ex, this)
     private fun Sakskompleks.hentPerson() = PersonOppslag(sparkelBaseUrl, stsClient).hentTPSData(this)
-    private fun Sakskompleks.hentBeregningsgrunnlag() = Inntektsoppslag(sparkelBaseUrl, stsClient).hentBeregningsgrunnlag(aktørId, orgnummer, startSyketilfelle.minusMonths(3), startSyketilfelle.minusMonths(1))
+    private fun Sakskompleks.hentBeregningsgrunnlag() = Inntektsoppslag(sparkelBaseUrl, stsClient).hentBeregningsgrunnlag(aktørId, orgnummer!!, startSyketilfelle.minusMonths(3), startSyketilfelle.minusMonths(1))
     private fun Sakskompleks.hentSammenligningsgrunnlag() = Inntektsoppslag(sparkelBaseUrl, stsClient).hentSammenligningsgrunnlag(aktørId, startSyketilfelle.minusYears(1), startSyketilfelle.minusMonths(1))
     private fun Sakskompleks.hentArbeidInntektYtelse() = ArbeidInntektYtelseOppslag(sparkelBaseUrl, stsClient).hentArbeidInntektYtelse(this)
     private fun Sakskompleks.hentSykepengehistorikk() = SykepengehistorikkOppslag(sparkelBaseUrl, stsClient).hentSykepengehistorikk(aktørId, startSyketilfelle)
