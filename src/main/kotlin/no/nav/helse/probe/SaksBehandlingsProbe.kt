@@ -44,6 +44,11 @@ class SaksbehandlingProbe(env: Environment) {
                 .labelNames("faktum")
                 .help("Hvilke faktum klarer vi ikke fastsette")
                 .register()
+        private val søknadFiltrertBortPgaTypeCounter = Counter.build()
+            .name("soknad_filtrert_bort_pga_type")
+            .labelNames("type")
+            .help("Antall søknader som blir filtrert bort fordi vi ikke støtter typen")
+            .register()
 
     }
 
@@ -63,6 +68,11 @@ class SaksbehandlingProbe(env: Environment) {
     fun mottattSøknad(søknadId: String, søknadStatus: String, søknadType: String) {
         sendMottattSykepengesøknadEvent(søknadId, søknadStatus, søknadType)
         mottattCounter.labels(søknadStatus, søknadType).inc()
+    }
+
+    fun filtrertBortSøknadPgaType(søknadId: String, søknadType: String) {
+        log.info("Søknad $søknadId er filtrert bort pga den har type: $søknadType")
+        søknadFiltrertBortPgaTypeCounter.labels(søknadType).inc()
     }
 
     fun mottattSøknadUansettStatusOgType(søknadId: String) {

@@ -1,0 +1,19 @@
+{
+  "id": "68da259c-ff7f-47cf-8fa0-c348ae95e220",
+  "aktorId": "1234567890123",
+  "sykmeldingId": null,
+  "soknadstype": "OPPHOLD_UTLAND",
+  "status": "SENDT",
+  "fom": null,
+  "tom": null,
+  "opprettetDato": "2019-06-01T00:00:00.000",
+  "innsendtDato": "2019-06-01",
+  "startSykeforlop": null,
+  "sykmeldingUtskrevet": null,
+  "arbeidsgiver": null,
+  "korrigerer": null,
+  "korrigertAv": null,
+  "arbeidssituasjon": null,
+  "soknadPerioder": [],
+  "sporsmal": null
+}

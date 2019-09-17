@@ -6,15 +6,12 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import no.nav.helse.EndToEndTest
 import no.nav.helse.behandling.Sakskompleks
 import no.nav.helse.oppslag.Inntekt
 import no.nav.helse.oppslag.Inntektsarbeidsgiver
 import no.nav.helse.readResource
-import no.nav.helse.sykepenger.beregning.Sykepengegrunnlag
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-
-import org.junit.jupiter.api.Assertions.*
 import java.math.BigDecimal
 import java.time.YearMonth
 

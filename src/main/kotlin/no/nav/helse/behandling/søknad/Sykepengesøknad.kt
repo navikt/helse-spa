@@ -36,14 +36,10 @@ data class Sykepengesøknad(val jsonNode: JsonNode) {
 
     val arbeidsgiver
         get() = with(jsonNode.path("arbeidsgiver")) {
-            if (isNull) {
-                null
-            } else {
-                ArbeidsgiverFraSøknad(
-                    navn = get("navn").textValue(),
-                    orgnummer = get("orgnummer").textValue()
-                )
-            }
+            ArbeidsgiverFraSøknad(
+                navn = get("navn").textValue(),
+                orgnummer = get("orgnummer").textValue()
+            )
         }
 
     val soktUtenlandsopphold get() = jsonNode.get("soktUtenlandsopphold").booleanValue()
@@ -127,7 +123,7 @@ fun Sykepengesøknad.tilSakskompleks(): Sakskompleks =
                 "sykmeldinger" to emptyList<Sykmelding>(),
                 "søknader" to listOf(this),
                 "inntektsmeldinger" to emptyList<Inntektsmelding>(),
-                "orgnummer" to arbeidsgiver?.orgnummer,
+                "orgnummer" to arbeidsgiver.orgnummer,
                 "syketilfelleStartdato" to startSyketilfelle,
                 "syketilfelleSluttdato" to tom
             )
