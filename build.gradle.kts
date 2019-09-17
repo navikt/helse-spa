@@ -53,7 +53,7 @@ dependencies {
         exclude(group = "junit")
     }
     testCompile("io.mockk:mockk:$mockkVersion")
-    testCompile("no.nav:kafka-embedded-env:2.1.1")
+    testCompile("no.nav:kafka-embedded-env:2.2.3")
     testCompile("org.junit.jupiter:junit-jupiter-api:$junitJupiterVersion")
     testCompile("org.junit.jupiter:junit-jupiter-params:$junitJupiterVersion")
     testCompile("org.assertj:assertj-core:$assertJVersion")
