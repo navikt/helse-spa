@@ -8,7 +8,7 @@ fun FaktagrunnlagResultat.mvpFilter(): Either<Behandlingsfeil, FaktagrunnlagResu
     val mvpKriterier = listOf(
             sjekkSvarISøknaden(sakskompleks.søknader[0]),
             vurderMVPKriterierForMedlemskap(faktagrunnlag.tps),
-            vurderMVPKriterierForOpptjeningstid(sakskompleks.søknader[0].arbeidsgiver!!, faktagrunnlag.arbeidInntektYtelse.arbeidsforhold),
+            vurderMVPKriterierForOpptjeningstid(sakskompleks.søknader[0].arbeidsgiver, faktagrunnlag.arbeidInntektYtelse.arbeidsforhold),
             vurderMVPKriterierForSykepengegrunnlaget(sakskompleks, faktagrunnlag.beregningsperiode, faktagrunnlag.sammenligningsperiode),
             vurderMVPKriterierForAndreYtelser(faktagrunnlag.arbeidInntektYtelse.ytelser, faktagrunnlag.ytelser)
     )

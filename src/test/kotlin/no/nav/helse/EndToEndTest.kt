@@ -193,10 +193,10 @@ class EndToEndTest {
         produceOneMessage(SakskompleksTopic, sakskompleks.id, sakskompleks.jsonNode)
         val innsendtSøknad = produserSykepengesøknadV2(aktørId)
         produceOneMessage(SYKEPENGESØKNADER_INN.name, "key1", objectMapper.readTree("/søknader/frilanser_sendt_nav.json".readResource()))
+        produceOneMessage(SYKEPENGESØKNADER_INN.name, "key2", objectMapper.readTree("/søknader/utlandsopphold_sendt_nav.json".readResource()))
 
         val sykepengeVedtak: List<SykepengeVedtak> = ventPåVedtak(2)
             .sortedBy { it.vedtak.perioder[0].fom }
-        val behandlingsfeil = ventPåBehandlingsfeil(1)
 
         // Sjekk vedtak 1 - søknad omgjort til sakskompleks
         checkSøknad(innsendtSøknad, sykepengeVedtak[0].sakskompleks.søknader[0])
@@ -213,15 +213,18 @@ class EndToEndTest {
         checkBeregningMedInntektsmelding(sykepengeVedtak[1].beregningFraInntektsmelding)
         checkVedtak(sykepengeVedtak[1].vedtak)
 
-        // Sjekk vedtak 3 - frilansersøknad
-        assert(behandlingsfeil.size).isEqualTo(1)
-        assert(behandlingsfeil[0].mvpFeil[0].årsak).isEqualTo("Søknadstype - SELVSTENDIGE_OG_FRILANSERE")
+        assert(getCounterValue("soknad_filtrert_bort_pga_type", listOf("ARBEIDSTAKERE"))).isEqualTo(0)
+
+        // Sjekk vedtak 3 - søknad som frilanser filtrert bort
+        assert(getCounterValue("soknad_filtrert_bort_pga_type", listOf("SELVSTENDIGE_OG_FRILANSERE"))).isEqualTo(1)
+        // Sjekk vedtak 4 - søknad om sykepenger i utlandet filtrert bort
+        assert(getCounterValue("soknad_filtrert_bort_pga_type", listOf("OPPHOLD_UTLAND"))).isEqualTo(1)
     }
 
     private fun checkSøknad(innsendtSøknad: SykepengesøknadV2DTO, faktiskSøknad: Sykepengesøknad) {
         assert(innsendtSøknad.aktorId).isEqualTo(faktiskSøknad.aktorId)
         assert(innsendtSøknad.status.name).isEqualTo(faktiskSøknad.status)
-        assert(innsendtSøknad.arbeidsgiver.orgnummer).isEqualTo(faktiskSøknad.arbeidsgiver!!.orgnummer)
+        assert(innsendtSøknad.arbeidsgiver.orgnummer).isEqualTo(faktiskSøknad.arbeidsgiver.orgnummer)
         assert(innsendtSøknad.soktUtenlandsopphold).isEqualTo(faktiskSøknad.soktUtenlandsopphold)
         assert(innsendtSøknad.fom).isEqualTo(første_dag_i_syketilfelle)
         assert(innsendtSøknad.tom).isEqualTo(faktiskSøknad.tom)
@@ -487,26 +490,6 @@ class EndToEndTest {
         override fun close() {}
     }
 
-    class MVPFilterFeilDeserializer : Deserializer<Behandlingsfeil.MVPFilterFeil> {
-        private val log = LoggerFactory.getLogger("SykepengeVedtakDeserializer")
-
-        override fun configure(configs: MutableMap<String, *>?, isKey: Boolean) {}
-
-        override fun deserialize(topic: String?, data: ByteArray?): Behandlingsfeil.MVPFilterFeil? {
-            return data?.let {
-                try {
-                    defaultObjectMapper.readValue<Behandlingsfeil.MVPFilterFeil>(it)
-                } catch (e: Exception) {
-                    log.warn("Not a valid json", e)
-                    null
-                }
-            }
-        }
-
-        override fun close() {}
-
-    }
-
     private fun ventPåVedtak(forventet: Int): List<SykepengeVedtak> {
         val resultConsumer = KafkaConsumer<String, SykepengeVedtak>(
             consumerProperties(),
@@ -538,39 +521,6 @@ class EndToEndTest {
         }
 
         throw RuntimeException("fant ikke $forventet vedtak etter 20 sekunder")
-    }
-
-    private fun ventPåBehandlingsfeil(forventet: Int): List<Behandlingsfeil.MVPFilterFeil> {
-        val resultConsumer = KafkaConsumer<String, Behandlingsfeil.MVPFilterFeil>(
-            consumerProperties(),
-            StringDeserializer(),
-            MVPFilterFeilDeserializer()
-        )
-        resultConsumer.subscribe(listOf(SYKEPENGEBEHANDLINGSFEIL.name))
-
-        val end = System.currentTimeMillis() + 20 * 1000
-
-        val feil = mutableListOf<Behandlingsfeil.MVPFilterFeil>()
-
-        while (System.currentTimeMillis() < end) {
-            val records = resultConsumer.poll(Duration.ofSeconds(1))
-
-            resultConsumer.seekToBeginning(resultConsumer.assignment())
-
-            if (!records.isEmpty) {
-                records.records(SYKEPENGEBEHANDLINGSFEIL.name).forEach { record ->
-                    if (!feil.any { v -> v.sakskompleksId == record.value().sakskompleksId }) {
-                        feil.add(record.value())
-                    }
-                }
-            }
-
-            if (feil.size == forventet) {
-                return feil
-            }
-        }
-
-        throw RuntimeException("fant ikke $forventet behandlingsfeil etter 20 sekunder")
     }
 
     private fun produserSykepengesøknadV2(aktørId: String): SykepengesøknadV2DTO {

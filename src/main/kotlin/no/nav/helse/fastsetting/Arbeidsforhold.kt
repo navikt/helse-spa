@@ -42,7 +42,7 @@ fun vurderArbeidsforhold(fakta : FaktagrunnlagResultat) : Vurdering<Arbeidsforho
     return when {
         arbeidsforholdFakta.none {
             it.arbeidsgiver.identifikator == fakta.sakskompleks.orgnummer
-        } -> Uavklart(Uavklart.Årsak.HAR_IKKE_DATA, "Ingen arbeidsforhold hos aktuell arbeidsgiver", "Søker har ikke arbeidsforhold hos ${fakta.sakskompleks.søknader[0].arbeidsgiver!!.navn}", arbeidsforholdFakta)
-        else -> Vurdering.Avklart(arbeidsforholdFakta.first { it.arbeidsgiver.identifikator == fakta.sakskompleks.orgnummer }, "Søker har et arbeidsforhold hos ${fakta.sakskompleks.søknader[0].arbeidsgiver!!.navn}", arbeidsforholdFakta, "SPA")
+        } -> Uavklart(Uavklart.Årsak.HAR_IKKE_DATA, "Ingen arbeidsforhold hos aktuell arbeidsgiver", "Søker har ikke arbeidsforhold hos ${fakta.sakskompleks.søknader[0].arbeidsgiver.navn}", arbeidsforholdFakta)
+        else -> Vurdering.Avklart(arbeidsforholdFakta.first { it.arbeidsgiver.identifikator == fakta.sakskompleks.orgnummer }, "Søker har et arbeidsforhold hos ${fakta.sakskompleks.søknader[0].arbeidsgiver.navn}", arbeidsforholdFakta, "SPA")
     }
 }

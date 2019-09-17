@@ -48,9 +48,11 @@ class SaksbehandlingStream(val env: Environment) {
     private val consumer: StreamConsumer
 
     init {
-        val streamConfig = if ("true" == env.plainTextKafka) streamConfigPlainTextKafka() else streamConfig(appId, env.bootstrapServersUrl,
-                env.kafkaUsername to env.kafkaPassword,
-                env.navTruststorePath to env.navTruststorePassword)
+        val streamConfig = if ("true" == env.plainTextKafka) streamConfigPlainTextKafka() else streamConfig(
+            appId, env.bootstrapServersUrl,
+            env.kafkaUsername to env.kafkaPassword,
+            env.navTruststorePath to env.navTruststorePassword
+        )
         consumer = StreamConsumer(appId, KafkaStreams(topology(oppslag, probe), streamConfig))
     }
 
@@ -59,7 +61,10 @@ class SaksbehandlingStream(val env: Environment) {
         put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, env.bootstrapServersUrl)
         put(StreamsConfig.APPLICATION_ID_CONFIG, appId)
         put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest")
-        put(StreamsConfig.DEFAULT_DESERIALIZATION_EXCEPTION_HANDLER_CLASS_CONFIG, LogAndFailExceptionHandler::class.java)
+        put(
+            StreamsConfig.DEFAULT_DESERIALIZATION_EXCEPTION_HANDLER_CLASS_CONFIG,
+            LogAndFailExceptionHandler::class.java
+        )
     }
 
     companion object {
@@ -91,9 +96,13 @@ class SaksbehandlingStream(val env: Environment) {
                     }
                 }
                 .filter { _, søknad ->
-                    søknad.type == "OPPHOLD_UTLAND" ||
-                            søknad.type == "SELVSTENDIGE_OG_FRILANSERE" ||
-                            søknad.type == "ARBEIDSTAKERE"
+                    when (søknad.type) {
+                        "ARBEIDSTAKERE" -> true
+                        else -> {
+                            probe.filtrertBortSøknadPgaType(søknad.id, søknad.type)
+                            false
+                        }
+                    }
                 }
                 .peek { søknadId, søknad ->
                     loggMedSøknadId(søknadId) {
@@ -126,8 +135,10 @@ class SaksbehandlingStream(val env: Environment) {
             sendTilVedtakskø(probe, vedtakFraSøknader)
 
             val (behandlingsfeilFraSakskompleks,
-                vedtakFraSakskompleks) = builder.stream<String, JsonNode>(SakskompleksTopic, Consumed.with(Serdes.String(), JsonNodeSerde(objectMapper))
-                .withOffsetResetPolicy(Topology.AutoOffsetReset.EARLIEST))
+                vedtakFraSakskompleks) = builder.stream<String, JsonNode>(
+                SakskompleksTopic, Consumed.with(Serdes.String(), JsonNodeSerde(objectMapper))
+                    .withOffsetResetPolicy(Topology.AutoOffsetReset.EARLIEST)
+            )
                 .mapValues { jsonNode -> Sakskompleks(jsonNode) }
                 .mapValues { _, sakskompleks ->
                     loggMedSakskompleksId(sakskompleks.id) {
@@ -144,34 +155,40 @@ class SaksbehandlingStream(val env: Environment) {
             return builder.build()
         }
 
-        private fun sendTilVedtakskø(probe: SaksbehandlingProbe, vedtak: KStream<String, Either<Behandlingsfeil, SykepengeVedtak>>) {
+        private fun sendTilVedtakskø(
+            probe: SaksbehandlingProbe,
+            vedtak: KStream<String, Either<Behandlingsfeil, SykepengeVedtak>>
+        ) {
             vedtak
-                    .peek { _, _ -> probe.behandlingOk() }
-                    .mapValues { _, sykepengevedtak -> (sykepengevedtak as Either.Right).b }
-                    .peek { _, sykepengevedtak ->
-                        loggMedSakskompleksId(sykepengevedtak.sakskompleks.id) {
-                            probe.vedtakBehandlet(sykepengevedtak)
-                        }
-                    }.mapValues { _, sykepengevedtak ->
-                        loggMedSakskompleksId(sykepengevedtak.sakskompleks.id) {
-                            serialize(sykepengevedtak)
-                        }
-                    }.toTopic(VEDTAK_SYKEPENGER)
+                .peek { _, _ -> probe.behandlingOk() }
+                .mapValues { _, sykepengevedtak -> (sykepengevedtak as Either.Right).b }
+                .peek { _, sykepengevedtak ->
+                    loggMedSakskompleksId(sykepengevedtak.sakskompleks.id) {
+                        probe.vedtakBehandlet(sykepengevedtak)
+                    }
+                }.mapValues { _, sykepengevedtak ->
+                    loggMedSakskompleksId(sykepengevedtak.sakskompleks.id) {
+                        serialize(sykepengevedtak)
+                    }
+                }.toTopic(VEDTAK_SYKEPENGER)
         }
 
-        private fun sendTilFeilkø(probe: SaksbehandlingProbe, feilendeSøknader: KStream<String, Either<Behandlingsfeil, SykepengeVedtak>>) {
+        private fun sendTilFeilkø(
+            probe: SaksbehandlingProbe,
+            feilendeSøknader: KStream<String, Either<Behandlingsfeil, SykepengeVedtak>>
+        ) {
             feilendeSøknader
-                    .peek { _, _ -> probe.behandlingFeil() }
-                    .mapValues { _, behandlingsfeil -> (behandlingsfeil as Either.Left).a }
-                    .peek { _, behandlingsfeil ->
-                        loggMedSakskompleksId(behandlingsfeil.sakskompleksId) {
-                            probe.behandlingsFeilMedType(behandlingsfeil)
-                        }
-                    }.mapValues { _, behandlingsfeil ->
-                        loggMedSakskompleksId(behandlingsfeil.sakskompleksId) {
-                            serializeBehandlingsfeil(behandlingsfeil)
-                        }
-                    }.toTopic(SYKEPENGEBEHANDLINGSFEIL)
+                .peek { _, _ -> probe.behandlingFeil() }
+                .mapValues { _, behandlingsfeil -> (behandlingsfeil as Either.Left).a }
+                .peek { _, behandlingsfeil ->
+                    loggMedSakskompleksId(behandlingsfeil.sakskompleksId) {
+                        probe.behandlingsFeilMedType(behandlingsfeil)
+                    }
+                }.mapValues { _, behandlingsfeil ->
+                    loggMedSakskompleksId(behandlingsfeil.sakskompleksId) {
+                        serializeBehandlingsfeil(behandlingsfeil)
+                    }
+                }.toTopic(SYKEPENGEBEHANDLINGSFEIL)
         }
     }
 
