@@ -4,7 +4,7 @@ val slf4jVersion = "1.7.25"
 val ktorVersion = "1.1.2"
 val prometheusVersion = "0.5.0"
 val gsonVersion = "2.7"
-val navStreamsVersion = "1a24b7e"
+val navStreamsVersion = "d392648"
 val fuelVersion = "1.15.1"
 val arrowVersion = "0.9.0"
 
@@ -61,7 +61,17 @@ dependencies {
     testRuntime("org.junit.jupiter:junit-jupiter-engine:$junitJupiterVersion")
 }
 
+val githubUser: String by project
+val githubPassword: String by project
+
 repositories {
+    maven {
+        credentials {
+            username = githubUser
+            password = githubPassword
+        }
+        setUrl("https://maven.pkg.github.com/navikt/helse-streams")
+    }
     jcenter()
     mavenCentral()
     maven("http://packages.confluent.io/maven/")
