@@ -21,7 +21,7 @@ githubUser=x-access-token
 githubPassword=[token]
 ```
 
-Erstatt `[token]` med et du har [opprettet for anledningen](https://github.com/settings/tokens). 
+Erstatt `[token]` med et du har [opprettet for anledningen](https://github.com/settings/tokens). SSO må enables.
 Tokenet bør scopes med bare `read:packages`, som et sikkerhetstiltak.
 
 Eventuelt kan verdiene også settes via kommandolinjen:
