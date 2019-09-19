@@ -39,15 +39,17 @@ dependencies {
     compile("no.nav.helse:streams:$navStreamsVersion")
     compile("com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion")
     compile("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion")
-    compile("no.nav.helse.sykepenger.lovverk:sykepenger-inngangsvilkar:2018-12-20-101.4f8f899")
-    compile("no.nav.helse.sykepenger.lovverk:sykepenger-beregning:2018-12-20-101.1e2f74a")
-    compile("no.nav:nare:dfe6569")
+    compile("no.nav.helse.sykepenger.lovverk:sykepenger-inngangsvilkar:2018-12-20-101.c76cc03")
+    compile("no.nav.helse.sykepenger.lovverk:sykepenger-beregning:2018-12-20-101.0591027")
+    compile("no.nav:nare:012820b")
 
-    compile("no.nav.helse:maksdato:89af124")
+    compile("no.nav.helse:maksdato:fb586fd")
     compile("no.nav:nare-prometheus:0b41ab4")
     compile("com.github.kittinunf.fuel:fuel:$fuelVersion")
 
     compile("io.arrow-kt:arrow-core-data:$arrowVersion")
+
+    testCompile("org.apache.kafka:kafka-streams-test-utils:2.0.1")
 
     testCompile("com.github.tomakehurst:wiremock:$wireMockVersion") {
         exclude(group = "junit")
@@ -71,6 +73,20 @@ repositories {
             password = githubPassword
         }
         setUrl("https://maven.pkg.github.com/navikt/helse-streams")
+    }
+    maven {
+        credentials {
+            username = githubUser
+            password = githubPassword
+        }
+        setUrl("https://maven.pkg.github.com/navikt/helse-sykepenger-inngangsvilkar")
+    }
+    maven {
+        credentials {
+            username = githubUser
+            password = githubPassword
+        }
+        setUrl("https://maven.pkg.github.com/navikt/helse-sykepenger-beregning")
     }
     jcenter()
     mavenCentral()
