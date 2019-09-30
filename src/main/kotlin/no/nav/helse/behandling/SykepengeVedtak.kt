@@ -5,6 +5,7 @@ import no.nav.helse.sykepenger.beregning.Beregningsresultat
 import no.nav.nare.core.evaluations.Evaluering
 import java.math.BigDecimal
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.util.UUID
 
 data class SykepengeVedtak(
@@ -14,7 +15,8 @@ data class SykepengeVedtak(
         val vilkårsprøving: Evaluering,
         val beregning: Beregningsresultat,
         val vedtak: Vedtak,
-        val behandlingsId: String = UUID.randomUUID().toString()
+        val behandlingsId: String = UUID.randomUUID().toString(),
+        val behandlingstidspunkt: LocalDateTime = LocalDateTime.now()
 )
 
 data class Vedtak(val perioder: List<Vedtaksperiode> = emptyList())
