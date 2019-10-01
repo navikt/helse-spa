@@ -1,0 +1,28 @@
+apiVersion: nais.io/v1alpha1
+kind: Alert
+metadata:
+  name: spa-alerts
+  labels:
+    team: tbd
+spec:
+  receivers:
+    slack:
+      channel: '#team-bømlo-alerts'
+  alerts:
+  - alert: spa-har-ingen-aktive-pods
+    expr: up{app=~"spa",job="kubernetes-pods"} == 0
+    for: 2m
+    description: spa mangler aktive pods i preprod!
+    action: Se `kubectl describe pod {{ $labels.kubernetes_pod_name }}` for events,
+      og `kubectl logs {{ $labels.kubernetes_pod_name }}` for logger
+    sla: respond within 1h, during office hours
+    severity: danger
+  - alert: spa-kontinuerlig-restart
+    expr: sum(increase(kube_pod_container_status_restarts_total{container=~"spa"}[30m]))
+      by (container) > 2
+    for: 5m
+    description: spa mangler aktive pods i preprod!
+    action: Se `kubectl describe pod {{ $labels.kubernetes_pod_name }}` for events,
+      og `kubectl logs {{ $labels.kubernetes_pod_name }}` for logger
+    sla: respond within 1h, during office hours
+    severity: danger
